@@ -1,0 +1,113 @@
+{
+  "initialBytes": 2240228,
+  "files": [
+    {
+      "file": "README.md",
+      "bytes": 6754
+    },
+    {
+      "file": "assets/THREE-LICENSE.txt",
+      "bytes": 1081
+    },
+    {
+      "file": "assets/icon-192.png",
+      "bytes": 13907
+    },
+    {
+      "file": "assets/icon.svg",
+      "bytes": 963
+    },
+    {
+      "file": "index.html",
+      "bytes": 40169
+    },
+    {
+      "file": "js/kulhat.bundle.js",
+      "bytes": 2180758
+    },
+    {
+      "file": "js/platform.js",
+      "bytes": 3350
+    },
+    {
+      "file": "source/RELEASE-README.md",
+      "bytes": 6754
+    },
+    {
+      "file": "source/dist/audio.js",
+      "bytes": 3032
+    },
+    {
+      "file": "source/dist/core.js",
+      "bytes": 38244
+    },
+    {
+      "file": "source/dist/game.js",
+      "bytes": 108034
+    },
+    {
+      "file": "source/dist/icon-192.png",
+      "bytes": 13907
+    },
+    {
+      "file": "source/dist/icon.svg",
+      "bytes": 963
+    },
+    {
+      "file": "source/dist/kulhat.html",
+      "bytes": 40503
+    },
+    {
+      "file": "source/dist/platform.js",
+      "bytes": 3350
+    },
+    {
+      "file": "source/dist/profile.js",
+      "bytes": 4445
+    },
+    {
+      "file": "source/dist/vendor/LICENSE-THREE.txt",
+      "bytes": 1081
+    },
+    {
+      "file": "source/dist/vendor/RoundedBoxGeometry.js",
+      "bytes": 6488
+    },
+    {
+      "file": "source/dist/vendor/three.core.js",
+      "bytes": 1403455
+    },
+    {
+      "file": "source/dist/vendor/three.module.js",
+      "bytes": 603113
+    },
+    {
+      "file": "source/package.json",
+      "bytes": 249
+    },
+    {
+      "file": "source/scripts/export-kulhat.mjs",
+      "bytes": 7496
+    },
+    {
+      "file": "source/tests/audio.test.js",
+      "bytes": 2507
+    },
+    {
+      "file": "source/tests/campaign.test.js",
+      "bytes": 12306
+    },
+    {
+      "file": "source/tests/maps.test.js",
+      "bytes": 1520
+    },
+    {
+      "file": "source/tests/pilot.js",
+      "bytes": 2311
+    },
+    {
+      "file": "source/tests/profile.test.js",
+      "bytes": 3778
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "generated": "2026-10-17T14:10:28.137Z",
+  "checks": [
+    {
+      "name": "Core regression",
+      "passed": true
+    },
+    {
+      "name": "3D and DOM integration",
+      "passed": true
+    },
+    {
+      "name": "KULHAT 800-run campaign soak",
+      "passed": true
+    },
+    {
+      "name": "KIRILMA 160-run combat soak",
+      "passed": true
+    }
+  ],
+  "courier": {
+    "missions": 40,
+    "runs": 800,
+    "completed": 787,
+    "playerLosses": 13,
+    "baselineMinutes": 117
+  },
+  "browserVisualQA": "BLOCKED: supervised preview cannot mount proc (bwrap permission denied)",
+  "realDeviceQA": "NOT RUN",
+  "releaseReady": false
+}

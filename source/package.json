@@ -1,0 +1,9 @@
+{
+  "name": "kulhat-standalone",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/export-kulhat.mjs",
+    "test": "node --test tests/campaign.test.js tests/profile.test.js tests/audio.test.js tests/maps.test.js"
+  }
+}
