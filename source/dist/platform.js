@@ -78,6 +78,14 @@
     },
   };
   window.KULHAT_PLATFORM = platform;
+  // Language rule: Turkish for tr*, English for everything else.
+  const toLang = (tag) => (/^tr\b/i.test(String(tag || "")) ? "tr" : "en");
+  function setLang(tag) {
+    platform.lang = toLang(tag);
+    document.documentElement.lang = platform.lang;
+    const note = document.querySelector("#loading small");
+    if (note && platform.lang === "en") note.textContent = "The city is waking up…";
+  }
   function startGame() {
     const s = document.createElement("script");
     s.src = "./js/kulhat.bundle.js";
@@ -89,12 +97,22 @@
     document.body.append(s);
   }
   if (!yt) {
+    let saved = null;
+    try { saved = localStorage.getItem("kulhat-lang"); } catch {}
+    setLang(saved || /*BROWSER-LANG*/ (navigator.language || "tr") /*END*/);
     startGame();
     return;
   }
   // The loading screen (#loading) is already on screen.
   try { yt.game.firstFrameReady(); } catch {}
-  Promise.resolve()
+  // YouTube decides the language; never the browser locale inside Playables.
+  const language = Promise.race([
+    Promise.resolve().then(() => yt.system.getLanguage()),
+    new Promise((r) => setTimeout(() => r("en"), 1500)),
+  ])
+    .catch(() => "en")
+    .then(setLang);
+  language
     .then(() => yt.game.loadData())
     .then((data) => {
       if (typeof data === "string" && data) memory.set(SAVE_KEY, data);

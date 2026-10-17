@@ -84,7 +84,11 @@ html = html.replace(
   (playables ? `<script src="${YT_SDK}"></script>\n    ` : "") +
     '<script src="./js/platform.js"></script>',
 );
-fs.copyFileSync(path.join(dist, "platform.js"), path.join(output, "js", "platform.js"));
+let platformJs = fs.readFileSync(path.join(dist, "platform.js"), "utf8");
+// Playables must not read browser locale APIs; that fallback only exists for plain web builds.
+if (playables)
+  platformJs = platformJs.replace(/\/\*BROWSER-LANG\*\/[\s\S]*?\/\*END\*\//, '"en"');
+fs.writeFileSync(path.join(output, "js", "platform.js"), platformJs);
 html = html.replaceAll("./icon.svg", "./assets/icon.svg");
 html = html.replaceAll("./icon-192.png", "./assets/icon-192.png");
 fs.writeFileSync(path.join(output, "index.html"), html);
@@ -112,6 +116,7 @@ if (!playables) {
 for (const name of [
   "game.js",
   "platform.js",
+  "i18n.js",
   "core.js",
   "profile.js",
   "audio.js",

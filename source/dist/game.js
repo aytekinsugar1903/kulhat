@@ -16,6 +16,7 @@ import {
   showRewardedAd,
 } from "./profile.js";
 import { GameAudio } from "./audio.js";
+import { L, LANG, setStaticText } from "./i18n.js";
 import {
   Run,
   MISSIONS,
@@ -27,7 +28,10 @@ import {
   TITLE,
   objective,
   missionName,
+  storyText,
 } from "./core.js";
+const UPPER = LANG === "en" ? "en" : "tr",
+  NUMBERS = LANG === "en" ? "en-US" : "tr-TR";
 const mapRecords = () =>
   settings.landscape === "trail" ? settings.trailRecords : settings.records;
 const stageName = (m) => missionName(m, settings.landscape);
@@ -43,7 +47,7 @@ try {
 } catch (e) {
   $("#loading").hidden = true;
   view.innerHTML =
-    '<div class="error"><h2>3D görüntü açılamadı</h2><p>WebGL destekleyen Safari veya Chrome ile açmayı dene.</p></div>';
+    L('<div class="error"><h2>3D görüntü açılamadı</h2><p>WebGL destekleyen Safari veya Chrome ile açmayı dene.</p></div>');
   throw e;
 }
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.65));
@@ -244,7 +248,7 @@ glow("#ffd1ae", -55, 50, -180, 70);
 let segments = [];
 const SEG = 28;
 function sign(text, color, parent, x, y, z) {
-  if (text !== "KAPI") return null;
+  if (text !== L("KAPI")) return null;
   let t = tex(
     (c, w, h) => {
       c.fillStyle = "#0b1e2b";
@@ -270,7 +274,7 @@ function sign(text, color, parent, x, y, z) {
     new T.PlaneGeometry(3.6, 0.9),
     new T.MeshBasicMaterial({ map: t }),
   );
-  o.position.set(x, text === "KAPI" ? y : y + 2.2, z);
+  o.position.set(x, text === L("KAPI") ? y : y + 2.2, z);
   if (parent.userData.rooftop) {
     o.scale.setScalar(1.4);
     o.position.x = x < 0 ? -7.8 : 7.8;
@@ -279,7 +283,7 @@ function sign(text, color, parent, x, y, z) {
   }
   o.userData.ownMat = true;
   o.userData.signText = text;
-  if (text === "KAPI") parent.add(o);
+  if (text === L("KAPI")) parent.add(o);
   else {
     o.material.map.dispose();
     o.material.dispose();
@@ -442,21 +446,21 @@ let ytAudio = platform ? platform.isAudioEnabled() : true,
   systemPaused = false;
 let { settings, profile } = loadGame(storageAdapter, validateSave);
 const TRANSMISSIONS = [
-  "Yayın henüz kilitli. İlk bölge finaline ulaş.",
-  "01 · Biri şehrin tahliye yollarını içeriden kapattı.",
-  "02 · Külhat bir isim değil; kayıp kuryelerin ortak çağrı kodu.",
-  "03 · Takipçi yükün peşinde değil, taşıdığın şehir hafızasının peşinde.",
-  "04 · Altı röle aynı gece susturuldu. İçlerinden biri hâlâ cevap veriyor.",
-  "05 · Son teslimat bir paket değil; şehrin yeniden başlatma anahtarı.",
-  "06 · Yayın tamamlandı: sıradaki hedef, sessizliğin merkezindeki Çekirdek.",
-  "07 · Kızıl Maden'in vinçleri kaçış raylarına vagon bırakıyor.",
-  "08 · Kartal Geçidi açıldı. Kasabanın son konvoyu artık özgür.",
+  L("Yayın henüz kilitli. İlk bölge finaline ulaş."),
+  L("01 · Biri şehrin tahliye yollarını içeriden kapattı."),
+  L("02 · Külhat bir isim değil; kayıp kuryelerin ortak çağrı kodu."),
+  L("03 · Takipçi yükün peşinde değil, taşıdığın şehir hafızasının peşinde."),
+  L("04 · Altı röle aynı gece susturuldu. İçlerinden biri hâlâ cevap veriyor."),
+  L("05 · Son teslimat bir paket değil; şehrin yeniden başlatma anahtarı."),
+  L("06 · Yayın tamamlandı: sıradaki hedef, sessizliğin merkezindeki Çekirdek."),
+  L("07 · Kızıl Maden'in vinçleri kaçış raylarına vagon bırakıyor."),
+  L("08 · Kartal Geçidi açıldı. Kasabanın son konvoyu artık özgür."),
 ];
 const DAILY_CONTRACTS = [
-  { text: "Bir teslimatı başarıyla tamamla", met: (r) => r.success },
-  { text: "Tek koşuda en az 3 dron düşür", met: (r) => r.kills >= 3 },
+  { text: L("Bir teslimatı başarıyla tamamla"), met: (r) => r.success },
+  { text: L("Tek koşuda en az 3 dron düşür"), met: (r) => r.kills >= 3 },
   {
-    text: "Bir kestirme kullanarak teslimatı tamamla",
+    text: L("Bir kestirme kullanarak teslimatı tamamla"),
     met: (r) => r.success && r.routes.includes("risk"),
   },
 ];
@@ -522,8 +526,8 @@ function save() {
   if (!saveGame(storageAdapter, settings, profile)) {
     const el = $("#storage");
     if (el)
-      el.textContent = "Kayıt kullanılamıyor; bu oturumdaki ilerleme bellekte.";
-    else notice("Kayıt kullanılamıyor; ilerleme bu oturumda bellekte.", 4);
+      el.textContent = L("Kayıt kullanılamıyor; bu oturumdaki ilerleme bellekte.");
+    else notice(L("Kayıt kullanılamıyor; ilerleme bu oturumda bellekte."), 4);
   }
 }
 function sound(f = 400, d = 0.1, type = "sine") {
@@ -544,7 +548,7 @@ function setQuality(q) {
   skyline.visible = !low;
   dust.children.forEach((cloud, i) => (cloud.visible = !low || i < 2));
   rain.material.opacity = low ? 0 : 0.5;
-  $("#quality").textContent = low ? "GÖRÜNTÜ: EKONOMİK" : "GÖRÜNTÜ: YÜKSEK";
+  $("#quality").textContent = low ? L("GÖRÜNTÜ: EKONOMİK") : L("GÖRÜNTÜ: YÜKSEK");
 }
 function cleanup(group) {
   group.parent?.remove(group);
@@ -627,37 +631,59 @@ function burst(position, color, count = 16) {
 }
 function westernText(text) {
   if (settings.landscape !== "western" || typeof text !== "string") return text;
-  return text
-    .replaceAll("dron düşür", "at arabası durdur")
-    .replaceAll("Drona", "At arabasına")
-    .replaceAll("Dronları vurmak", "Arabaları durdurmak")
-    .replaceAll("dronları devre dışı bırakır", "arabaları durdurur")
-    .replaceAll("DRONLARI", "ARABALARI")
-    .replaceAll("DRONLAR DEVRE DIŞI", "ARABALAR DURDURULDU")
-    .replaceAll("METRO", "MADEN")
-    .replaceAll("metro", "maden");
+  const pairs =
+    LANG === "en"
+      ? [
+          ["disables drones", "stops wagons"],
+          ["Shooting drones", "Stopping wagons"],
+          ["Shoot down", "Stop"],
+          ["a drone", "a wagon"],
+          ["DRONES DISABLED", "WAGONS STOPPED"],
+          ["DRONES", "WAGONS"],
+          ["drones", "wagons"],
+          ["slide under lasers", "slide under low beams"],
+          ["slide under the laser", "slide under low beams"],
+          ["covered metro", "mine shaft"],
+          ["METRO", "MINE"],
+          ["metro", "mine"],
+        ]
+      : [
+          ["dron düşür", "at arabası durdur"],
+          ["Drona", "At arabasına"],
+          ["Dronları vurmak", "Arabaları durdurmak"],
+          ["dronları devre dışı bırakır", "arabaları durdurur"],
+          ["DRONLARI", "ARABALARI"],
+          [L("DRONLAR DEVRE DIŞI"), "ARABALAR DURDURULDU"],
+          ["lazerlerin altından", "alçak kirişlerin altından"],
+          ["lazerin altından", "alçak kirişlerin altından"],
+          ["kapalı metroya", "maden ocağına"],
+          ["METRO", "MADEN"],
+          ["metro", "maden"],
+        ];
+  for (const [from, to] of pairs) text = text.replaceAll(from, to);
+  return text;
 }
 function routeLabels() {
   return settings.landscape === "western"
-    ? { left: "MADEN OCAĞI", middle: "ANA CADDE", right: "ÇATILAR" }
-    : { left: "MAĞARA", middle: "PATİKA", right: "SIRT YOLU" };
+    ? { left: L("MADEN OCAĞI"), middle: L("ANA CADDE"), right: L("ÇATILAR") }
+    : { left: L("MAĞARA"), middle: L("PATİKA"), right: L("SIRT YOLU") };
 }
 function routeHint() {
   const names = routeLabels();
   return (
-    "SOL: " + names.left + " · ORTA: " + names.middle + " · SAĞ: " + names.right
+    L("SOL: ") + names.left + L(" · ORTA: ") + names.middle + L(" · SAĞ: ") + names.right
   );
 }
 function cargoLabel(kind) {
   return (
     {
-      data: "Standart paket",
-      heavy: "Ağır paket",
-      fragile: "Kırılgan yük",
-      medical: "Tıbbi malzeme",
-      volatile: "Hassas yük",
-      core: "Özel emanet",
-    }[kind] || "Paket"
+      data: L("Standart paket"),
+      heavy: L("Ağır paket"),
+      fragile: L("Kırılgan yük"),
+      medical: L("Tıbbi malzeme"),
+      volatile: L("Hassas yük"),
+      core: L("Özel emanet"),
+    }[kind] || L("Paket")
   );
 }
 function notice(text, duration = 2) {
@@ -747,10 +773,11 @@ function dressRoute(g, kind, variant = 0, district = 0) {
             box(0.06, 1.1, 0.19, wood, side * 10 + dx, 1.9, z + 5, d);
           }
           box(0.25, 1.25, 9.8, wood, side * 6.9, 4.7, z, d);
-          box(2.6, 0.22, 10.6, mat("#a58157"), side * 6, 2.65, z, d);
+          box(2.7, 0.18, 10.6, mat("#6f5236"), side * 6, 3.25, z, d).rotation.z =
+            side * 0.22;
           box(2.8, 0.22, 10.6, mat("#8c6d4d"), side * 6, 0.1, z, d);
           for (let dz of quality === "low" ? [-3.8, 3.8] : [-3.8, 0, 3.8]) {
-            box(0.16, 2.6, 0.16, mat("#73573c"), side * 5.5, 1.3, z + dz, d);
+            box(0.16, 3.05, 0.16, mat("#73573c"), side * 5.5, 1.52, z + dz, d);
             box(0.1, 1.3, 1.1, mat("#352e28"), side * 6.94, 1.5, z + dz, d);
             box(0.13, 0.1, 1.35, mat("#c5a575"), side * 6.88, 2.2, z + dz, d);
           }
@@ -769,14 +796,14 @@ function dressRoute(g, kind, variant = 0, district = 0) {
             box(0.15, 0.12, 7, mat("#ad774a"), side * 6.3, y, z - 5, d);
           sign(
             [
-              "SALOON",
-              "ŞERİF",
-              "GENEL MAĞAZA",
-              "POSTA",
-              "AHIR",
-              "DEMİRCİ",
-              "İSTASYON",
-              "ESKİ HAN",
+              L("SALOON"),
+              L("ŞERİF"),
+              L("GENEL MAĞAZA"),
+              L("POSTA"),
+              L("AHIR"),
+              L("DEMİRCİ"),
+              L("İSTASYON"),
+              L("ESKİ HAN"),
             ][variant],
             "#eacb91",
             d,
@@ -804,10 +831,10 @@ function dressRoute(g, kind, variant = 0, district = 0) {
   if (kind === "legacy-street") {
     if (variant >= 4) {
       let name = [
-        "LİMAN CADDESİ",
-        "TRAMVAY BULVARI",
-        "SANAT SOKAĞI",
-        "ESKİ ŞEHİR",
+        L("LİMAN CADDESİ"),
+        L("TRAMVAY BULVARI"),
+        L("SANAT SOKAĞI"),
+        L("ESKİ ŞEHİR"),
       ][variant - 4];
       for (let side of [-1, 1]) {
         box(
@@ -869,7 +896,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
             d,
           ).rotation.z = side * 0.12;
         sign(
-          side < 0 ? "BAKIR PAZAR" : "GECE ÇARŞISI",
+          side < 0 ? L("BAKIR PAZAR") : L("GECE ÇARŞISI"),
           "#ffd28e",
           d,
           side * 6.2,
@@ -883,7 +910,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         for (let side of [-1, 1])
           box(0.22, 5.4, 0.22, mat("#65737b"), side * 5.6, 2.7, z, d);
       }
-      sign("İNŞA HATTI · 04", "#ffb35f", d, 0, 6.2, -11);
+      sign(L("İNŞA HATTI · 04"), "#ffb35f", d, 0, 6.2, -11);
     } else if (variant === 2) {
       for (let side of [-1, 1])
         for (let z of [-4, -10, -16, -22]) {
@@ -913,7 +940,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         for (let z of [-4, -12, -20])
           box(1.1, 1.1, 2.4, mat("#bf7254", 0.35, 0.3), side * 5.2, 2.8, z, d);
       }
-      sign("TÜRBİN SOKAĞI", "#ff8b6d", d, 0, 5.5, -20);
+      sign(L("TÜRBİN SOKAĞI"), "#ff8b6d", d, 0, 5.5, -20);
     }
     return;
   }
@@ -958,14 +985,14 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         box(11.5, 0.45, 0.55, mat("#765638"), 0, 6.3, z, d);
       sign(
         [
-          "KÖMÜR DAMARI",
-          "VİNÇ KUYUSU",
-          "KIZIL TÜNEL",
-          "ÜÇ RAY",
-          "CEVHER HATTI",
-          "ESKİ ŞAFT",
-          "VAGON DEPOSU",
-          "DERİN MADEN",
+          L("KÖMÜR DAMARI"),
+          L("VİNÇ KUYUSU"),
+          L("KIZIL TÜNEL"),
+          L("ÜÇ RAY"),
+          L("CEVHER HATTI"),
+          L("ESKİ ŞAFT"),
+          L("VAGON DEPOSU"),
+          L("DERİN MADEN"),
         ][variant],
         "#ffd18a",
         d,
@@ -1005,7 +1032,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         box(0.12, 1, 3, mat("#eb806a"), side * 5.68, 3, z - 2, d);
       }
       sign(
-        side < 0 ? "M2 · SON İSTASYON" : "ÇIKIŞ →",
+        side < 0 ? L("M2 · SON İSTASYON") : L("ÇIKIŞ →"),
         "#78ffdc",
         d,
         side * 3.9,
@@ -1017,10 +1044,10 @@ function dressRoute(g, kind, variant = 0, district = 0) {
       box(7, 0.1, 0.4, mat("#d8fffa", 0.3, 0.1, "#8bded5"), 0, 6.65, z, d);
     if (variant >= 4) {
       let names = [
-        "M4 · AKTARMA İSTASYONU",
-        "ESKİ TAŞ TÜNEL",
-        "KARGO METROSU",
-        "M7 · MAVİ HAT",
+        L("M4 · AKTARMA İSTASYONU"),
+        L("ESKİ TAŞ TÜNEL"),
+        L("KARGO METROSU"),
+        L("M7 · MAVİ HAT"),
       ];
       for (let side of [-1, 1]) {
         for (let z of [-5, -13, -21]) {
@@ -1063,7 +1090,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         );
       for (let side of [-1, 1])
         box(0.34, 0.34, 25, mat("#cf704e"), side * 4.9, 4.7, -14, d);
-      sign("BAKIM TÜNELİ", "#ffad67", d, 0, 4.3, -17);
+      sign(L("BAKIM TÜNELİ"), "#ffad67", d, 0, 4.3, -17);
     } else if (variant === 2) {
       for (let side of [-1, 1]) {
         box(
@@ -1079,7 +1106,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         for (let z of [-4, -11, -18, -25])
           orb(0.2, mat("#8bf4e2", 0.2, 0.1, "#45aa9e"), side * 4.8, 0.35, z, d);
       }
-      sign("SU SERVİS GALERİSİ", "#8beee5", d, 0, 5, -12);
+      sign(L("SU SERVİS GALERİSİ"), "#8beee5", d, 0, 5, -12);
     } else if (variant === 3) {
       for (let side of [-1, 1])
         for (let z of [-4, -10, -16, -22])
@@ -1098,7 +1125,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
             z,
             d,
           );
-      sign("NEON TERMİNAL", "#ff8bd0", d, 0, 4.7, -18);
+      sign(L("NEON TERMİNAL"), "#ff8bd0", d, 0, 4.7, -18);
     }
   } else {
     d.userData.rooftop = true;
@@ -1157,7 +1184,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
           d,
         );
     }
-    sign("GÖKYÜZÜ BAHÇELERİ", "#ffe1a0", d, 0, 4.6, -23);
+    sign(L("GÖKYÜZÜ BAHÇELERİ"), "#ffe1a0", d, 0, 4.6, -23);
     box(10, 0.12, 0.12, mat("#395262"), 0, 5, -23, d);
     for (let x = -4; x <= 4; x += 2)
       orb(
@@ -1175,10 +1202,10 @@ function dressRoute(g, kind, variant = 0, district = 0) {
       );
     if (variant >= 4) {
       let names = [
-        "ANTEN ÇATILARI",
-        "SU KULELERİ",
-        "RENKLİ TERASLAR",
-        "YÜKSEK KÖPRÜLER",
+        L("ANTEN ÇATILARI"),
+        L("SU KULELERİ"),
+        L("RENKLİ TERASLAR"),
+        L("YÜKSEK KÖPRÜLER"),
       ];
       for (let side of [-1, 1]) {
         for (let z of [-5, -18]) {
@@ -1222,7 +1249,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         for (let side of [-1, 1])
           box(1.1, 0.65, 2.2, mat("#55ac93"), side * 5.6, 0.4, z, d);
       }
-      sign("AÇIK BAHÇELER", "#91fff0", d, 0, 5.3, -19);
+      sign(L("AÇIK BAHÇELER"), "#91fff0", d, 0, 5.3, -19);
     } else if (variant === 2) {
       for (let side of [-1, 1])
         for (let z of [-5, -12, -19]) {
@@ -1246,7 +1273,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         fan.position.set(side * 4.2, 0.35, -14);
         d.add(fan);
       }
-      sign("GÜNEŞ TERASI", "#ffd074", d, 0, 4.8, -22);
+      sign(L("GÜNEŞ TERASI"), "#ffd074", d, 0, 4.8, -22);
     } else if (variant === 3) {
       for (let z of [-4, -10, -16, -22]) {
         box(9, 0.08, 0.08, mat("#5b506f"), 0, 4.1, z, d);
@@ -1265,7 +1292,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
             d,
           );
       }
-      sign("GÖK PAZARI", "#ff9bcf", d, 0, 5.2, -16);
+      sign(L("GÖK PAZARI"), "#ff9bcf", d, 0, 5.2, -16);
     }
     for (let o of d.children) {
       let shape = o.geometry?.parameters;
@@ -1337,7 +1364,7 @@ function generateRegion(i) {
     if (i === 4) {
       for (let side of [-1, 1]) {
         box(1.1, 2.1, 0.5, mat("#c3bda9"), side * 6.4, 1.2, -10, decor);
-        sign("QUARANTINE", "#f69e87", decor, side * 8, 4, -14);
+        sign(L("QUARANTINE"), "#f69e87", decor, side * 8, 4, -14);
       }
     }
     if (i === 5) {
@@ -1570,7 +1597,13 @@ function createObject(o, tracked = true) {
       g.userData.train = true;
     }
   }
-  if (o.type === "laser") {
+  if (o.type === "laser" && settings.landscape === "western") {
+    // Western: same slide-under hazard, drawn as a low wooden beam on posts.
+    const beam = mat("#8a5a32", 0.05, 0.9);
+    for (let s of [-1, 1]) box(0.3, 3.3, 0.3, mat("#5e4029", 0.05, 0.9), s * 1.4, 1.65, 0, g);
+    box(3.1, 0.45, 0.4, beam, 0, 1.85, 0, g);
+    box(2.6, 0.12, 0.42, mat("#f0b871", 0.3, 0.4, "#91613a"), 0, 1.55, 0, g);
+  } else if (o.type === "laser") {
     for (let s of [-1, 1]) box(0.15, 3.3, 0.35, metal, s * 1.4, 1.65, 0, g);
     for (let y of [1.6, 2.05])
       box(2.8, 0.1, 0.15, mat("#eb9a85", 0.2, 0.3, "#e56150"), 0, y, 0, g);
@@ -1732,7 +1765,7 @@ function createObject(o, tracked = true) {
   if (o.type === "panel") {
     box(0.25, 2.6, 0.4, metal, 0, 1.3, 0, g);
     box(1, 1.1, 0.2, mat("#59babc", 0.3, 0.2, "#367e83"), 0, 1.9, 0.3, g);
-    sign("KAPI", "#94ece0", g, 0, 1.9, 0.42);
+    sign(L("KAPI"), "#94ece0", g, 0, 1.9, 0.42);
   }
   if (tracked) {
     scene.add(g);
@@ -1762,7 +1795,7 @@ for (let side of [-1, 1]) {
       );
     }
     sign(
-      settings.landscape === "western" ? "MADEN OCAĞI" : "M2 · METRO",
+      settings.landscape === "western" ? L("MADEN OCAĞI") : L("M2 · METRO"),
       "#ffd396",
       entry,
       0,
@@ -1785,12 +1818,12 @@ for (let side of [-1, 1]) {
       );
       for (let z of [-9, -20]) orb(0.8, mat("#5baa83"), x, 3, z, entry);
     }
-    sign("ÇATI BAHÇELERİ ↑", "#ffd393", entry, 0, 5, -5);
+    sign(L("ÇATI BAHÇELERİ ↑"), "#ffd393", entry, 0, 5, -5);
   }
   let road = box(4, 0.08, 45, roadMat, side * 5, -0.05, -4, forkVisual);
   road.rotation.y = side * -0.22;
   sign(
-    side < 0 ? "MADEN ↓ +70m" : "ÇATILAR ↑ −90m",
+    side < 0 ? L("MADEN ↓ +70m") : L("ÇATILAR ↑ −90m"),
     side < 0 ? "#8ce7d2" : "#f2b18c",
     forkVisual,
     side * 3.5,
@@ -1799,7 +1832,7 @@ for (let side of [-1, 1]) {
   );
   box(0.15, 4, 0.15, mat("#667f89"), side * 3.5, 2, 0, forkVisual);
 }
-sign("SOKAK ↑ · ◆ ELMAS", "#c9afff", forkVisual, 0, 6.7, -8);
+sign(L("SOKAK ↑ · ◆ ELMAS"), "#c9afff", forkVisual, 0, 6.7, -8);
 // Directions are drawn once in the viewport-safe HTML strip, above GPU glows.
 const redundantSigns = [];
 forkVisual.traverse((o) => {
@@ -1893,14 +1926,14 @@ function openMission(id, endless = false) {
   initAmbient();
   notice(
     id === 0
-      ? "YUKARI KAYDIR: ZIPLA · SAĞ/SOL: KAÇ"
-      : stageName(run.mission).toLocaleUpperCase("tr") +
+      ? L("YUKARI KAYDIR: ZIPLA · SAĞ/SOL: KAÇ")
+      : stageName(run.mission).toLocaleUpperCase(UPPER) +
           " · " +
           cargoLabel(run.mission.cargo),
     3,
   );
   $("#hint").textContent =
-    "KAYDIR: KAÇ / ZIPLA / KAY · HEDEFE DOKUN VEYA BASILI TUT: ATEŞ";
+    L("KAYDIR: KAÇ / ZIPLA / KAY · HEDEFE DOKUN VEYA BASILI TUT: ATEŞ");
   updateHud();
 }
 function showMenu() {
@@ -1939,15 +1972,15 @@ function showMenu() {
     contract = dailyContract(),
     dailyDone = settings.daily.day === contract.key && settings.daily.done;
   $("#menu").innerHTML =
-    '<div class="card campaign"><div class="quick-tools"><button id="armoryShortcut">SİLAH DEPOSU ↗</button></div><div class="eyebrow">KÜLHAT · SON TESLİMAT</div><h1>Şehir sustu. <br>Sen <em>durma.</em></h1><p class="intro">Yükünü koru. Takipçiyi atlat. Kestirmeyi seç ya da güvenli yoldan git. Çevreyi silaha dönüştür.</p><div class="menu-summary"><span>◈ ' +
+    L('<div class="card campaign"><div class="quick-tools"><button id="armoryShortcut">SİLAH DEPOSU ↗</button></div><div class="eyebrow">KÜLHAT · SON TESLİMAT</div><h1>Şehir sustu. <br>Sen <em>durma.</em></h1><p class="intro">Yükünü koru. Takipçiyi atlat. Kestirmeyi seç ya da güvenli yoldan git. Çevreyi silaha dönüştür.</p><div class="menu-summary"><span>◈ ') +
     settings.coins +
-    " altın</span><span>◆ " +
+    L(" altın</span><span>◆ ") +
     settings.diamonds +
-    " elmas</span><span>★ " +
+    L(" elmas</span><span>★ ") +
     starCount +
     " / 120</span><span>" +
     Object.keys(mapRecords()).length +
-    ' / 40 teslimat</span></div><div class="retention-grid"><div class="retention-card"><b>KAYIP YAYIN · ' +
+    L(' / 40 teslimat</span></div><div class="retention-grid"><div class="retention-card"><b>KAYIP YAYIN · ') +
     signalCount +
     "/8</b><span>" +
     TRANSMISSIONS[signalCount] +
@@ -1955,9 +1988,9 @@ function showMenu() {
     (signalCount / 8) * 100 +
     '%"></i></div><div class="retention-card ' +
     (dailyDone ? "complete" : "") +
-    '"><b>BUGÜNÜN KONTRATI</b><span>' +
+    L('"><b>BUGÜNÜN KONTRATI</b><span>') +
     contract.text +
-    (dailyDone ? " · TAMAMLANDI" : " · ÖDÜL ◈120 + ◆1") +
+    (dailyDone ? L(" · TAMAMLANDI") : L(" · ÖDÜL ◈120 + ◆1")) +
     '</span><i style="width:' +
     (dailyDone ? 100 : 0) +
     '%"></i></div></div><div class="district-tabs">' +
@@ -1968,15 +2001,15 @@ function showMenu() {
         '" class="' +
         (page === i ? "active" : "") +
         '" aria-label="' +
-        "Etap grubu " +
+        L("Etap grubu ") +
         (i + 1) +
         '">0' +
         (i + 1) +
         "</button>",
     ).join("") +
     '</div><div class="district-name">' +
-    (settings.landscape === "western" ? "WESTERN KASABASI" : "DAĞ PATİKASI") +
-    " · ETAP GRUBU " +
+    (settings.landscape === "western" ? L("WESTERN KASABASI") : L("DAĞ PATİKASI")) +
+    L(" · ETAP GRUBU ") +
     String(page + 1).padStart(2, "0") +
     '</div><div class="mission-list">' +
     MISSIONS.filter((m) => m.district === page)
@@ -1997,26 +2030,26 @@ function showMenu() {
           " · " +
           Math.round(m.length / 100) / 10 +
           " km " +
-          "· TEHDİT " +
+          L("· TEHDİT ") +
           m.threat +
           "/8 " +
-          (m.boss ? "· TAKİP" : "") +
+          (m.boss ? L("· TAKİP") : "") +
           "</small><span>" +
           (mapRecords()[m.id]
             ? "★".repeat(mapRecords()[m.id].stars)
             : m.id >= settings.unlocked && !settings.freePlay
-              ? "KİLİTLİ"
-              : "HAZIR") +
+              ? L("KİLİTLİ")
+              : L("HAZIR")) +
           "</span></button>",
       )
       .join("") +
-    '</div><div class="mission-objective">★ YAN HEDEF: ' +
+    L('</div><div class="mission-objective">★ YAN HEDEF: ') +
     objective(MISSIONS[selected]).text +
-    '</div><div class="mode-groups"><div class="choice-group"><h2>ZORLUK</h2><div class="row contract-options" role="group" aria-label="Zorluk">' +
+    L('</div><div class="mode-groups"><div class="choice-group"><h2>ZORLUK</h2><div class="row contract-options" role="group" aria-label="Zorluk">') +
     [
-      ["standard", "STANDART · ×1"],
-      ["bounty", "AVCI · +%10 HIZ · ×1,5 ALTIN"],
-      ["elite", "ELİT · +%20 HIZ · ×2 ALTIN"],
+      ["standard", L("STANDART · ×1")],
+      ["bounty", L("AVCI · +%10 HIZ · ×1,5 ALTIN")],
+      ["elite", L("ELİT · +%20 HIZ · ×2 ALTIN")],
     ]
       .map(
         ([id, label]) =>
@@ -2031,10 +2064,10 @@ function showMenu() {
           "</button>",
       )
       .join("") +
-    '</div></div><div class="choice-group"><h2>HARİTA</h2><div class="row landscape-options" role="group" aria-label="Harita">' +
+    L('</div></div><div class="choice-group"><h2>HARİTA</h2><div class="row landscape-options" role="group" aria-label="Harita">') +
     [
-      ["western", "WESTERN KASABASI"],
-      ["trail", "DAĞ PATİKASI"],
+      ["western", L("WESTERN KASABASI")],
+      ["trail", L("DAĞ PATİKASI")],
     ]
       .map(
         ([id, label]) =>
@@ -2051,17 +2084,17 @@ function showMenu() {
       .join("") +
     '</div></div></div><div class="row"><button id="freeplay">' +
     (settings.freePlay
-      ? "SERBEST KEŞİF · 40 ETAP AÇIK"
-      : "TÜM ETAPLARI DENE · SERBEST KEŞİF") +
+      ? L("SERBEST KEŞİF · 40 ETAP AÇIK")
+      : L("TÜM ETAPLARI DENE · SERBEST KEŞİF")) +
     '</button></div><div class="row"><button class="primary" id="launch" ' +
     (selected >= settings.unlocked && !settings.freePlay ? "disabled" : "") +
     ">" +
     String(selected + 1).padStart(2, "0") +
-    ' · TESLİMATA BAŞLA ↗</button><button id="openArmory">SİLAH DEPOSU</button>' +
-    (settings.records[39] || settings.trailRecords[39] ? '<button id="endless">Sonsuz koşu</button>' : "") +
-    '</div><section id="armory-panel" class="armory-panel" role="dialog" aria-modal="true" aria-label="Silah deposu" ' +
+    L(' · TESLİMATA BAŞLA ↗</button><button id="openArmory">SİLAH DEPOSU</button>') +
+    (settings.records[39] || settings.trailRecords[39] ? L('<button id="endless">Sonsuz koşu</button>') : "") +
+    L('</div><section id="armory-panel" class="armory-panel" role="dialog" aria-modal="true" aria-label="Silah deposu" ') +
     (armoryOpen ? "" : "hidden") +
-    '><div class="armory-heading"><h2>SİLAH DEPOSU</h2><button id="closeArmory">KAPAT ✕</button></div><div class="arsenal">' +
+    L('><div class="armory-heading"><h2>SİLAH DEPOSU</h2><button id="closeArmory">KAPAT ✕</button></div><div class="arsenal">') +
     Object.entries(COURIER_WEAPONS)
       .map(([id, w]) => {
         let owned = settings.ownedWeapons.includes(id),
@@ -2074,9 +2107,9 @@ function showMenu() {
           (settings.weapon === id ? "selected" : "") +
           '"><b>' +
           w.name +
-          " · SV " +
+          L(" · SV ") +
           (level + 1) +
-          " · USTALIK " +
+          L(" · USTALIK ") +
           masteryLevel(settings.weaponMastery[id]) +
           "/4</b><small>" +
           w.desc +
@@ -2085,26 +2118,26 @@ function showMenu() {
           '">' +
           (owned
             ? settings.weapon === id
-              ? "KUŞANILDI"
-              : "KUŞAN"
-            : "SATIN AL · " + price) +
+              ? L("KUŞANILDI")
+              : L("KUŞAN")
+            : L("SATIN AL · ") + price) +
           '</button><button data-weapon-upgrade="' +
           id +
           '" ' +
           (!owned || level >= 4 ? "disabled" : "") +
           ">" +
           (level >= 4
-            ? "AZAMİ SEVİYE"
-            : "GÜÇLENDİR · " +
+            ? L("AZAMİ SEVİYE")
+            : L("GÜÇLENDİR · ") +
               (upgradeCoins ? "◈ " + upgradeCoins : "◆ " + upgradeDiamonds)) +
           "</button></div></div>"
         );
       })
       .join("") +
-    '</div><div class="district-name">ZIRH VE YÜK</div><div class="upgrade">' +
+    L('</div><div class="district-name">ZIRH VE YÜK</div><div class="upgrade">') +
     [
-      ["shield", "Kalkan", 40, 3],
-      ["cargo", "Yük koruması", 60, 3],
+      ["shield", L("Kalkan"), 40, 3],
+      ["cargo", L("Yük koruması"), 60, 3],
     ]
       .map(
         ([key, title, cost, max]) =>
@@ -2123,15 +2156,15 @@ function showMenu() {
           "</small></button>",
       )
       .join("") +
-    '</div></section><div class="tip">Telefonda doğrudan kaydır. Hedefe dokunarak ateş et.<br>PC: WASD / oklar · Space ateş · Esc duraklat.<br>40 görev + 120 yıldız + kampanya sonrası sonsuz koşu.</div><div class="menu-settings"><button id="sound">SES ' +
-    (muted ? "KAPALI" : "AÇIK") +
+    L('</div></section><div class="tip">Telefonda doğrudan kaydır. Hedefe dokunarak ateş et.<br>PC: WASD / oklar · Space ateş · Esc duraklat.<br>40 görev + 120 yıldız + kampanya sonrası sonsuz koşu.</div><div class="menu-settings"><button id="sound">SES ') +
+    (muted ? L("KAPALI") : L("AÇIK")) +
     '</button><button id="display">' +
-    (quality === "low" ? "GÖRÜNTÜ: EKONOMİK" : "GÖRÜNTÜ: YÜKSEK") +
-    '</button><button id="controls">NASIL OYNANIR?</button><button id="dailyHub">GÜNLÜK ÖDÜLLER</button><button id="costumeHub">KOSTÜMLER</button></div><div id="storage" class="storage">İlerleme bu tarayıcıda saklanır.</div><div class="build-label">Yayın adayı · Cihaz ve platform kontrolleri bekleniyor.</div></div>';
+    (quality === "low" ? L("GÖRÜNTÜ: EKONOMİK") : L("GÖRÜNTÜ: YÜKSEK")) +
+    L('</button><button id="controls">NASIL OYNANIR?</button><button id="dailyHub">GÜNLÜK ÖDÜLLER</button><button id="costumeHub">KOSTÜMLER</button></div><div id="storage" class="storage">İlerleme bu tarayıcıda saklanır.</div><div class="build-label">Yayın adayı · Cihaz ve platform kontrolleri bekleniyor.</div></div>');
   const scorePanel =
-    '<aside class="scoreboard"><h2>PUAN TABLOSU · BU CİHAZ</h2><p>En iyi 10 koşun</p>' +
+    L('<aside class="scoreboard"><h2>PUAN TABLOSU · BU CİHAZ</h2><p>En iyi 10 koşun</p>') +
     (settings.leaderboard.length
-      ? '<table style="width:100%;text-align:left"><tr><th>#</th><th>Bölüm</th><th>Puan</th></tr>' +
+      ? L('<table style="width:100%;text-align:left"><tr><th>#</th><th>Bölüm</th><th>Puan</th></tr>') +
         settings.leaderboard
           .map(
             (r, i) =>
@@ -2141,12 +2174,12 @@ function showMenu() {
               missionName(MISSIONS[r.mission], r.landscape || "western") +
               (r.success ? " ★" : "") +
               "</td><td>" +
-              r.score.toLocaleString("tr-TR") +
+              r.score.toLocaleString(NUMBERS) +
               "</td></tr>",
           )
           .join("") +
         "</table>"
-      : "<p>İlk koşunu tamamlayınca puanın burada görünecek.</p>") +
+      : L("<p>İlk koşunu tamamlayınca puanın burada görünecek.</p>")) +
     "</aside>";
   const panelEnd = $("#menu").innerHTML.lastIndexOf("</div>");
   $("#menu").innerHTML =
@@ -2279,11 +2312,25 @@ function showMenu() {
           }
         }),
     );
+  if (!inPlayables) {
+    // Language toggle (outside YouTube only; inside, the YouTube language is used).
+    $("#menu .menu-settings")?.insertAdjacentHTML(
+      "beforeend",
+      '<button id="langToggle" lang="' + (LANG === "en" ? "tr" : "en") + '">' +
+        (LANG === "en" ? "TÜRKÇE" : "ENGLISH") + "</button>",
+    );
+    $("#langToggle").onclick = () => {
+      try {
+        localStorage.setItem("kulhat-lang", LANG === "en" ? "tr" : "en");
+      } catch {}
+      location.reload();
+    };
+  }
   if (inPlayables) {
     // YouTube's own mute control is the overall switch inside Playables.
     $("#sound").hidden = true;
     const storageNote = $("#storage");
-    if (storageNote) storageNote.textContent = "İlerleme YouTube'da saklanır.";
+    if (storageNote) storageNote.textContent = L("İlerleme YouTube'da saklanır.");
   }
   $("#sound").onclick = () => {
     muted = !muted;
@@ -2315,15 +2362,15 @@ function showProfile(tab = "daily") {
       })();
   const content =
     tab === "daily"
-      ? '<h2>7 GÜNLÜK GİRİŞ ÖDÜLÜ</h2><div class="login-calendar">' +
+      ? L('<h2>7 GÜNLÜK GİRİŞ ÖDÜLÜ</h2><div class="login-calendar">') +
         LOGIN_REWARDS.map(
           (coins, i) =>
             '<div class="login-day ' +
             (i + 1 === currentDay ? "today " : "") +
             (loginTaken && i < profile.login.streak ? "claimed" : "") +
             '"><b>' +
-            (i + 1) +
-            ". GÜN</b><span>◈ " +
+            (LANG === "en" ? "DAY " + (i + 1) : i + 1 + ". GÜN") +
+            "</b><span>◈ " +
             coins +
             "</span>" +
             (loginTaken && i + 1 === currentDay ? "✓" : "") +
@@ -2332,8 +2379,8 @@ function showProfile(tab = "daily") {
         '</div><button id="claimLogin" class="primary" ' +
         (loginTaken ? "disabled" : "") +
         ">" +
-        (loginTaken ? "BUGÜN ALINDI" : "BUGÜNÜN ÖDÜLÜNÜ AL") +
-        '</button><h2>BUGÜNÜN 3 GÖREVİ</h2><p>Koşu bitince ilerleme kaydedilir. Her gün yenilenir.</p><div class="daily-tasks">' +
+        (loginTaken ? L("BUGÜN ALINDI") : L("BUGÜNÜN ÖDÜLÜNÜ AL")) +
+        L('</button><h2>BUGÜNÜN 3 GÖREVİ</h2><p>Koşu bitince ilerleme kaydedilir. Her gün yenilenir.</p><div class="daily-tasks">') +
         TASKS.map(
           (task, i) =>
             "<div><b>" +
@@ -2355,11 +2402,11 @@ function showProfile(tab = "daily") {
               ? "disabled"
               : "") +
             ">" +
-            (state.claimed.includes(i) ? "ALINDI" : "ÖDÜLÜ AL") +
+            (state.claimed.includes(i) ? L("ALINDI") : L("ÖDÜLÜ AL")) +
             "</button></div>",
         ).join("") +
         "</div>"
-      : '<h2>KURYE KOSTÜMLERİ</h2><p>Yalnızca görünüm değişir. Güç ve hız aynıdır.</p><div class="costume-grid">' +
+      : L('<h2>KURYE KOSTÜMLERİ</h2><p>Yalnızca görünüm değişir. Güç ve hız aynıdır.</p><div class="costume-grid">') +
         COSTUMES.map(
           (c) =>
             '<button data-costume="' +
@@ -2380,9 +2427,9 @@ function showProfile(tab = "daily") {
             c.name +
             "</b><small>" +
             (profile.costume === c.id
-              ? "KUŞANILDI"
+              ? L("KUŞANILDI")
               : profile.costumes.includes(c.id)
-                ? "KUŞAN"
+                ? L("KUŞAN")
                 : "◈ " + c.price) +
             "</small></button>",
         ).join("") +
@@ -2390,15 +2437,15 @@ function showProfile(tab = "daily") {
   const extras = $("#extras");
   extras.hidden = false;
   extras.innerHTML =
-    '<div class="card profile-card" role="dialog" aria-modal="true" aria-label="Ödüller ve kostümler"><div class="profile-heading"><b>◈ ' +
+    L('<div class="card profile-card" role="dialog" aria-modal="true" aria-label="Ödüller ve kostümler"><div class="profile-heading"><b>◈ ') +
     settings.coins +
     " · ◆ " +
     settings.diamonds +
-    '</b><button id="closeProfile" aria-label="Kapat">✕</button></div><div class="row"><button id="profileDaily" class="' +
+    L('</b><button id="closeProfile" aria-label="Kapat">✕</button></div><div class="row"><button id="profileDaily" class="') +
     (tab === "daily" ? "choice-selected" : "") +
-    '">GÜNLÜK ÖDÜLLER</button><button id="profileCostumes" class="' +
+    L('">GÜNLÜK ÖDÜLLER</button><button id="profileCostumes" class="') +
     (tab === "costumes" ? "choice-selected" : "") +
-    '">KOSTÜMLER</button></div>' +
+    L('">KOSTÜMLER</button></div>') +
     content +
     "</div>";
   $("#closeProfile").onclick = () => {
@@ -2471,14 +2518,14 @@ function drawTutorial() {
   const overlay = $("#tutorial");
   overlay.hidden = false;
   const names = [
-    "Sağa kaydır",
-    "Yukarı kaydırarak zıpla",
-    "Hedefe dokunarak ateş et",
+    L("Sağa kaydır"),
+    L("Yukarı kaydırarak zıpla"),
+    L("Hedefe dokunarak ateş et"),
   ];
   overlay.innerHTML =
     '<div class="tutorial-card" role="dialog" aria-modal="true" aria-label="' +
     names[tutorialStep] +
-    '"><button id="skipTutorial" aria-label="Öğreticiyi atla">✕</button><div class="gesture-scene gesture-' +
+    L('"><button id="skipTutorial" aria-label="Öğreticiyi atla">✕</button><div class="gesture-scene gesture-') +
     tutorialStep +
     '"><div class="gesture-lanes"><i></i><i></i><i></i></div><div class="gesture-player"></div><div class="gesture-target">◎</div><svg class="tutorial-hand" viewBox="0 0 80 100" aria-hidden="true"><path d="M24 49V13c0-10 14-10 14 0v28-9c0-9 13-9 13 0v9-5c0-8 13-8 13 0v10-4c0-7 12-7 12 0v29c0 15-9 25-23 25H39c-9 0-14-5-18-13L7 60c-6-11 5-18 12-9l5 6Z" fill="#fff0d4" stroke="#173b48" stroke-width="4"/></svg><div class="gesture-arrow">' +
     ["↔", "↑", "◉"][tutorialStep] +
@@ -2516,12 +2563,12 @@ function drawTutorial() {
 }
 function showControls() {
   $("#menu").innerHTML =
-    '<div class="card help-card"><div class="eyebrow">KURYE EL KİTABI</div><h1>Akıllı koş.<br><em>Sağ çık.</em></h1><div class="help-grid"><p><b>Hareket</b>Sağa/sola kaydır: şerit. Yukarı: zıpla. Aşağı: lazerin altından kay.</p><p><b>Çatışma</b>Drona veya çevre hedefine dokun. Basılı tutarak seri ateş et. Şarjör otomatik dolar.</p><p><b>Çevre</b>Turuncu varil: alan patlaması. Turkuaz ızgara: dronları devre dışı bırakır. KAPI paneli: ilerideki engeli açar.</p><p><b>Yollar</b>İlk görevde bile yol ayrımı var. Solda kal: kapalı metroya in, lazerlerin altından kay. Sağda kal: bahçeli çatılara yüksel, döşeme boşluklarından atla. Ortada kal: yeni sokaktan devam et. Her rotada elmas topla; turuncu güç çekirdekleri bu koşudaki silah hasarını artırır.</p><p><b>Yük</b>Ağır yükle zıplama alçalır. Cam yük darbede daha çok hasar alır. Hasarsız teslimat üç yıldız kazandırır.</p><p><b>Takipçi</b>Darbe aradaki mesafeyi kapatır. Dronları vurmak ve çevre hedefleri takipçiyi yavaşlatır.</p></div><button class="primary" id="backMenu">Anladım ↗</button></div>';
+    L('<div class="card help-card"><div class="eyebrow">KURYE EL KİTABI</div><h1>Akıllı koş.<br><em>Sağ çık.</em></h1><div class="help-grid"><p><b>Hareket</b>Sağa/sola kaydır: şerit. Yukarı: zıpla. Aşağı: lazerin altından kay.</p><p><b>Çatışma</b>Drona veya çevre hedefine dokun. Basılı tutarak seri ateş et. Şarjör otomatik dolar.</p><p><b>Çevre</b>Turuncu varil: alan patlaması. Turkuaz ızgara: dronları devre dışı bırakır. KAPI paneli: ilerideki engeli açar.</p><p><b>Yollar</b>İlk görevde bile yol ayrımı var. Solda kal: kapalı metroya in, lazerlerin altından kay. Sağda kal: bahçeli çatılara yüksel, döşeme boşluklarından atla. Ortada kal: yeni sokaktan devam et. Her rotada elmas topla; turuncu güç çekirdekleri bu koşudaki silah hasarını artırır.</p><p><b>Yük</b>Ağır yükle zıplama alçalır. Cam yük darbede daha çok hasar alır. Hasarsız teslimat üç yıldız kazandırır.</p><p><b>Takipçi</b>Darbe aradaki mesafeyi kapatır. Dronları vurmak ve çevre hedefleri takipçiyi yavaşlatır.</p></div><button class="primary" id="backMenu">Anladım ↗</button></div>');
   $("#menu").innerHTML = westernText($("#menu").innerHTML);
   $("#menu .help-grid p:nth-child(4)").innerHTML =
-    "<b>Yollar</b>" +
+    L("<b>Yollar</b>") +
     routeHint() +
-    ". Sol geçitte alçak engellere, sağ geçitte boşluklara dikkat et. Her rotada elmas ve güç çekirdeği topla.";
+    L(". Sol geçitte alçak engellere, sağ geçitte boşluklara dikkat et. Her rotada elmas ve güç çekirdeği topla.");
   $("#backMenu").onclick = showMenu;
 }
 function pause() {
@@ -2538,7 +2585,7 @@ function pause() {
     gameAudio.stop();
     $("#menu").hidden = false;
     $("#menu").innerHTML =
-      '<div class="card"><div class="eyebrow">TESLİMAT DURAKLATILDI</div><h1>Nefes al.<br><em>Devam et.</em></h1><div class="row"><button class="primary" id="resume">Devam et ↗</button><button id="base">Üsse dön</button></div><p>Üsse dönersen bu koşudaki altın ve görev ilerlemesi kaydedilmez.</p></div>';
+      L('<div class="card"><div class="eyebrow">TESLİMAT DURAKLATILDI</div><h1>Nefes al.<br><em>Devam et.</em></h1><div class="row"><button class="primary" id="resume">Devam et ↗</button><button id="base">Üsse dön</button></div><p>Üsse dönersen bu koşudaki altın ve görev ilerlemesi kaydedilmez.</p></div>');
     $("#resume").onclick = resume;
     $("#base").onclick = showMenu;
   }
@@ -2555,21 +2602,23 @@ function resume() {
 // Explains how the end score and stars were reached.
 function resultBreakdown(r) {
   if (!r.success || !Number.isFinite(r.runScore)) return "";
-  const n = (x) => x.toLocaleString("tr-TR");
+  const n = (x) => x.toLocaleString(NUMBERS);
   return (
-    '<p class="score-breakdown">Koşu ' +
+    L('<p class="score-breakdown">Koşu ') +
     n(r.runScore) +
-    " + teslimat bonusu " +
+    L(" + teslimat bonusu ") +
     n(r.deliveryBonus) +
-    " + yıldız bonusu " +
+    L(" + yıldız bonusu ") +
     n(r.starBonus) +
     " (" +
     r.stars +
-    " × 1.000) = <b>" +
+    " × " +
+    n(1000) +
+    ") = <b>" +
     n(r.score) +
-    '</b></p><p class="star-rules">★ Teslimat ✓ · ★ Yük %75+ ' +
+    L('</b></p><p class="star-rules">★ Teslimat ✓ · ★ Yük %75+ ') +
     (r.cargoStar ? "✓" : "✗") +
-    " · ★ Yan hedef " +
+    L(" · ★ Yan hedef ") +
     (r.objective ? "✓" : "✗") +
     "</p>"
   );
@@ -2607,17 +2656,17 @@ function results(r) {
   $("#menu").hidden = false;
   let reason =
     {
-      health: "Zırhın tükendi.",
-      cargo: "Yük kurtarılamadı.",
-      hunter: "Takipçi sana ulaştı.",
+      health: L("Zırhın tükendi."),
+      cargo: L("Yük kurtarılamadı."),
+      hunter: L("Takipçi sana ulaştı."),
     }[r.reason] || "";
   $("#menu").innerHTML =
     '<div class="card result-card"><div class="eyebrow">' +
-    (r.success ? "TESLİMAT TAMAMLANDI" : "KOŞU SONA ERDİ") +
+    (r.success ? L("TESLİMAT TAMAMLANDI") : L("KOŞU SONA ERDİ")) +
     "</div><h1>" +
     (r.success
-      ? "Hat açık.<br><em>Şehir yaşıyor.</em>"
-      : "Planı değiştir.<br><em>Yeniden koş.</em>") +
+      ? L("Hat açık.<br><em>Şehir yaşıyor.</em>")
+      : L("Planı değiştir.<br><em>Yeniden koş.</em>")) +
     '</h1><div class="result-stars">' +
     (r.success ? "★".repeat(r.stars) + "☆".repeat(3 - r.stars) : "") +
     "</div><p>" +
@@ -2626,46 +2675,47 @@ function results(r) {
     (lastDamage || "") +
     '</p><div class="result-grid"><span><b>' +
     Math.floor(r.distance) +
-    " m</b>mesafe</span><span><b>%" +
-    Math.round(r.cargo) +
-    "</b>yük sağlamlığı</span><span><b>" +
+    (LANG === "en"
+      ? " m</b>distance</span><span><b>" + Math.round(r.cargo) + "%"
+      : " m</b>mesafe</span><span><b>%" + Math.round(r.cargo)) +
+    L("</b>yük sağlamlığı</span><span><b>") +
     r.kills +
     (settings.landscape === "western"
-      ? "</b>durdurulan araba</span><span><b>"
-      : "</b>dron</span><span><b>") +
+      ? L("</b>durdurulan araba</span><span><b>")
+      : L("</b>dron</span><span><b>")) +
     r.environment +
-    "</b>çevre hedefi</span><span><b>" +
+    L("</b>çevre hedefi</span><span><b>") +
     r.coins +
-    "</b>toplanan altın</span><span><b>◆ " +
+    L("</b>toplanan altın</span><span><b>◆ ") +
     (r.gems || 0) +
-    "</b>toplanan elmas</span><span><b>" +
+    L("</b>toplanan elmas</span><span><b>") +
     (r.power || 0) +
-    "/5</b>silah gücü</span><span><b>" +
+    L("/5</b>silah gücü</span><span><b>") +
     r.routes.length +
-    "</b>rota seçimi</span><span><b>" +
-    r.score.toLocaleString("tr-TR") +
-    "</b>puan</span></div>" +
+    L("</b>rota seçimi</span><span><b>") +
+    r.score.toLocaleString(NUMBERS) +
+    L("</b>puan</span></div>") +
     resultBreakdown(r) +
     "<p>★ " +
-    (r.objective ? "Yan hedef tamamlandı." : r.objectiveText || "") +
+    (r.objective ? L("Yan hedef tamamlandı.") : r.objectiveText || "") +
     "</p>" +
     (dailyReward
-      ? '<p class="reward-callout">BUGÜNÜN KONTRATI TAMAM · ◈120 + ◆1</p>'
+      ? L('<p class="reward-callout">BUGÜNÜN KONTRATI TAMAM · ◈120 + ◆1</p>')
       : "") +
     (newTransmission
-      ? '<p class="story-callout">YENİ KAYIP YAYIN: ' +
+      ? L('<p class="story-callout">YENİ KAYIP YAYIN: ') +
         TRANSMISSIONS[transmissionCount()] +
         "</p>"
       : "") +
     "<p>" +
     (r.success
       ? r.mission === 39
-        ? "Kampanya tamamlandı. Sonsuz koşu üste açıldı."
-        : run.mission.story
-      : "Kalkan ve yük koruması darbeleri hafifletir. Yol çatallarında güvenli rotayı seçebilirsin.") +
+        ? L("Kampanya tamamlandı. Sonsuz koşu üste açıldı.")
+        : storyText(run.mission, settings.landscape)
+      : L("Kalkan ve yük koruması darbeleri hafifletir. Yol çatallarında güvenli rotayı seçebilirsin.")) +
     '</p><div class="row"><button id="retry" class="primary">' +
-    (r.success && r.mission < 39 ? "Sonraki teslimat ↗" : "Yeniden dene ↗") +
-    '</button><button id="back">Üs ve yükseltmeler</button></div></div>';
+    (r.success && r.mission < 39 ? L("Sonraki teslimat ↗") : L("Yeniden dene ↗")) +
+    L('</button><button id="back">Üs ve yükseltmeler</button></div></div>');
   $("#menu").innerHTML = westernText($("#menu").innerHTML);
   $("#retry").classList.add("retry-large");
   const resultCard = $("#menu .result-card");
@@ -2675,15 +2725,15 @@ function results(r) {
       '<p class="best-score ' +
         (newRecord ? "record-celebration" : "") +
         '">' +
-        (newRecord ? "✦ YENİ REKOR! ✦ · " : "EN İYİ SKOR · ") +
-        Math.max(previousBest, r.score).toLocaleString("tr-TR") +
+        (newRecord ? L("✦ YENİ REKOR! ✦ · ") : L("EN İYİ SKOR · ")) +
+        Math.max(previousBest, r.score).toLocaleString(NUMBERS) +
         "</p>" +
-        '<div class="ad-placements"><button id="adContinue" disabled>Devam et (reklam)</button><button id="adDouble" disabled>Altını 2 katına çıkar (reklam)</button><small>Reklamlar bu sürümde kapalı.</small></div>',
+        L('<div class="ad-placements"><button id="adContinue" disabled>Devam et (reklam)</button><button id="adDouble" disabled>Altını 2 katına çıkar (reklam)</button><small>Reklamlar bu sürümde kapalı.</small></div>'),
     );
   // No placements are enabled until a real SDK and platform review are complete.
   // One mock entry point is exported by profile.js for later SDK integration.
   if (REWARDED_ADS_ENABLED)
-    console.warn("Reklam yerleri için platform entegrasyonu gerekli.");
+    console.warn(L("Reklam yerleri için platform entegrasyonu gerekli."));
   const retryRow = $("#retry").parentNode;
   const resultHeading = $("#menu .result-card h1");
   if (retryRow && resultHeading?.parentNode)
@@ -2722,46 +2772,49 @@ function events() {
       burst(pos, "#ffda70", 4);
     }
     if (e.type === "power") {
-      notice("SİLAH GÜCÜ " + e.level + "/5 · HASAR ARTTI", 1.2);
+      notice(L("SİLAH GÜCÜ ") + e.level + L("/5 · HASAR ARTTI"), 1.2);
       sound(760, 0.08, "square");
     }
     if (e.type === "gem") {
       burst(pos, "#a8f6ff", 5);
-      notice("ELMAS ALINDI · ◆ " + e.total, 1.2);
+      notice(L("ELMAS ALINDI · ◆ ") + e.total, 1.2);
       sound(1450, 0.08, "triangle");
     }
-    if (e.type === "shield") notice("KALKAN ALINDI", 1);
-    if (e.type === "repair") notice("YÜK ONARILDI", 1);
-    if (e.type === "supply") notice("ARA İKMAL · +1 CAN · YÜK ONARILDI", 2);
+    if (e.type === "shield") notice(L("KALKAN ALINDI"), 1);
+    if (e.type === "repair") notice(L("YÜK ONARILDI"), 1);
+    if (e.type === "supply") notice(L("ARA İKMAL · +1 CAN · YÜK ONARILDI"), 2);
     if (
       e.type === "warning" &&
       (run.mission.id < 3 || ["saw", "rock", "wagon", "cart"].includes(e.kind))
     ) {
       notice(
         {
-          barrier: "BARİYER · ZIPLA VEYA KAÇ",
+          barrier: L("BARİYER · ZIPLA VEYA KAÇ"),
           rock:
             (settings.landscape === "western"
-              ? "YUVARLANAN FIÇI → "
-              : "YUVARLANAN KAYA → ") +
-            ["SOL", "ORTA", "SAĞ"][e.lane + 1] +
-            " ŞERİT · ŞERİT DEĞİŞTİR",
+              ? L("YUVARLANAN FIÇI → ")
+              : L("YUVARLANAN KAYA → ")) +
+            [L("SOL"), L("ORTA"), L("SAĞ")][e.lane + 1] +
+            L(" ŞERİT · ŞERİT DEĞİŞTİR"),
           wagon:
-            "AT ARABASI → " +
-            ["SOL", "ORTA", "SAĞ"][e.lane + 1] +
-            " ŞERİT · KENARA KAÇ",
+            L("AT ARABASI → ") +
+            [L("SOL"), L("ORTA"), L("SAĞ")][e.lane + 1] +
+            L(" ŞERİT · KENARA KAÇ"),
           cart:
-            "AĞIR MADEN VAGONU → " +
-            ["SOL", "ORTA", "SAĞ"][e.lane + 1] +
-            " · ŞERİT DEĞİŞTİR",
+            L("AĞIR MADEN VAGONU → ") +
+            [L("SOL"), L("ORTA"), L("SAĞ")][e.lane + 1] +
+            L(" · ŞERİT DEĞİŞTİR"),
           saw:
-            (e.side < 0 ? "SOLDAN" : "SAĞDAN") +
-            " TESTERE → " +
-            ["SOL", "ORTA", "SAĞ"][e.lane + 1] +
-            " ŞERİT · ZIPLA / KAÇ",
-          laser: "LAZER · KAY VEYA KAÇ",
-          wall: "KAPALI YOL · ŞERİT DEĞİŞTİR",
-          bolt: "DRON ATEŞİ · KAÇ",
+            (e.side < 0 ? L("SOLDAN") : L("SAĞDAN")) +
+            L(" TESTERE → ") +
+            [L("SOL"), L("ORTA"), L("SAĞ")][e.lane + 1] +
+            L(" ŞERİT · ZIPLA / KAÇ"),
+          laser:
+            settings.landscape === "western"
+              ? L("ALÇAK KİRİŞ · KAY VEYA KAÇ")
+              : L("LAZER · KAY VEYA KAÇ"),
+          wall: L("KAPALI YOL · ŞERİT DEĞİŞTİR"),
+          bolt: L("DRON ATEŞİ · KAÇ"),
         }[e.kind] || "",
         0.8,
       );
@@ -2775,29 +2828,32 @@ function events() {
       flashTimer = 0.2;
       $("#flash").classList.add("hit");
       lastDamage = {
-        barrier: "Bariyere çarptın; yukarı kaydırarak zıpla.",
+        barrier: L("Bariyere çarptın; yukarı kaydırarak zıpla."),
         rock:
           settings.landscape === "western"
-            ? "Yuvarlanan fıçıya çarptın; açık şeride geç."
-            : "Yuvarlanan kayaya çarptın; açık şeride geç.",
-        cart: "Ağır vagon iki can götürür; başka raya geç.",
-        saw: "Dönen testereye yakalandın; daha erken zıpla.",
-        laser: "Lazere yakalandın; aşağı kaydır.",
-        wall: "Kapalı şeritten zamanında çıkamadın.",
-        train: "Tren hattından kaçman gerekiyor.",
-        gap: "Çatı boşluğunu zıplayarak geç.",
+            ? L("Yuvarlanan fıçıya çarptın; açık şeride geç.")
+            : L("Yuvarlanan kayaya çarptın; açık şeride geç."),
+        cart: L("Ağır vagon iki can götürür; başka raya geç."),
+        saw: L("Dönen testereye yakalandın; daha erken zıpla."),
+        laser:
+          settings.landscape === "western"
+            ? L("Alçak kirişe çarptın; aşağı kaydır.")
+            : L("Lazere yakalandın; aşağı kaydır."),
+        wall: L("Kapalı şeritten zamanında çıkamadın."),
+        train: L("Tren hattından kaçman gerekiyor."),
+        gap: L("Çatı boşluğunu zıplayarak geç."),
         drone:
           settings.landscape === "western"
-            ? "At arabasının yolundan çekil."
-            : "Dronu vur veya yanından kaç.",
-        bolt: "Dron ateşinden kaçınmak için şerit değiştir.",
+            ? L("At arabasının yolundan çekil.")
+            : L("Dronu vur veya yanından kaç."),
+        bolt: L("Dron ateşinden kaçınmak için şerit değiştir."),
       }[e.kind];
       notice(lastDamage, 2);
       sound(110, 0.15, "sawtooth");
     }
     if (e.type === "blocked") {
       burst(pos, "#a6f4ec");
-      notice("KALKAN DARBESİ", 0.8);
+      notice(L("KALKAN DARBESİ"), 0.8);
     }
     if (e.type === "explode" || e.type === "environment") {
       burst(
@@ -2810,13 +2866,13 @@ function events() {
         20,
       );
       sound(e.kind === "wagon" ? 190 : 130, 0.17, "sawtooth");
-      if (e.kind === "wagon") notice("AT ARABASI DURDURULDU · ◈3", 1);
+      if (e.kind === "wagon") notice(L("AT ARABASI DURDURULDU · ◈3"), 1);
       if (e.type === "environment")
         notice(
           {
-            barrel: "ZİNCİRLEME PATLAMA",
-            vent: "DRONLAR DEVRE DIŞI",
-            panel: "GEÇİT AÇILDI",
+            barrel: L("ZİNCİRLEME PATLAMA"),
+            vent: L("DRONLAR DEVRE DIŞI"),
+            panel: L("GEÇİT AÇILDI"),
           }[e.kind],
           1.2,
         );
@@ -2826,10 +2882,10 @@ function events() {
     if (e.type === "route")
       notice(
         e.choice === "safe"
-          ? routeLabels().left + " · GEÇİDE DİKKAT / +70m"
+          ? routeLabels().left + L(" · GEÇİDE DİKKAT / +70m")
           : e.choice === "street"
-            ? routeLabels().middle + " · ENGELLERİ AŞ / +20 ALTIN"
-            : routeLabels().right + " · BOŞLUKLARDAN ATLA / +30 ALTIN",
+            ? routeLabels().middle + L(" · ENGELLERİ AŞ / +20 ALTIN")
+            : routeLabels().right + L(" · BOŞLUKLARDAN ATLA / +30 ALTIN"),
         2,
       );
     if (e.type === "end") results(e.result);
@@ -2840,7 +2896,7 @@ function routeGoalNote() {
   if (!run || run.endless) return "";
   const delta = Math.round(run.goal - run.mission.length);
   return delta
-    ? " · ROTA\u00a0" + (delta > 0 ? "+" : "−") + Math.abs(delta) + "\u00a0m"
+    ? L(" · ROTA\u00a0") + (delta > 0 ? "+" : "−") + Math.abs(delta) + "\u00a0m"
     : "";
 }
 function updateHud() {
@@ -2848,7 +2904,7 @@ function updateHud() {
   $("#sector").textContent =
     String(run.mission.id + 1).padStart(2, "0") +
     " · " +
-    stageName(run.mission).toLocaleUpperCase("tr");
+    stageName(run.mission).toLocaleUpperCase(UPPER);
   $("#distance").textContent =
     Math.floor(run.distance) +
     " / " +
@@ -2859,13 +2915,13 @@ function updateHud() {
     ? "100%"
     : Math.min(100, (run.distance / run.goal) * 100) + "%";
   $("#hp").textContent = "▰ ".repeat(Math.max(0, run.health));
-  $("#shield").textContent = "KALKAN " + run.shield;
+  $("#shield").textContent = L("KALKAN ") + run.shield;
   $("#coins").textContent =
     "◈ " +
     run.coins +
     " · ◆ " +
     run.gems +
-    " · PUAN " +
+    L(" · PUAN ") +
     Math.floor(
       run.distance * 10 +
         run.coins * 25 +
@@ -2873,29 +2929,30 @@ function updateHud() {
         run.kills * 200 +
         run.environment * 100,
     );
-  $("#cargo").textContent = "YÜK %" + Math.round(run.cargo);
+  $("#cargo").textContent =
+    LANG === "en" ? "CARGO " + Math.round(run.cargo) + "%" : "YÜK %" + Math.round(run.cargo);
   $("#ammo").textContent =
     run.reload > 0
-      ? "DOLDURULUYOR"
-      : COURIER_WEAPONS[run.weapon].name.toLocaleUpperCase("tr") +
+      ? L("DOLDURULUYOR")
+      : COURIER_WEAPONS[run.weapon].name.toLocaleUpperCase(UPPER) +
         " · " +
         run.ammo +
         " / " +
         run.ammoMax;
   $("#hunter").textContent = run.mission.pursuit
-    ? "TAKİPÇİ " + Math.max(0, Math.round(run.hunter)) + " m"
-    : "TAKİP YOK";
+    ? L("TAKİPÇİ ") + Math.max(0, Math.round(run.hunter)) + " m"
+    : L("TAKİP YOK");
   $("#hunter").classList.toggle("danger", run.hunter < 30);
   $("#objective").textContent = "★ " + westernText(objective(run.mission).text);
   $("#route").textContent = westernText(
     run.fork
-      ? "YOL AYRIMI " + Math.ceil(run.fork.at - run.distance) + " m"
+      ? L("YOL AYRIMI ") + Math.ceil(run.fork.at - run.distance) + " m"
       : run.route === "safe"
-        ? routeLabels().left + " · ALÇAK KİRİŞLER"
+        ? routeLabels().left + L(" · ALÇAK KİRİŞLER")
         : run.route === "risk"
-          ? routeLabels().right + " · BOŞLUKLARA DİKKAT"
+          ? routeLabels().right + L(" · BOŞLUKLARA DİKKAT")
           : run.route === "street"
-            ? routeLabels().middle + " · ALTIN VE ELMAS TOPLA"
+            ? routeLabels().middle + L(" · ALTIN VE ELMAS TOPLA")
             : "",
   );
 }
@@ -3432,7 +3489,7 @@ function frame(now) {
       slowTime += fpsTime;
       if (slowTime >= 6 && quality !== "low") {
         setQuality("low");
-        notice("AKICILIK İÇİN GÖRÜNTÜ AYARLANDI", 2);
+        notice(L("AKICILIK İÇİN GÖRÜNTÜ AYARLANDI"), 2);
       }
     } else slowTime = 0;
     fpsTime = frameCount = 0;
@@ -3441,6 +3498,7 @@ function frame(now) {
 }
 let frameHandle = 0;
 setQuality(settings.quality === "low" ? "low" : "high");
+setStaticText();
 showMenu();
 $("#loading").hidden = true;
 frameHandle = requestAnimationFrame(frame);
@@ -3449,5 +3507,5 @@ platform?.gameReady();
 window.addEventListener("error", (e) => {
   platform?.logError();
   if (e.filename?.endsWith("game.js"))
-    notice("Bir hata oluştu; sayfayı yenileyebilirsin.", 10);
+    notice(L("Bir hata oluştu; sayfayı yenileyebilirsin."), 10);
 });

@@ -1,3 +1,4 @@
+import { L } from "./i18n.js";
 // All persistence goes through these two functions. Replace the adapter for a platform SDK.
 export const SAVE_KEY = "kulhat-save-v2";
 export function loadGame(storage, validate) {
@@ -21,30 +22,30 @@ export function saveGame(storage, settings, profile) {
 export const COSTUMES = [
   {
     id: "courier",
-    name: "Külhat",
+    name: L("Külhat"),
     price: 0,
     suit: "#174c5c",
     armor: "#66d7cb",
   },
-  { id: "ember", name: "Kor", price: 200, suit: "#743c2b", armor: "#ffa45e" },
+  { id: "ember", name: L("Kor"), price: 200, suit: "#743c2b", armor: "#ffa45e" },
   {
     id: "sage",
-    name: "Adaçayı",
+    name: L("Adaçayı"),
     price: 350,
     suit: "#334d3c",
     armor: "#afce82",
   },
-  { id: "violet", name: "Gece", price: 500, suit: "#433665", armor: "#c0a0f0" },
+  { id: "violet", name: L("Gece"), price: 500, suit: "#433665", armor: "#c0a0f0" },
   {
     id: "ivory",
-    name: "Fildişi",
+    name: L("Fildişi"),
     price: 700,
     suit: "#635b4a",
     armor: "#eee1bf",
   },
   {
     id: "crimson",
-    name: "Kızıl",
+    name: L("Kızıl"),
     price: 900,
     suit: "#552e36",
     armor: "#f06e80",
@@ -83,9 +84,9 @@ export function dayKey(date = new Date()) {
 }
 export const LOGIN_REWARDS = [50, 75, 100, 125, 150, 200, 300];
 export const TASKS = [
-  { key: "distance", target: 500, label: "500 m koş", reward: 60 },
-  { key: "gems", target: 20, label: "20 elmas topla", reward: 90 },
-  { key: "coins", target: 50, label: "50 altın topla", reward: 70 },
+  { key: "distance", target: 500, label: L("500 m koş"), reward: 60 },
+  { key: "gems", target: 20, label: L("20 elmas topla"), reward: 90 },
+  { key: "coins", target: 50, label: L("50 altın topla"), reward: 70 },
 ];
 export function dailyState(profile, date = new Date()) {
   const key = dayKey(date);

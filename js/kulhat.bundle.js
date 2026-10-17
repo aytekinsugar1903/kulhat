@@ -77251,8 +77251,443 @@ class RoundedBoxGeometry extends BoxGeometry {
 
 return {RoundedBoxGeometry:RoundedBoxGeometry};
 })();
+// i18n.js
+M[5]=(()=>{
+// KÜLHAT localization. Turkish is the source language; EN maps Turkish UI strings to English.
+// The language is chosen once at start-up: platform.js sets KULHAT_PLATFORM.lang
+// (YouTube: ytgame.system.getLanguage(); elsewhere: saved choice or browser language).
+function pickLanguage() {
+  const p = globalThis.KULHAT_PLATFORM;
+  if (p && (p.lang === "en" || p.lang === "tr")) return p.lang;
+  try {
+    const saved = globalThis.localStorage?.getItem("kulhat-lang");
+    if (saved === "en" || saved === "tr") return saved;
+  } catch {}
+  return "tr";
+}
+const LANG = pickLanguage();
+const EN = {
+ "Yağmur Çarşısı": "Rain Bazaar",
+ "Yüksek Bahçeler": "High Gardens",
+ "Su Altındaki Şehir": "Sunken City",
+ "Aktarım Kalesi": "Relay Citadel",
+ "Kızıl Maden": "Red Mine",
+ "Karantina": "Quarantine",
+ "Kartal Kanyonu": "Eagle Canyon",
+ "İlk Posta": "First Mail",
+ "Dar Sokak": "Narrow Street",
+ "Salondaki Göz": "Eye in the Saloon",
+ "İki Patika": "Two Trails",
+ "İlk Kovalamaca": "First Chase",
+ "Ağır Sandık": "Heavy Crate",
+ "Son Vagon": "Last Wagon",
+ "Barut Fıçısı": "Powder Keg",
+ "Makas Değişimi": "Switch the Tracks",
+ "Demir Şerif": "Iron Sheriff",
+ "Cam Fener": "Glass Lantern",
+ "Çatı Katı": "Attic Run",
+ "Su Kulesi": "Water Tower",
+ "Yel Değirmeni": "Windmill",
+ "Çatılarda Takip": "Rooftop Chase",
+ "Doktorun Çantası": "Doctor's Bag",
+ "Yıkık Köprü": "Broken Bridge",
+ "Kuru Dere": "Dry Creek",
+ "Ahır Geçidi": "Barn Pass",
+ "Taşkın Avcısı": "Flood Hunter",
+ "Sessiz Kasaba": "Silent Town",
+ "Zırhlı Posta Arabası": "Armored Stagecoach",
+ "Kararsız Barut": "Unstable Powder",
+ "Kapanan Çember": "Closing Circle",
+ "Kanun Kaçağı Avcısı": "Outlaw Hunter",
+ "Dönüş Yok": "No Way Back",
+ "Üçüncü Kapı": "Third Gate",
+ "Son Telgraf": "Last Telegram",
+ "Kale Yolu": "Fort Road",
+ "Son Teslimat": "Last Delivery",
+ "Kızıl Ocak": "Red Pit",
+ "Kopan Makara": "Snapped Pulley",
+ "Üç Ray": "Three Rails",
+ "Kömür Arabası": "Coal Cart",
+ "Göçükten Kaçış": "Cave-in Escape",
+ "Dar Kanyon": "Narrow Canyon",
+ "Kızgın Kayalar": "Scorching Rocks",
+ "Asma Köprü": "Rope Bridge",
+ "Son Kervan": "Last Caravan",
+ "Kartal Kayası": "Eagle Rock",
+ "İlk Yük": "First Load",
+ "Dar Patika": "Narrow Path",
+ "Kayadaki Göz": "Eye in the Rock",
+ "İki Dere": "Two Streams",
+ "Çam Altı Takibi": "Pine Chase",
+ "Ağır Heybe": "Heavy Pack",
+ "Son Teleferik": "Last Cable Car",
+ "Gaz Tüpü": "Gas Canister",
+ "Yol Ayrımı": "The Fork",
+ "Sarp Yokuş Avcısı": "Steep Slope Hunter",
+ "Cam Termos": "Glass Flask",
+ "Kaya Çıkıntısı": "Rock Ledge",
+ "Buzul Suyu": "Glacier Water",
+ "Rüzgâr Sırtı": "Windy Ridge",
+ "Zirve Takibi": "Summit Chase",
+ "Sağlık Çantası": "Medical Kit",
+ "Halat Köprü": "Rope Crossing",
+ "Şelale Üstü": "Above the Falls",
+ "Sisli Koridor": "Misty Corridor",
+ "Çağlayan Avcısı": "Cascade Hunter",
+ "Sessiz Yayla": "Silent Highland",
+ "Zırhlı Gözcü": "Armored Lookout",
+ "Oynak Kaya": "Loose Rock",
+ "Kapanan Vadi": "Closing Valley",
+ "Sis Avcısı": "Fog Hunter",
+ "Geri Dönüş Yok": "No Turning Back",
+ "Üçüncü Geçit": "Third Pass",
+ "Son Kamp": "Last Camp",
+ "Zirve Yolu": "Summit Road",
+ "Terk Edilmiş Ocak": "Abandoned Mine",
+ "Kopan Halat": "Snapped Rope",
+ "Üç Tünel": "Three Tunnels",
+ "Cevher Konvoyu": "Ore Convoy",
+ "Heyelandan Kaçış": "Landslide Escape",
+ "Derin Boğaz": "Deep Gorge",
+ "Taş Yağmuru": "Falling Stones",
+ "Kartal Yuvası": "Eagle's Nest",
+ "Kervan Yolu": "Caravan Trail",
+ "Doruk Geçidi": "Summit Pass",
+ "Veri çekirdeği bulundu. Çarşının son kuryesisin.": "The data core is found. You are the bazaar's last courier.",
+ "Aktarım istasyonuna giden tren hattını aç.": "Open the rail line to the relay station.",
+ "Cam çekirdek tek bir sert darbeye bile duyarlı.": "The glass core can't take even one hard hit.",
+ "Tıbbi paketler suya teslim olmayacak.": "The medical packs will not be lost to the water.",
+ "Karantinanın enerji kaynağını taşıyorsun.": "You are carrying the quarantine zone's power source.",
+ "Çekirdeği kaleye ulaştır. Şehrin ışıklarını geri getir.": "Get the core to the citadel. Bring the city's lights back.",
+ "Kızıl Maden'in vinçlerini aş; kaçış rayını açık tut.": "Get past the Red Mine cranes and keep the escape rail clear.",
+ "Son konvoyu Kartal Kanyonu'ndan geçir.": "Lead the last convoy through Eagle Canyon.",
+ "Kasabanın son postası sende. Çantayı istasyona ulaştır.": "You carry the town's last mail. Get the bag to the station.",
+ "Ağır sandıklar treni bekliyor; hattı açık tut.": "Heavy crates are waiting for the train. Keep the line open.",
+ "Cam fenerler en küçük sarsıntıda çatlar. Yumuşak koş.": "Glass lanterns crack at the slightest jolt. Run smooth.",
+ "Doktorun ilaçları dere taşmadan karşıya geçmeli.": "The doctor's medicine has to cross before the creek floods.",
+ "Barut sandığı kararsız ve kanun kaçakları peşinde.": "The powder crate is unstable, and outlaws are on your tail.",
+ "Son telgrafı kaleye götür. Kasabanın sesi sende.": "Carry the last telegram to the fort. The town's voice is in your hands.",
+ "Kızıl Ocak'ın vinçlerini aş; kaçış rayını açık tut.": "Get past the Red Pit cranes and keep the escape rail clear.",
+ "Son kervanı kanyondan geçir. Kartal Kayası'ndan sonra yol özgür.": "Lead the last caravan through the canyon. Past Eagle Rock, the road is free.",
+ "Yayla köyünün tek yükü sende. Patikadan aşağı indir.": "The highland village's only parcel is yours. Bring it down the trail.",
+ "Teleferik durdu; heybeleri sırtlayıp yokuşu aş.": "The cable car has stopped. Shoulder the packs and climb.",
+ "Cam termoslar buzul suyu taşıyor. Taşlara dikkat.": "The glass flasks hold glacier water. Watch the rocks.",
+ "Sağlık çantası şelalenin öbür yakasında bekleniyor.": "A medical kit is needed on the far side of the falls.",
+ "Sis çöktü, kayalar oynuyor. Gözcüler seni izliyor.": "Fog has rolled in and the rocks are shifting. Lookouts are watching.",
+ "Zirve kampına son yükü çıkar. Dağın ışıkları yeniden yansın.": "Haul the last load up to summit camp. Light up the mountain again.",
+ "Terk edilmiş ocakta halatlar kopuyor; tünelden çıkışı bul.": "Ropes are snapping in the abandoned mine. Find the way out.",
+ "Derin boğazdan geç. Doruk Geçidi'nden sonra yol açık.": "Cross the deep gorge. Beyond Summit Pass, the way is clear.",
+ "Veri çekirdeği": "Data core",
+ "Ağır batarya": "Heavy battery",
+ "Cam çekirdek": "Glass core",
+ "Tıbbi paket": "Medical pack",
+ "Kararsız hücre": "Unstable cell",
+ "Son çekirdek": "Final core",
+ "Standart paket": "Standard parcel",
+ "Ağır paket": "Heavy parcel",
+ "Kırılgan yük": "Fragile cargo",
+ "Tıbbi malzeme": "Medical supplies",
+ "Hassas yük": "Volatile cargo",
+ "Özel emanet": "Special consignment",
+ "Paket": "Parcel",
+ "Kurye Tabancası": "Courier Pistol",
+ "Dengeli ve güvenilir": "Balanced and reliable",
+ "Üçlü Atım": "Triple Shot",
+ "Her dokunuşta üç mermi": "Three rounds per tap",
+ "İyon İğnesi": "Ion Needle",
+ "Hızlı ve yüksek hasarlı": "Fast and hard-hitting",
+ "Ray Kırıcı": "Rail Breaker",
+ "Yavaş ama zırh parçalayan": "Slow, but shreds armor",
+ "Kasırga Makineli": "Hurricane SMG",
+ "Geniş şarjör · kesintisiz baskı ateşi": "Big magazine · nonstop suppressing fire",
+ "Fırtına Beşlisi": "Storm Five",
+ "Tek dokunuşta beşli ağır yaylım": "A heavy five-round volley per tap",
+ "Hiç darbe almadan teslim et": "Deliver without taking a hit",
+ "Takipçi mesafesini 55 metrenin üstünde tut": "Keep the hunter more than 55 m behind",
+ "En az bir kestirme rota kullan": "Take at least one shortcut",
+ "İki çevre hedefini etkinleştir": "Trigger two environment targets",
+ "Külhat": "Külhat",
+ "Kor": "Ember",
+ "Adaçayı": "Sage",
+ "Gece": "Night",
+ "Fildişi": "Ivory",
+ "Kızıl": "Crimson",
+ "500 m koş": "Run 500 m",
+ "20 elmas topla": "Collect 20 gems",
+ "50 altın topla": "Collect 50 gold",
+ "<div class=\"error\"><h2>3D görüntü açılamadı</h2><p>WebGL destekleyen Safari veya Chrome ile açmayı dene.</p></div>": "<div class=\"error\"><h2>3D graphics could not start</h2><p>Try opening the game in Safari or Chrome with WebGL enabled.</p></div>",
+ "KAPI": "GATE",
+ "Yayın henüz kilitli. İlk bölge finaline ulaş.": "Broadcast locked. Reach the first zone's finale.",
+ "01 · Biri şehrin tahliye yollarını içeriden kapattı.": "01 · Someone sealed the city's escape routes from the inside.",
+ "02 · Külhat bir isim değil; kayıp kuryelerin ortak çağrı kodu.": "02 · Külhat isn't a name. It's the shared call sign of the lost couriers.",
+ "03 · Takipçi yükün peşinde değil, taşıdığın şehir hafızasının peşinde.": "03 · The hunter isn't after the cargo. It's after the city's memory you carry.",
+ "04 · Altı röle aynı gece susturuldu. İçlerinden biri hâlâ cevap veriyor.": "04 · Six relays went silent in one night. One of them still answers.",
+ "05 · Son teslimat bir paket değil; şehrin yeniden başlatma anahtarı.": "05 · The last delivery isn't a parcel. It's the key to restart the city.",
+ "06 · Yayın tamamlandı: sıradaki hedef, sessizliğin merkezindeki Çekirdek.": "06 · Broadcast complete. Next target: the Core at the heart of the silence.",
+ "07 · Kızıl Maden'in vinçleri kaçış raylarına vagon bırakıyor.": "07 · The Red Mine cranes are dropping carts onto the escape rails.",
+ "08 · Kartal Geçidi açıldı. Kasabanın son konvoyu artık özgür.": "08 · Eagle Pass is open. The town's last convoy is free.",
+ "Bir teslimatı başarıyla tamamla": "Complete a delivery",
+ "Tek koşuda en az 3 dron düşür": "Shoot down at least 3 drones in one run",
+ "Bir kestirme kullanarak teslimatı tamamla": "Complete a delivery using a shortcut",
+ "Kayıt kullanılamıyor; bu oturumdaki ilerleme bellekte.": "Saving is unavailable; progress is kept for this session only.",
+ "Kayıt kullanılamıyor; ilerleme bu oturumda bellekte.": "Saving is unavailable; progress is kept for this session only.",
+ "GÖRÜNTÜ: EKONOMİK": "GRAPHICS: LOW",
+ "GÖRÜNTÜ: YÜKSEK": "GRAPHICS: HIGH",
+ "MADEN OCAĞI": "MINE SHAFT",
+ "ANA CADDE": "MAIN STREET",
+ "ÇATILAR": "ROOFTOPS",
+ "MAĞARA": "CAVE",
+ "PATİKA": "TRAIL",
+ "SIRT YOLU": "RIDGE PATH",
+ "SOL: ": "LEFT: ",
+ " · ORTA: ": " · CENTER: ",
+ " · SAĞ: ": " · RIGHT: ",
+ "SALOON": "SALOON",
+ "ŞERİF": "SHERIFF",
+ "GENEL MAĞAZA": "GENERAL STORE",
+ "POSTA": "POST OFFICE",
+ "AHIR": "STABLES",
+ "DEMİRCİ": "BLACKSMITH",
+ "İSTASYON": "STATION",
+ "ESKİ HAN": "OLD INN",
+ "LİMAN CADDESİ": "HARBOR STREET",
+ "TRAMVAY BULVARI": "TRAM BOULEVARD",
+ "SANAT SOKAĞI": "ART STREET",
+ "ESKİ ŞEHİR": "OLD TOWN",
+ "BAKIR PAZAR": "COPPER MARKET",
+ "GECE ÇARŞISI": "NIGHT BAZAAR",
+ "İNŞA HATTI · 04": "BUILD LINE · 04",
+ "TÜRBİN SOKAĞI": "TURBINE STREET",
+ "KÖMÜR DAMARI": "COAL SEAM",
+ "VİNÇ KUYUSU": "CRANE SHAFT",
+ "KIZIL TÜNEL": "RED TUNNEL",
+ "ÜÇ RAY": "THREE RAILS",
+ "CEVHER HATTI": "ORE LINE",
+ "ESKİ ŞAFT": "OLD SHAFT",
+ "VAGON DEPOSU": "CART DEPOT",
+ "DERİN MADEN": "DEEP MINE",
+ "M2 · SON İSTASYON": "M2 · LAST STATION",
+ "ÇIKIŞ →": "EXIT →",
+ "M4 · AKTARMA İSTASYONU": "M4 · TRANSFER STATION",
+ "ESKİ TAŞ TÜNEL": "OLD STONE TUNNEL",
+ "KARGO METROSU": "CARGO METRO",
+ "M7 · MAVİ HAT": "M7 · BLUE LINE",
+ "BAKIM TÜNELİ": "SERVICE TUNNEL",
+ "SU SERVİS GALERİSİ": "WATER SERVICE GALLERY",
+ "NEON TERMİNAL": "NEON TERMINAL",
+ "GÖKYÜZÜ BAHÇELERİ": "SKY GARDENS",
+ "ANTEN ÇATILARI": "ANTENNA ROOFS",
+ "SU KULELERİ": "WATER TOWERS",
+ "RENKLİ TERASLAR": "COLORFUL TERRACES",
+ "YÜKSEK KÖPRÜLER": "HIGH BRIDGES",
+ "AÇIK BAHÇELER": "OPEN GARDENS",
+ "GÜNEŞ TERASI": "SUN TERRACE",
+ "GÖK PAZARI": "SKY MARKET",
+ "QUARANTINE": "QUARANTINE",
+ "M2 · METRO": "M2 · METRO",
+ "ÇATI BAHÇELERİ ↑": "ROOF GARDENS ↑",
+ "MADEN ↓ +70m": "MINE ↓ +70m",
+ "ÇATILAR ↑ −90m": "ROOFTOPS ↑ −90m",
+ "SOKAK ↑ · ◆ ELMAS": "STREET ↑ · ◆ GEMS",
+ "YUKARI KAYDIR: ZIPLA · SAĞ/SOL: KAÇ": "SWIPE UP: JUMP · LEFT/RIGHT: DODGE",
+ "KAYDIR: KAÇ / ZIPLA / KAY · HEDEFE DOKUN VEYA BASILI TUT: ATEŞ": "SWIPE: DODGE / JUMP / SLIDE · TAP OR HOLD A TARGET: FIRE",
+ "<div class=\"card campaign\"><div class=\"quick-tools\"><button id=\"armoryShortcut\">SİLAH DEPOSU ↗</button></div><div class=\"eyebrow\">KÜLHAT · SON TESLİMAT</div><h1>Şehir sustu. <br>Sen <em>durma.</em></h1><p class=\"intro\">Yükünü koru. Takipçiyi atlat. Kestirmeyi seç ya da güvenli yoldan git. Çevreyi silaha dönüştür.</p><div class=\"menu-summary\"><span>◈ ": "<div class=\"card campaign\"><div class=\"quick-tools\"><button id=\"armoryShortcut\">ARMORY ↗</button></div><div class=\"eyebrow\">KÜLHAT · LAST DELIVERY</div><h1>The city went quiet. <br>You <em>keep running.</em></h1><p class=\"intro\">Protect your cargo. Outrun the hunter. Take the shortcut or play it safe. Turn the streets into weapons.</p><div class=\"menu-summary\"><span>◈ ",
+ " altın</span><span>◆ ": " gold</span><span>◆ ",
+ " elmas</span><span>★ ": " gems</span><span>★ ",
+ " / 40 teslimat</span></div><div class=\"retention-grid\"><div class=\"retention-card\"><b>KAYIP YAYIN · ": " / 40 deliveries</span></div><div class=\"retention-grid\"><div class=\"retention-card\"><b>LOST BROADCAST · ",
+ "\"><b>BUGÜNÜN KONTRATI</b><span>": "\"><b>TODAY'S CONTRACT</b><span>",
+ " · TAMAMLANDI": " · DONE",
+ " · ÖDÜL ◈120 + ◆1": " · REWARD ◈120 + ◆1",
+ "Etap grubu ": "Stage group ",
+ "WESTERN KASABASI": "WESTERN TOWN",
+ "DAĞ PATİKASI": "MOUNTAIN TRAIL",
+ " · ETAP GRUBU ": " · STAGE GROUP ",
+ "· TEHDİT ": "· THREAT ",
+ "· TAKİP": "· CHASE",
+ "KİLİTLİ": "LOCKED",
+ "HAZIR": "READY",
+ "</div><div class=\"mission-objective\">★ YAN HEDEF: ": "</div><div class=\"mission-objective\">★ SIDE GOAL: ",
+ "</div><div class=\"mode-groups\"><div class=\"choice-group\"><h2>ZORLUK</h2><div class=\"row contract-options\" role=\"group\" aria-label=\"Zorluk\">": "</div><div class=\"mode-groups\"><div class=\"choice-group\"><h2>DIFFICULTY</h2><div class=\"row contract-options\" role=\"group\" aria-label=\"Difficulty\">",
+ "STANDART · ×1": "STANDARD · ×1",
+ "AVCI · +%10 HIZ · ×1,5 ALTIN": "BOUNTY · +10% SPEED · ×1.5 GOLD",
+ "ELİT · +%20 HIZ · ×2 ALTIN": "ELITE · +20% SPEED · ×2 GOLD",
+ "</div></div><div class=\"choice-group\"><h2>HARİTA</h2><div class=\"row landscape-options\" role=\"group\" aria-label=\"Harita\">": "</div></div><div class=\"choice-group\"><h2>MAP</h2><div class=\"row landscape-options\" role=\"group\" aria-label=\"Map\">",
+ "SERBEST KEŞİF · 40 ETAP AÇIK": "FREE PLAY · ALL 40 STAGES OPEN",
+ "TÜM ETAPLARI DENE · SERBEST KEŞİF": "TRY EVERY STAGE · FREE PLAY",
+ " · TESLİMATA BAŞLA ↗</button><button id=\"openArmory\">SİLAH DEPOSU</button>": " · START DELIVERY ↗</button><button id=\"openArmory\">ARMORY</button>",
+ "<button id=\"endless\">Sonsuz koşu</button>": "<button id=\"endless\">Endless run</button>",
+ "</div><section id=\"armory-panel\" class=\"armory-panel\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Silah deposu\" ": "</div><section id=\"armory-panel\" class=\"armory-panel\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Armory\" ",
+ "><div class=\"armory-heading\"><h2>SİLAH DEPOSU</h2><button id=\"closeArmory\">KAPAT ✕</button></div><div class=\"arsenal\">": "><div class=\"armory-heading\"><h2>ARMORY</h2><button id=\"closeArmory\">CLOSE ✕</button></div><div class=\"arsenal\">",
+ " · SV ": " · LV ",
+ " · USTALIK ": " · MASTERY ",
+ "KUŞANILDI": "EQUIPPED",
+ "KUŞAN": "EQUIP",
+ "SATIN AL · ": "BUY · ",
+ "AZAMİ SEVİYE": "MAX LEVEL",
+ "GÜÇLENDİR · ": "UPGRADE · ",
+ "</div><div class=\"district-name\">ZIRH VE YÜK</div><div class=\"upgrade\">": "</div><div class=\"district-name\">ARMOR AND CARGO</div><div class=\"upgrade\">",
+ "Yük koruması": "Cargo protection",
+ "Kalkan": "Shield",
+ "</div></section><div class=\"tip\">Telefonda doğrudan kaydır. Hedefe dokunarak ateş et.<br>PC: WASD / oklar · Space ateş · Esc duraklat.<br>40 görev + 120 yıldız + kampanya sonrası sonsuz koşu.</div><div class=\"menu-settings\"><button id=\"sound\">SES ": "</div></section><div class=\"tip\">On phones, just swipe. Tap a target to fire.<br>PC: WASD / arrows · Space to fire · Esc to pause.<br>40 missions + 120 stars + an endless run after the campaign.</div><div class=\"menu-settings\"><button id=\"sound\">SOUND ",
+ "KAPALI": "OFF",
+ "AÇIK": "ON",
+ "</button><button id=\"controls\">NASIL OYNANIR?</button><button id=\"dailyHub\">GÜNLÜK ÖDÜLLER</button><button id=\"costumeHub\">KOSTÜMLER</button></div><div id=\"storage\" class=\"storage\">İlerleme bu tarayıcıda saklanır.</div><div class=\"build-label\">Yayın adayı · Cihaz ve platform kontrolleri bekleniyor.</div></div>": "</button><button id=\"controls\">HOW TO PLAY</button><button id=\"dailyHub\">DAILY REWARDS</button><button id=\"costumeHub\">OUTFITS</button></div><div id=\"storage\" class=\"storage\">Progress is saved in this browser.</div><div class=\"build-label\">Release candidate · Device and platform checks pending.</div></div>",
+ "<aside class=\"scoreboard\"><h2>PUAN TABLOSU · BU CİHAZ</h2><p>En iyi 10 koşun</p>": "<aside class=\"scoreboard\"><h2>LEADERBOARD · THIS DEVICE</h2><p>Your top 10 runs</p>",
+ "<table style=\"width:100%;text-align:left\"><tr><th>#</th><th>Bölüm</th><th>Puan</th></tr>": "<table style=\"width:100%;text-align:left\"><tr><th>#</th><th>Stage</th><th>Score</th></tr>",
+ "<p>İlk koşunu tamamlayınca puanın burada görünecek.</p>": "<p>Finish your first run and your score will show up here.</p>",
+ "İlerleme YouTube'da saklanır.": "Progress is saved on YouTube.",
+ "<h2>7 GÜNLÜK GİRİŞ ÖDÜLÜ</h2><div class=\"login-calendar\">": "<h2>7-DAY LOGIN REWARD</h2><div class=\"login-calendar\">",
+ "BUGÜN ALINDI": "CLAIMED TODAY",
+ "BUGÜNÜN ÖDÜLÜNÜ AL": "CLAIM TODAY'S REWARD",
+ "</button><h2>BUGÜNÜN 3 GÖREVİ</h2><p>Koşu bitince ilerleme kaydedilir. Her gün yenilenir.</p><div class=\"daily-tasks\">": "</button><h2>TODAY'S 3 TASKS</h2><p>Progress is saved when a run ends. New tasks every day.</p><div class=\"daily-tasks\">",
+ "ALINDI": "CLAIMED",
+ "ÖDÜLÜ AL": "CLAIM",
+ "<h2>KURYE KOSTÜMLERİ</h2><p>Yalnızca görünüm değişir. Güç ve hız aynıdır.</p><div class=\"costume-grid\">": "<h2>COURIER OUTFITS</h2><p>Looks only. Power and speed stay the same.</p><div class=\"costume-grid\">",
+ "<div class=\"card profile-card\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Ödüller ve kostümler\"><div class=\"profile-heading\"><b>◈ ": "<div class=\"card profile-card\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Rewards and outfits\"><div class=\"profile-heading\"><b>◈ ",
+ "</b><button id=\"closeProfile\" aria-label=\"Kapat\">✕</button></div><div class=\"row\"><button id=\"profileDaily\" class=\"": "</b><button id=\"closeProfile\" aria-label=\"Close\">✕</button></div><div class=\"row\"><button id=\"profileDaily\" class=\"",
+ "\">GÜNLÜK ÖDÜLLER</button><button id=\"profileCostumes\" class=\"": "\">DAILY REWARDS</button><button id=\"profileCostumes\" class=\"",
+ "\">KOSTÜMLER</button></div>": "\">OUTFITS</button></div>",
+ "Sağa kaydır": "Swipe right",
+ "Yukarı kaydırarak zıpla": "Swipe up to jump",
+ "Hedefe dokunarak ateş et": "Tap a target to fire",
+ "\"><button id=\"skipTutorial\" aria-label=\"Öğreticiyi atla\">✕</button><div class=\"gesture-scene gesture-": "\"><button id=\"skipTutorial\" aria-label=\"Skip tutorial\">✕</button><div class=\"gesture-scene gesture-",
+ "<div class=\"card help-card\"><div class=\"eyebrow\">KURYE EL KİTABI</div><h1>Akıllı koş.<br><em>Sağ çık.</em></h1><div class=\"help-grid\"><p><b>Hareket</b>Sağa/sola kaydır: şerit. Yukarı: zıpla. Aşağı: lazerin altından kay.</p><p><b>Çatışma</b>Drona veya çevre hedefine dokun. Basılı tutarak seri ateş et. Şarjör otomatik dolar.</p><p><b>Çevre</b>Turuncu varil: alan patlaması. Turkuaz ızgara: dronları devre dışı bırakır. KAPI paneli: ilerideki engeli açar.</p><p><b>Yollar</b>İlk görevde bile yol ayrımı var. Solda kal: kapalı metroya in, lazerlerin altından kay. Sağda kal: bahçeli çatılara yüksel, döşeme boşluklarından atla. Ortada kal: yeni sokaktan devam et. Her rotada elmas topla; turuncu güç çekirdekleri bu koşudaki silah hasarını artırır.</p><p><b>Yük</b>Ağır yükle zıplama alçalır. Cam yük darbede daha çok hasar alır. Hasarsız teslimat üç yıldız kazandırır.</p><p><b>Takipçi</b>Darbe aradaki mesafeyi kapatır. Dronları vurmak ve çevre hedefleri takipçiyi yavaşlatır.</p></div><button class=\"primary\" id=\"backMenu\">Anladım ↗</button></div>": "<div class=\"card help-card\"><div class=\"eyebrow\">COURIER HANDBOOK</div><h1>Run smart.<br><em>Make it out.</em></h1><div class=\"help-grid\"><p><b>Moving</b>Swipe left/right: change lanes. Up: jump. Down: slide under the laser.</p><p><b>Combat</b>Tap a drone or an environment target. Hold to fire continuously. Your magazine reloads by itself.</p><p><b>Environment</b>Orange barrel: area blast. Teal grate: disables drones. GATE panel: opens the blockade ahead.</p><p><b>Routes</b>Every mission has forks, even the first. Stay left: drop into the covered metro and slide under lasers. Stay right: climb to the garden rooftops and jump the gaps. Stay center: carry on down a new street. Grab gems on every route; orange power cores boost your weapon damage for the run.</p><p><b>Cargo</b>Heavy cargo lowers your jumps. Glass cargo takes more damage per hit. A clean delivery with no damage earns all three stars.</p><p><b>Hunter</b>Every hit lets the hunter close in. Shooting drones and triggering environment targets slows it down.</p></div><button class=\"primary\" id=\"backMenu\">Got it ↗</button></div>",
+ "<b>Yollar</b>": "<b>Routes</b>",
+ ". Sol geçitte alçak engellere, sağ geçitte boşluklara dikkat et. Her rotada elmas ve güç çekirdeği topla.": ". On the left route, watch for low obstacles; on the right, watch for gaps. Grab gems and power cores on every route.",
+ "<div class=\"card\"><div class=\"eyebrow\">TESLİMAT DURAKLATILDI</div><h1>Nefes al.<br><em>Devam et.</em></h1><div class=\"row\"><button class=\"primary\" id=\"resume\">Devam et ↗</button><button id=\"base\">Üsse dön</button></div><p>Üsse dönersen bu koşudaki altın ve görev ilerlemesi kaydedilmez.</p></div>": "<div class=\"card\"><div class=\"eyebrow\">DELIVERY PAUSED</div><h1>Catch your breath.<br><em>Then keep going.</em></h1><div class=\"row\"><button class=\"primary\" id=\"resume\">Resume ↗</button><button id=\"base\">Back to base</button></div><p>If you return to base, this run's gold and mission progress won't be saved.</p></div>",
+ "<p class=\"score-breakdown\">Koşu ": "<p class=\"score-breakdown\">Run ",
+ " + teslimat bonusu ": " + delivery bonus ",
+ " + yıldız bonusu ": " + star bonus ",
+ "</b></p><p class=\"star-rules\">★ Teslimat ✓ · ★ Yük %75+ ": "</b></p><p class=\"star-rules\">★ Delivered ✓ · ★ Cargo 75%+ ",
+ " · ★ Yan hedef ": " · ★ Side goal ",
+ "Zırhın tükendi.": "Your armor gave out.",
+ "Yük kurtarılamadı.": "The cargo couldn't be saved.",
+ "Takipçi sana ulaştı.": "The hunter caught you.",
+ "TESLİMAT TAMAMLANDI": "DELIVERY COMPLETE",
+ "KOŞU SONA ERDİ": "RUN OVER",
+ "Hat açık.<br><em>Şehir yaşıyor.</em>": "Line open.<br><em>The city lives.</em>",
+ "Planı değiştir.<br><em>Yeniden koş.</em>": "Change the plan.<br><em>Run it again.</em>",
+ "</b>yük sağlamlığı</span><span><b>": "</b>cargo condition</span><span><b>",
+ "</b>durdurulan araba</span><span><b>": "</b>wagons stopped</span><span><b>",
+ "</b>dron</span><span><b>": "</b>drones</span><span><b>",
+ "</b>çevre hedefi</span><span><b>": "</b>environment targets</span><span><b>",
+ "</b>toplanan altın</span><span><b>◆ ": "</b>gold collected</span><span><b>◆ ",
+ "</b>toplanan elmas</span><span><b>": "</b>gems collected</span><span><b>",
+ "/5</b>silah gücü</span><span><b>": "/5</b>weapon power</span><span><b>",
+ "</b>rota seçimi</span><span><b>": "</b>route choices</span><span><b>",
+ "</b>puan</span></div>": "</b>score</span></div>",
+ "Yan hedef tamamlandı.": "Side goal complete.",
+ "<p class=\"reward-callout\">BUGÜNÜN KONTRATI TAMAM · ◈120 + ◆1</p>": "<p class=\"reward-callout\">TODAY'S CONTRACT DONE · ◈120 + ◆1</p>",
+ "<p class=\"story-callout\">YENİ KAYIP YAYIN: ": "<p class=\"story-callout\">NEW LOST BROADCAST: ",
+ "Kampanya tamamlandı. Sonsuz koşu üste açıldı.": "Campaign complete. Endless run is now open at base.",
+ "Kalkan ve yük koruması darbeleri hafifletir. Yol çatallarında güvenli rotayı seçebilirsin.": "Shields and cargo protection soften hits. At forks, you can take the safe route.",
+ "Sonraki teslimat ↗": "Next delivery ↗",
+ "Yeniden dene ↗": "Try again ↗",
+ "</button><button id=\"back\">Üs ve yükseltmeler</button></div></div>": "</button><button id=\"back\">Base and upgrades</button></div></div>",
+ "✦ YENİ REKOR! ✦ · ": "✦ NEW RECORD! ✦ · ",
+ "EN İYİ SKOR · ": "BEST SCORE · ",
+ "<div class=\"ad-placements\"><button id=\"adContinue\" disabled>Devam et (reklam)</button><button id=\"adDouble\" disabled>Altını 2 katına çıkar (reklam)</button><small>Reklamlar bu sürümde kapalı.</small></div>": "<div class=\"ad-placements\"><button id=\"adContinue\" disabled>Continue (ad)</button><button id=\"adDouble\" disabled>Double your gold (ad)</button><small>Ads are off in this version.</small></div>",
+ "Reklam yerleri için platform entegrasyonu gerekli.": "Ad slots need platform integration.",
+ "SİLAH GÜCÜ ": "WEAPON POWER ",
+ "/5 · HASAR ARTTI": "/5 · MORE DAMAGE",
+ "ELMAS ALINDI · ◆ ": "GEM COLLECTED · ◆ ",
+ "KALKAN ALINDI": "SHIELD PICKED UP",
+ "YÜK ONARILDI": "CARGO REPAIRED",
+ "ARA İKMAL · +1 CAN · YÜK ONARILDI": "RESUPPLY · +1 LIFE · CARGO REPAIRED",
+ "BARİYER · ZIPLA VEYA KAÇ": "BARRIER · JUMP OR DODGE",
+ "YUVARLANAN FIÇI → ": "ROLLING BARREL → ",
+ "YUVARLANAN KAYA → ": "ROLLING BOULDER → ",
+ "SOL": "LEFT",
+ "ORTA": "CENTER",
+ "SAĞ": "RIGHT",
+ " ŞERİT · ŞERİT DEĞİŞTİR": " LANE · SWITCH LANES",
+ "AT ARABASI → ": "WAGON → ",
+ " ŞERİT · KENARA KAÇ": " LANE · GET OUT OF THE WAY",
+ "AĞIR MADEN VAGONU → ": "HEAVY MINE CART → ",
+ " · ŞERİT DEĞİŞTİR": " · SWITCH LANES",
+ "SOLDAN": "LEFT",
+ "SAĞDAN": "RIGHT",
+ " TESTERE → ": " SAW → ",
+ " ŞERİT · ZIPLA / KAÇ": " LANE · JUMP / DODGE",
+ "LAZER · KAY VEYA KAÇ": "LASER · SLIDE OR DODGE",
+ "ALÇAK KİRİŞ · KAY VEYA KAÇ": "LOW BEAM · SLIDE OR DODGE",
+ "KAPALI YOL · ŞERİT DEĞİŞTİR": "ROAD BLOCKED · SWITCH LANES",
+ "DRON ATEŞİ · KAÇ": "DRONE FIRE · DODGE",
+ "Bariyere çarptın; yukarı kaydırarak zıpla.": "You hit a barrier. Swipe up to jump.",
+ "Yuvarlanan fıçıya çarptın; açık şeride geç.": "A rolling barrel got you. Move to a clear lane.",
+ "Yuvarlanan kayaya çarptın; açık şeride geç.": "A rolling boulder got you. Move to a clear lane.",
+ "Ağır vagon iki can götürür; başka raya geç.": "A heavy cart costs two lives. Switch rails.",
+ "Dönen testereye yakalandın; daha erken zıpla.": "The spinning saw caught you. Jump earlier.",
+ "Lazere yakalandın; aşağı kaydır.": "The laser caught you. Swipe down to slide.",
+ "Alçak kirişe çarptın; aşağı kaydır.": "You hit a low beam. Swipe down to slide.",
+ "Kapalı şeritten zamanında çıkamadın.": "You didn't leave the blocked lane in time.",
+ "Tren hattından kaçman gerekiyor.": "Get off the train line.",
+ "Çatı boşluğunu zıplayarak geç.": "Jump across the roof gap.",
+ "At arabasının yolundan çekil.": "Get out of the wagon's way.",
+ "Dronu vur veya yanından kaç.": "Shoot the drone or dodge past it.",
+ "Dron ateşinden kaçınmak için şerit değiştir.": "Switch lanes to dodge drone fire.",
+ "KALKAN DARBESİ": "SHIELD HIT",
+ "AT ARABASI DURDURULDU · ◈3": "WAGON STOPPED · ◈3",
+ "ZİNCİRLEME PATLAMA": "CHAIN BLAST",
+ "DRONLAR DEVRE DIŞI": "DRONES DISABLED",
+ "GEÇİT AÇILDI": "GATE OPEN",
+ " · GEÇİDE DİKKAT / +70m": " · WATCH THE PASS / +70m",
+ " · ENGELLERİ AŞ / +20 ALTIN": " · CLEAR THE OBSTACLES / +20 GOLD",
+ " · BOŞLUKLARDAN ATLA / +30 ALTIN": " · JUMP THE GAPS / +30 GOLD",
+ " · ROTA ": " · ROUTE ",
+ "KALKAN ": "SHIELD ",
+ " · PUAN ": " · SCORE ",
+ "DOLDURULUYOR": "RELOADING",
+ "TAKİPÇİ ": "HUNTER ",
+ "TAKİP YOK": "NO PURSUIT",
+ "YOL AYRIMI ": "FORK IN ",
+ " · ALÇAK KİRİŞLER": " · LOW BEAMS",
+ " · BOŞLUKLARA DİKKAT": " · WATCH THE GAPS",
+ " · ALTIN VE ELMAS TOPLA": " · GRAB GOLD AND GEMS",
+ "AKICILIK İÇİN GÖRÜNTÜ AYARLANDI": "GRAPHICS LOWERED FOR SMOOTHER PLAY",
+ "Bir hata oluştu; sayfayı yenileyebilirsin.": "Something went wrong. Try reloading the page."
+};
+function L(text) {
+  return LANG === "en" && Object.prototype.hasOwnProperty.call(EN, text) ? EN[text] : text;
+}
+const STATIC_EN = {
+ "title": "KÜLHAT · Last Delivery",
+ ".hud .sub": "LAST DELIVERY",
+ "#sector": "CAMPAIGN",
+ "#distance": "40 missions · 8 zones",
+ "#shield": "SHIELD 0",
+ "#cargo": "CARGO 100%",
+ "#objective": "★ Side goal",
+ "#hunter": "NO PURSUIT",
+ ".bottomstats .right span": "AMMO",
+ "#hint": "SWIPE: DODGE / JUMP / SLIDE · TAP A TARGET: FIRE",
+ "#fork-left-title + small": "← LEFT · +70 m",
+ "#fork-middle-title + small": "↑ CENTER · ◆ GEMS",
+ "#fork-right-title + small": "RIGHT → · −90 m",
+ "#loading small": "The city is waking up…"
+};
+const ARIA_EN = {"#pause": "Pause", "#fork-signs": "Fork in the road"};
+// Translates the fixed HUD text that lives in index.html.
+function setStaticText() {
+  if (typeof document === "undefined") return;
+  document.documentElement.lang = LANG;
+  if (LANG !== "en") return;
+  for (const [sel, text] of Object.entries(STATIC_EN)) {
+    if (sel === "title") document.title = text;
+    else {
+      const el = document.querySelector(sel);
+      if (el) el.textContent = text;
+    }
+  }
+  for (const [sel, text] of Object.entries(ARIA_EN))
+    document.querySelector(sel)?.setAttribute("aria-label", text);
+}
+
+return {LANG,L,setStaticText};
+})();
 // profile.js
 M[4]=(()=>{
+const {L}=M[5];
 // All persistence goes through these two functions. Replace the adapter for a platform SDK.
 const SAVE_KEY = "kulhat-save-v2";
 function loadGame(storage, validate) {
@@ -77276,30 +77711,30 @@ function saveGame(storage, settings, profile) {
 const COSTUMES = [
   {
     id: "courier",
-    name: "Külhat",
+    name: L("Külhat"),
     price: 0,
     suit: "#174c5c",
     armor: "#66d7cb",
   },
-  { id: "ember", name: "Kor", price: 200, suit: "#743c2b", armor: "#ffa45e" },
+  { id: "ember", name: L("Kor"), price: 200, suit: "#743c2b", armor: "#ffa45e" },
   {
     id: "sage",
-    name: "Adaçayı",
+    name: L("Adaçayı"),
     price: 350,
     suit: "#334d3c",
     armor: "#afce82",
   },
-  { id: "violet", name: "Gece", price: 500, suit: "#433665", armor: "#c0a0f0" },
+  { id: "violet", name: L("Gece"), price: 500, suit: "#433665", armor: "#c0a0f0" },
   {
     id: "ivory",
-    name: "Fildişi",
+    name: L("Fildişi"),
     price: 700,
     suit: "#635b4a",
     armor: "#eee1bf",
   },
   {
     id: "crimson",
-    name: "Kızıl",
+    name: L("Kızıl"),
     price: 900,
     suit: "#552e36",
     armor: "#f06e80",
@@ -77338,9 +77773,9 @@ function dayKey(date = new Date()) {
 }
 const LOGIN_REWARDS = [50, 75, 100, 125, 150, 200, 300];
 const TASKS = [
-  { key: "distance", target: 500, label: "500 m koş", reward: 60 },
-  { key: "gems", target: 20, label: "20 elmas topla", reward: 90 },
-  { key: "coins", target: 50, label: "50 altın topla", reward: 70 },
+  { key: "distance", target: 500, label: L("500 m koş"), reward: 60 },
+  { key: "gems", target: 20, label: L("20 elmas topla"), reward: 90 },
+  { key: "coins", target: 50, label: L("50 altın topla"), reward: 70 },
 ];
 function dailyState(profile, date = new Date()) {
   const key = dayKey(date);
@@ -77400,7 +77835,7 @@ async function showRewardedAd() {
 return {SAVE_KEY,loadGame,saveGame,COSTUMES,normalizeProfile,dayKey,LOGIN_REWARDS,TASKS,dailyState,claimLogin,recordDaily,claimTask,selectCostume,REWARDED_ADS_ENABLED,showRewardedAd};
 })();
 // audio.js
-M[5]=(()=>{
+M[6]=(()=>{
 // Original procedural short loops and effects; no recordings or external assets.
 class GameAudio {
   constructor(host) {
@@ -77513,11 +77948,12 @@ class GameAudio {
 return {GameAudio};
 })();
 // core.js
-M[6]=(()=>{
+M[7]=(()=>{
+const {L,LANG}=M[5];
 const TITLE = "KÜLHAT";
 const DISTRICTS = [
   {
-    name: "Yağmur Çarşısı",
+    name: L("Yağmur Çarşısı"),
     sky: "#293e4f",
     fog: "#293e4f",
     light: "#f4cab2",
@@ -77533,7 +77969,7 @@ const DISTRICTS = [
     kind: "rail",
   },
   {
-    name: "Yüksek Bahçeler",
+    name: L("Yüksek Bahçeler"),
     sky: "#344e58",
     fog: "#344e58",
     light: "#d2e5c1",
@@ -77541,7 +77977,7 @@ const DISTRICTS = [
     kind: "roof",
   },
   {
-    name: "Su Altındaki Şehir",
+    name: L("Su Altındaki Şehir"),
     sky: "#223a4e",
     fog: "#223a4e",
     light: "#a9d5ee",
@@ -77549,7 +77985,7 @@ const DISTRICTS = [
     kind: "flood",
   },
   {
-    name: "Karantina",
+    name: L("Karantina"),
     sky: "#233446",
     fog: "#233446",
     light: "#c6c6ee",
@@ -77557,19 +77993,19 @@ const DISTRICTS = [
     kind: "quarantine",
   },
   {
-    name: "Aktarım Kalesi",
+    name: L("Aktarım Kalesi"),
     sky: "#443c50",
     fog: "#443c50",
     light: "#f5c6a4",
     rain: false,
     kind: "citadel",
   },
-  { name: "Kızıl Maden", sky: "#554332", fog: "#70553c", light: "#ffd39a", rain: false, kind: "mine" },
-  { name: "Kartal Kanyonu", sky: "#a3b8ba", fog: "#b7a38a", light: "#ffe2ae", rain: false, kind: "canyon" },
+  { name: L("Kızıl Maden"), sky: "#554332", fog: "#70553c", light: "#ffd39a", rain: false, kind: "mine" },
+  { name: L("Kartal Kanyonu"), sky: "#a3b8ba", fog: "#b7a38a", light: "#ffe2ae", rain: false, kind: "canyon" },
 ];
 const NAMES = [
   ["İlk Paket", "Dar Geçit", "Çarşıdaki Göz", "İki Yol", "İlk Takip"],
-  ["Ağır Yük", "Son Vagon", "Kırmızı Varil", "Makası Değiştir", "Demir Avcı"],
+  ["Ağır Yük", L("Son Vagon"), "Kırmızı Varil", "Makası Değiştir", "Demir Avcı"],
   ["Cam Çekirdek", "Çatı Arası", "Soğutucu", "Rüzgâr Hattı", "Yüksek Takip"],
   [
     "Tıbbi Sevkiyat",
@@ -77582,42 +78018,68 @@ const NAMES = [
     "Sessiz Bölge",
     "Zırhlı Göz",
     "Kararsız Hücre",
-    "Kapanan Çember",
+    L("Kapanan Çember"),
     "Karantina Avcısı",
   ],
   [
-    "Geri Dönüş Yok",
-    "Üçüncü Kapı",
+    L("Geri Dönüş Yok"),
+    L("Üçüncü Kapı"),
     "Son Kesinti",
     "Çekirdek Yolu",
-    "Son Teslimat",
+    L("Son Teslimat"),
   ],
-  ["Maden Girişi", "Kopan Vinç", "Üç Ray", "Kömür Konvoyu", "Çöküşten Kaçış"],
-  ["Dar Kanyon", "Taş Yağmuru", "Asma Geçit", "Son Konvoy", "Kartal Geçidi"],
+  ["Maden Girişi", "Kopan Vinç", L("Üç Ray"), "Kömür Konvoyu", "Çöküşten Kaçış"],
+  [L("Dar Kanyon"), L("Taş Yağmuru"), "Asma Geçit", "Son Konvoy", "Kartal Geçidi"],
 ];
 // Per-map stage names. NAMES above stays as the neutral city default.
 const MAP_NAMES = {
   western: [
-    ["İlk Posta", "Dar Sokak", "Salondaki Göz", "İki Patika", "İlk Kovalamaca"],
-    ["Ağır Sandık", "Son Vagon", "Barut Fıçısı", "Makas Değişimi", "Demir Şerif"],
-    ["Cam Fener", "Çatı Katı", "Su Kulesi", "Yel Değirmeni", "Çatılarda Takip"],
-    ["Doktorun Çantası", "Yıkık Köprü", "Kuru Dere", "Ahır Geçidi", "Taşkın Avcısı"],
-    ["Sessiz Kasaba", "Zırhlı Posta Arabası", "Kararsız Barut", "Kapanan Çember", "Kanun Kaçağı Avcısı"],
-    ["Dönüş Yok", "Üçüncü Kapı", "Son Telgraf", "Kale Yolu", "Son Teslimat"],
-    ["Kızıl Ocak", "Kopan Makara", "Üç Ray", "Kömür Arabası", "Göçükten Kaçış"],
-    ["Dar Kanyon", "Kızgın Kayalar", "Asma Köprü", "Son Kervan", "Kartal Kayası"],
+    [L("İlk Posta"), L("Dar Sokak"), L("Salondaki Göz"), L("İki Patika"), L("İlk Kovalamaca")],
+    [L("Ağır Sandık"), L("Son Vagon"), L("Barut Fıçısı"), L("Makas Değişimi"), L("Demir Şerif")],
+    [L("Cam Fener"), L("Çatı Katı"), L("Su Kulesi"), L("Yel Değirmeni"), L("Çatılarda Takip")],
+    [L("Doktorun Çantası"), L("Yıkık Köprü"), L("Kuru Dere"), L("Ahır Geçidi"), L("Taşkın Avcısı")],
+    [L("Sessiz Kasaba"), L("Zırhlı Posta Arabası"), L("Kararsız Barut"), L("Kapanan Çember"), L("Kanun Kaçağı Avcısı")],
+    [L("Dönüş Yok"), L("Üçüncü Kapı"), L("Son Telgraf"), L("Kale Yolu"), L("Son Teslimat")],
+    [L("Kızıl Ocak"), L("Kopan Makara"), L("Üç Ray"), L("Kömür Arabası"), L("Göçükten Kaçış")],
+    [L("Dar Kanyon"), L("Kızgın Kayalar"), L("Asma Köprü"), L("Son Kervan"), L("Kartal Kayası")],
   ],
   trail: [
-    ["İlk Yük", "Dar Patika", "Kayadaki Göz", "İki Dere", "Çam Altı Takibi"],
-    ["Ağır Heybe", "Son Teleferik", "Gaz Tüpü", "Yol Ayrımı", "Sarp Yokuş Avcısı"],
-    ["Cam Termos", "Kaya Çıkıntısı", "Buzul Suyu", "Rüzgâr Sırtı", "Zirve Takibi"],
-    ["Sağlık Çantası", "Halat Köprü", "Şelale Üstü", "Sisli Koridor", "Çağlayan Avcısı"],
-    ["Sessiz Yayla", "Zırhlı Gözcü", "Oynak Kaya", "Kapanan Vadi", "Sis Avcısı"],
-    ["Geri Dönüş Yok", "Üçüncü Geçit", "Son Kamp", "Zirve Yolu", "Son Teslimat"],
-    ["Terk Edilmiş Ocak", "Kopan Halat", "Üç Tünel", "Cevher Konvoyu", "Heyelandan Kaçış"],
-    ["Derin Boğaz", "Taş Yağmuru", "Kartal Yuvası", "Kervan Yolu", "Doruk Geçidi"],
+    [L("İlk Yük"), L("Dar Patika"), L("Kayadaki Göz"), L("İki Dere"), L("Çam Altı Takibi")],
+    [L("Ağır Heybe"), L("Son Teleferik"), L("Gaz Tüpü"), L("Yol Ayrımı"), L("Sarp Yokuş Avcısı")],
+    [L("Cam Termos"), L("Kaya Çıkıntısı"), L("Buzul Suyu"), L("Rüzgâr Sırtı"), L("Zirve Takibi")],
+    [L("Sağlık Çantası"), L("Halat Köprü"), L("Şelale Üstü"), L("Sisli Koridor"), L("Çağlayan Avcısı")],
+    [L("Sessiz Yayla"), L("Zırhlı Gözcü"), L("Oynak Kaya"), L("Kapanan Vadi"), L("Sis Avcısı")],
+    [L("Geri Dönüş Yok"), L("Üçüncü Geçit"), L("Son Kamp"), L("Zirve Yolu"), L("Son Teslimat")],
+    [L("Terk Edilmiş Ocak"), L("Kopan Halat"), L("Üç Tünel"), L("Cevher Konvoyu"), L("Heyelandan Kaçış")],
+    [L("Derin Boğaz"), L("Taş Yağmuru"), L("Kartal Yuvası"), L("Kervan Yolu"), L("Doruk Geçidi")],
   ],
 };
+// Per-map story lines shown on the result screen (city lines stay on MISSIONS.story).
+const MAP_STORIES = {
+  western: [
+    L("Kasabanın son postası sende. Çantayı istasyona ulaştır."),
+    L("Ağır sandıklar treni bekliyor; hattı açık tut."),
+    L("Cam fenerler en küçük sarsıntıda çatlar. Yumuşak koş."),
+    L("Doktorun ilaçları dere taşmadan karşıya geçmeli."),
+    L("Barut sandığı kararsız ve kanun kaçakları peşinde."),
+    L("Son telgrafı kaleye götür. Kasabanın sesi sende."),
+    L("Kızıl Ocak'ın vinçlerini aş; kaçış rayını açık tut."),
+    L("Son kervanı kanyondan geçir. Kartal Kayası'ndan sonra yol özgür."),
+  ],
+  trail: [
+    L("Yayla köyünün tek yükü sende. Patikadan aşağı indir."),
+    L("Teleferik durdu; heybeleri sırtlayıp yokuşu aş."),
+    L("Cam termoslar buzul suyu taşıyor. Taşlara dikkat."),
+    L("Sağlık çantası şelalenin öbür yakasında bekleniyor."),
+    L("Sis çöktü, kayalar oynuyor. Gözcüler seni izliyor."),
+    L("Zirve kampına son yükü çıkar. Dağın ışıkları yeniden yansın."),
+    L("Terk edilmiş ocakta halatlar kopuyor; tünelden çıkışı bul."),
+    L("Derin boğazdan geç. Doruk Geçidi'nden sonra yol açık."),
+  ],
+};
+function storyText(m, landscape) {
+  return MAP_STORIES[landscape]?.[m.district] || m.story;
+}
 function missionName(m, landscape) {
   return MAP_NAMES[landscape]?.[m.district]?.[m.id % 5] || m.name;
 }
@@ -77655,29 +78117,29 @@ const MISSIONS = Array.from({ length: 40 }, (_, i) => {
     threat: 1 + district,
     reward: 80 + i * 7,
     story: [
-      "Veri çekirdeği bulundu. Çarşının son kuryesisin.",
-      "Aktarım istasyonuna giden tren hattını aç.",
-      "Cam çekirdek tek bir sert darbeye bile duyarlı.",
-      "Tıbbi paketler suya teslim olmayacak.",
-      "Karantinanın enerji kaynağını taşıyorsun.",
-      "Çekirdeği kaleye ulaştır. Şehrin ışıklarını geri getir.",
-      "Kızıl Maden'in vinçlerini aş; kaçış rayını açık tut.",
-      "Son konvoyu Kartal Kanyonu'ndan geçir.",
+      L("Veri çekirdeği bulundu. Çarşının son kuryesisin."),
+      L("Aktarım istasyonuna giden tren hattını aç."),
+      L("Cam çekirdek tek bir sert darbeye bile duyarlı."),
+      L("Tıbbi paketler suya teslim olmayacak."),
+      L("Karantinanın enerji kaynağını taşıyorsun."),
+      L("Çekirdeği kaleye ulaştır. Şehrin ışıklarını geri getir."),
+      L("Kızıl Maden'in vinçlerini aş; kaçış rayını açık tut."),
+      L("Son konvoyu Kartal Kanyonu'ndan geçir."),
     ][district],
   };
 });
 const CARGOS = {
-  data: { name: "Veri çekirdeği", damage: 12, jump: 9, speed: 1 },
-  heavy: { name: "Ağır batarya", damage: 10, jump: 8.3, speed: 0.93 },
-  fragile: { name: "Cam çekirdek", damage: 25, jump: 9, speed: 1 },
-  medical: { name: "Tıbbi paket", damage: 16, jump: 9, speed: 1 },
-  volatile: { name: "Kararsız hücre", damage: 20, jump: 9, speed: 1 },
-  core: { name: "Son çekirdek", damage: 18, jump: 9, speed: 1 },
+  data: { name: L("Veri çekirdeği"), damage: 12, jump: 9, speed: 1 },
+  heavy: { name: L("Ağır batarya"), damage: 10, jump: 8.3, speed: 0.93 },
+  fragile: { name: L("Cam çekirdek"), damage: 25, jump: 9, speed: 1 },
+  medical: { name: L("Tıbbi paket"), damage: 16, jump: 9, speed: 1 },
+  volatile: { name: L("Kararsız hücre"), damage: 20, jump: 9, speed: 1 },
+  core: { name: L("Son çekirdek"), damage: 18, jump: 9, speed: 1 },
 };
 const COURIER_WEAPONS = {
   sidearm: {
-    name: "Kurye Tabancası",
-    desc: "Dengeli ve güvenilir",
+    name: L("Kurye Tabancası"),
+    desc: L("Dengeli ve güvenilir"),
     coinCost: 0,
     diamondCost: 0,
     damage: 1,
@@ -77686,8 +78148,8 @@ const COURIER_WEAPONS = {
     rounds: 1,
   },
   burst: {
-    name: "Üçlü Atım",
-    desc: "Her dokunuşta üç mermi",
+    name: L("Üçlü Atım"),
+    desc: L("Her dokunuşta üç mermi"),
     coinCost: 220,
     diamondCost: 0,
     damage: 0.85,
@@ -77696,8 +78158,8 @@ const COURIER_WEAPONS = {
     rounds: 3,
   },
   ion: {
-    name: "İyon İğnesi",
-    desc: "Hızlı ve yüksek hasarlı",
+    name: L("İyon İğnesi"),
+    desc: L("Hızlı ve yüksek hasarlı"),
     coinCost: 0,
     diamondCost: 8,
     damage: 1.7,
@@ -77706,8 +78168,8 @@ const COURIER_WEAPONS = {
     rounds: 1,
   },
   rail: {
-    name: "Ray Kırıcı",
-    desc: "Yavaş ama zırh parçalayan",
+    name: L("Ray Kırıcı"),
+    desc: L("Yavaş ama zırh parçalayan"),
     coinCost: 0,
     diamondCost: 16,
     damage: 4.2,
@@ -77716,8 +78178,8 @@ const COURIER_WEAPONS = {
     rounds: 1,
   },
   repeater: {
-    name: "Kasırga Makineli",
-    desc: "Geniş şarjör · kesintisiz baskı ateşi",
+    name: L("Kasırga Makineli"),
+    desc: L("Geniş şarjör · kesintisiz baskı ateşi"),
     coinCost: 380,
     diamondCost: 0,
     damage: 0.75,
@@ -77726,8 +78188,8 @@ const COURIER_WEAPONS = {
     rounds: 1,
   },
   storm: {
-    name: "Fırtına Beşlisi",
-    desc: "Tek dokunuşta beşli ağır yaylım",
+    name: L("Fırtına Beşlisi"),
+    desc: L("Tek dokunuşta beşli ağır yaylım"),
     coinCost: 580,
     diamondCost: 0,
     damage: 1.05,
@@ -77881,25 +78343,28 @@ function rewardRun(save, result) {
 function objective(m) {
   let slot = m.id % 5;
   if (m.id === 0)
-    return { kind: "clean", count: 0, text: "Hiç darbe almadan teslim et" };
+    return { kind: "clean", count: 0, text: L("Hiç darbe almadan teslim et") };
   if (slot === 4)
     return {
       kind: "hunter",
       count: 55,
-      text: "Takipçi mesafesini 55 metrenin üstünde tut",
+      text: L("Takipçi mesafesini 55 metrenin üstünde tut"),
     };
   if (slot === 3)
-    return { kind: "risk", count: 1, text: "En az bir kestirme rota kullan" };
+    return { kind: "risk", count: 1, text: L("En az bir kestirme rota kullan") };
   if (m.environment && slot === 2)
     return {
       kind: "environment",
       count: 2,
-      text: "İki çevre hedefini etkinleştir",
+      text: L("İki çevre hedefini etkinleştir"),
     };
   return {
     kind: "kills",
     count: Math.max(1, Math.min(7, Math.floor(m.id / 5) + 1)),
-    text: Math.max(1, Math.min(7, Math.floor(m.id / 5) + 1)) + " dron düşür",
+    text:
+      LANG === "en"
+        ? "Shoot down " + Math.max(1, Math.min(7, Math.floor(m.id / 5) + 1)) + " drones"
+        : Math.max(1, Math.min(7, Math.floor(m.id / 5) + 1)) + " dron düşür",
   };
 }
 function signature(m) {
@@ -78710,15 +79175,18 @@ class Run {
   }
 }
 
-return {TITLE,DISTRICTS,missionName,MISSIONS,CARGOS,COURIER_WEAPONS,DEFAULT_SAVE,validateSave,rewardRun,objective,signature,rng,Run};
+return {TITLE,DISTRICTS,storyText,missionName,MISSIONS,CARGOS,COURIER_WEAPONS,DEFAULT_SAVE,validateSave,rewardRun,objective,signature,rng,Run};
 })();
 // game.js
 M[0]=(()=>{
 const T=M[1];
 const {RoundedBoxGeometry}=M[3];
 const {loadGame,saveGame,COSTUMES,LOGIN_REWARDS,TASKS,dayKey,dailyState,claimLogin,recordDaily,claimTask,selectCostume,REWARDED_ADS_ENABLED,showRewardedAd}=M[4];
-const {GameAudio}=M[5];
-const {Run,MISSIONS,DISTRICTS,CARGOS,COURIER_WEAPONS,validateSave,rewardRun,TITLE,objective,missionName}=M[6];
+const {GameAudio}=M[6];
+const {L,LANG,setStaticText}=M[5];
+const {Run,MISSIONS,DISTRICTS,CARGOS,COURIER_WEAPONS,validateSave,rewardRun,TITLE,objective,missionName,storyText}=M[7];
+const UPPER = LANG === "en" ? "en" : "tr",
+  NUMBERS = LANG === "en" ? "en-US" : "tr-TR";
 const mapRecords = () =>
   settings.landscape === "trail" ? settings.trailRecords : settings.records;
 const stageName = (m) => missionName(m, settings.landscape);
@@ -78734,7 +79202,7 @@ try {
 } catch (e) {
   $("#loading").hidden = true;
   view.innerHTML =
-    '<div class="error"><h2>3D görüntü açılamadı</h2><p>WebGL destekleyen Safari veya Chrome ile açmayı dene.</p></div>';
+    L('<div class="error"><h2>3D görüntü açılamadı</h2><p>WebGL destekleyen Safari veya Chrome ile açmayı dene.</p></div>');
   throw e;
 }
 renderer.setPixelRatio(Math.min(devicePixelRatio, 1.65));
@@ -78935,7 +79403,7 @@ glow("#ffd1ae", -55, 50, -180, 70);
 let segments = [];
 const SEG = 28;
 function sign(text, color, parent, x, y, z) {
-  if (text !== "KAPI") return null;
+  if (text !== L("KAPI")) return null;
   let t = tex(
     (c, w, h) => {
       c.fillStyle = "#0b1e2b";
@@ -78961,7 +79429,7 @@ function sign(text, color, parent, x, y, z) {
     new T.PlaneGeometry(3.6, 0.9),
     new T.MeshBasicMaterial({ map: t }),
   );
-  o.position.set(x, text === "KAPI" ? y : y + 2.2, z);
+  o.position.set(x, text === L("KAPI") ? y : y + 2.2, z);
   if (parent.userData.rooftop) {
     o.scale.setScalar(1.4);
     o.position.x = x < 0 ? -7.8 : 7.8;
@@ -78970,7 +79438,7 @@ function sign(text, color, parent, x, y, z) {
   }
   o.userData.ownMat = true;
   o.userData.signText = text;
-  if (text === "KAPI") parent.add(o);
+  if (text === L("KAPI")) parent.add(o);
   else {
     o.material.map.dispose();
     o.material.dispose();
@@ -79133,21 +79601,21 @@ let ytAudio = platform ? platform.isAudioEnabled() : true,
   systemPaused = false;
 let { settings, profile } = loadGame(storageAdapter, validateSave);
 const TRANSMISSIONS = [
-  "Yayın henüz kilitli. İlk bölge finaline ulaş.",
-  "01 · Biri şehrin tahliye yollarını içeriden kapattı.",
-  "02 · Külhat bir isim değil; kayıp kuryelerin ortak çağrı kodu.",
-  "03 · Takipçi yükün peşinde değil, taşıdığın şehir hafızasının peşinde.",
-  "04 · Altı röle aynı gece susturuldu. İçlerinden biri hâlâ cevap veriyor.",
-  "05 · Son teslimat bir paket değil; şehrin yeniden başlatma anahtarı.",
-  "06 · Yayın tamamlandı: sıradaki hedef, sessizliğin merkezindeki Çekirdek.",
-  "07 · Kızıl Maden'in vinçleri kaçış raylarına vagon bırakıyor.",
-  "08 · Kartal Geçidi açıldı. Kasabanın son konvoyu artık özgür.",
+  L("Yayın henüz kilitli. İlk bölge finaline ulaş."),
+  L("01 · Biri şehrin tahliye yollarını içeriden kapattı."),
+  L("02 · Külhat bir isim değil; kayıp kuryelerin ortak çağrı kodu."),
+  L("03 · Takipçi yükün peşinde değil, taşıdığın şehir hafızasının peşinde."),
+  L("04 · Altı röle aynı gece susturuldu. İçlerinden biri hâlâ cevap veriyor."),
+  L("05 · Son teslimat bir paket değil; şehrin yeniden başlatma anahtarı."),
+  L("06 · Yayın tamamlandı: sıradaki hedef, sessizliğin merkezindeki Çekirdek."),
+  L("07 · Kızıl Maden'in vinçleri kaçış raylarına vagon bırakıyor."),
+  L("08 · Kartal Geçidi açıldı. Kasabanın son konvoyu artık özgür."),
 ];
 const DAILY_CONTRACTS = [
-  { text: "Bir teslimatı başarıyla tamamla", met: (r) => r.success },
-  { text: "Tek koşuda en az 3 dron düşür", met: (r) => r.kills >= 3 },
+  { text: L("Bir teslimatı başarıyla tamamla"), met: (r) => r.success },
+  { text: L("Tek koşuda en az 3 dron düşür"), met: (r) => r.kills >= 3 },
   {
-    text: "Bir kestirme kullanarak teslimatı tamamla",
+    text: L("Bir kestirme kullanarak teslimatı tamamla"),
     met: (r) => r.success && r.routes.includes("risk"),
   },
 ];
@@ -79213,8 +79681,8 @@ function save() {
   if (!saveGame(storageAdapter, settings, profile)) {
     const el = $("#storage");
     if (el)
-      el.textContent = "Kayıt kullanılamıyor; bu oturumdaki ilerleme bellekte.";
-    else notice("Kayıt kullanılamıyor; ilerleme bu oturumda bellekte.", 4);
+      el.textContent = L("Kayıt kullanılamıyor; bu oturumdaki ilerleme bellekte.");
+    else notice(L("Kayıt kullanılamıyor; ilerleme bu oturumda bellekte."), 4);
   }
 }
 function sound(f = 400, d = 0.1, type = "sine") {
@@ -79235,7 +79703,7 @@ function setQuality(q) {
   skyline.visible = !low;
   dust.children.forEach((cloud, i) => (cloud.visible = !low || i < 2));
   rain.material.opacity = low ? 0 : 0.5;
-  $("#quality").textContent = low ? "GÖRÜNTÜ: EKONOMİK" : "GÖRÜNTÜ: YÜKSEK";
+  $("#quality").textContent = low ? L("GÖRÜNTÜ: EKONOMİK") : L("GÖRÜNTÜ: YÜKSEK");
 }
 function cleanup(group) {
   group.parent?.remove(group);
@@ -79318,37 +79786,59 @@ function burst(position, color, count = 16) {
 }
 function westernText(text) {
   if (settings.landscape !== "western" || typeof text !== "string") return text;
-  return text
-    .replaceAll("dron düşür", "at arabası durdur")
-    .replaceAll("Drona", "At arabasına")
-    .replaceAll("Dronları vurmak", "Arabaları durdurmak")
-    .replaceAll("dronları devre dışı bırakır", "arabaları durdurur")
-    .replaceAll("DRONLARI", "ARABALARI")
-    .replaceAll("DRONLAR DEVRE DIŞI", "ARABALAR DURDURULDU")
-    .replaceAll("METRO", "MADEN")
-    .replaceAll("metro", "maden");
+  const pairs =
+    LANG === "en"
+      ? [
+          ["disables drones", "stops wagons"],
+          ["Shooting drones", "Stopping wagons"],
+          ["Shoot down", "Stop"],
+          ["a drone", "a wagon"],
+          ["DRONES DISABLED", "WAGONS STOPPED"],
+          ["DRONES", "WAGONS"],
+          ["drones", "wagons"],
+          ["slide under lasers", "slide under low beams"],
+          ["slide under the laser", "slide under low beams"],
+          ["covered metro", "mine shaft"],
+          ["METRO", "MINE"],
+          ["metro", "mine"],
+        ]
+      : [
+          ["dron düşür", "at arabası durdur"],
+          ["Drona", "At arabasına"],
+          ["Dronları vurmak", "Arabaları durdurmak"],
+          ["dronları devre dışı bırakır", "arabaları durdurur"],
+          ["DRONLARI", "ARABALARI"],
+          [L("DRONLAR DEVRE DIŞI"), "ARABALAR DURDURULDU"],
+          ["lazerlerin altından", "alçak kirişlerin altından"],
+          ["lazerin altından", "alçak kirişlerin altından"],
+          ["kapalı metroya", "maden ocağına"],
+          ["METRO", "MADEN"],
+          ["metro", "maden"],
+        ];
+  for (const [from, to] of pairs) text = text.replaceAll(from, to);
+  return text;
 }
 function routeLabels() {
   return settings.landscape === "western"
-    ? { left: "MADEN OCAĞI", middle: "ANA CADDE", right: "ÇATILAR" }
-    : { left: "MAĞARA", middle: "PATİKA", right: "SIRT YOLU" };
+    ? { left: L("MADEN OCAĞI"), middle: L("ANA CADDE"), right: L("ÇATILAR") }
+    : { left: L("MAĞARA"), middle: L("PATİKA"), right: L("SIRT YOLU") };
 }
 function routeHint() {
   const names = routeLabels();
   return (
-    "SOL: " + names.left + " · ORTA: " + names.middle + " · SAĞ: " + names.right
+    L("SOL: ") + names.left + L(" · ORTA: ") + names.middle + L(" · SAĞ: ") + names.right
   );
 }
 function cargoLabel(kind) {
   return (
     {
-      data: "Standart paket",
-      heavy: "Ağır paket",
-      fragile: "Kırılgan yük",
-      medical: "Tıbbi malzeme",
-      volatile: "Hassas yük",
-      core: "Özel emanet",
-    }[kind] || "Paket"
+      data: L("Standart paket"),
+      heavy: L("Ağır paket"),
+      fragile: L("Kırılgan yük"),
+      medical: L("Tıbbi malzeme"),
+      volatile: L("Hassas yük"),
+      core: L("Özel emanet"),
+    }[kind] || L("Paket")
   );
 }
 function notice(text, duration = 2) {
@@ -79438,10 +79928,11 @@ function dressRoute(g, kind, variant = 0, district = 0) {
             box(0.06, 1.1, 0.19, wood, side * 10 + dx, 1.9, z + 5, d);
           }
           box(0.25, 1.25, 9.8, wood, side * 6.9, 4.7, z, d);
-          box(2.6, 0.22, 10.6, mat("#a58157"), side * 6, 2.65, z, d);
+          box(2.7, 0.18, 10.6, mat("#6f5236"), side * 6, 3.25, z, d).rotation.z =
+            side * 0.22;
           box(2.8, 0.22, 10.6, mat("#8c6d4d"), side * 6, 0.1, z, d);
           for (let dz of quality === "low" ? [-3.8, 3.8] : [-3.8, 0, 3.8]) {
-            box(0.16, 2.6, 0.16, mat("#73573c"), side * 5.5, 1.3, z + dz, d);
+            box(0.16, 3.05, 0.16, mat("#73573c"), side * 5.5, 1.52, z + dz, d);
             box(0.1, 1.3, 1.1, mat("#352e28"), side * 6.94, 1.5, z + dz, d);
             box(0.13, 0.1, 1.35, mat("#c5a575"), side * 6.88, 2.2, z + dz, d);
           }
@@ -79460,14 +79951,14 @@ function dressRoute(g, kind, variant = 0, district = 0) {
             box(0.15, 0.12, 7, mat("#ad774a"), side * 6.3, y, z - 5, d);
           sign(
             [
-              "SALOON",
-              "ŞERİF",
-              "GENEL MAĞAZA",
-              "POSTA",
-              "AHIR",
-              "DEMİRCİ",
-              "İSTASYON",
-              "ESKİ HAN",
+              L("SALOON"),
+              L("ŞERİF"),
+              L("GENEL MAĞAZA"),
+              L("POSTA"),
+              L("AHIR"),
+              L("DEMİRCİ"),
+              L("İSTASYON"),
+              L("ESKİ HAN"),
             ][variant],
             "#eacb91",
             d,
@@ -79495,10 +79986,10 @@ function dressRoute(g, kind, variant = 0, district = 0) {
   if (kind === "legacy-street") {
     if (variant >= 4) {
       let name = [
-        "LİMAN CADDESİ",
-        "TRAMVAY BULVARI",
-        "SANAT SOKAĞI",
-        "ESKİ ŞEHİR",
+        L("LİMAN CADDESİ"),
+        L("TRAMVAY BULVARI"),
+        L("SANAT SOKAĞI"),
+        L("ESKİ ŞEHİR"),
       ][variant - 4];
       for (let side of [-1, 1]) {
         box(
@@ -79560,7 +80051,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
             d,
           ).rotation.z = side * 0.12;
         sign(
-          side < 0 ? "BAKIR PAZAR" : "GECE ÇARŞISI",
+          side < 0 ? L("BAKIR PAZAR") : L("GECE ÇARŞISI"),
           "#ffd28e",
           d,
           side * 6.2,
@@ -79574,7 +80065,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         for (let side of [-1, 1])
           box(0.22, 5.4, 0.22, mat("#65737b"), side * 5.6, 2.7, z, d);
       }
-      sign("İNŞA HATTI · 04", "#ffb35f", d, 0, 6.2, -11);
+      sign(L("İNŞA HATTI · 04"), "#ffb35f", d, 0, 6.2, -11);
     } else if (variant === 2) {
       for (let side of [-1, 1])
         for (let z of [-4, -10, -16, -22]) {
@@ -79604,7 +80095,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         for (let z of [-4, -12, -20])
           box(1.1, 1.1, 2.4, mat("#bf7254", 0.35, 0.3), side * 5.2, 2.8, z, d);
       }
-      sign("TÜRBİN SOKAĞI", "#ff8b6d", d, 0, 5.5, -20);
+      sign(L("TÜRBİN SOKAĞI"), "#ff8b6d", d, 0, 5.5, -20);
     }
     return;
   }
@@ -79649,14 +80140,14 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         box(11.5, 0.45, 0.55, mat("#765638"), 0, 6.3, z, d);
       sign(
         [
-          "KÖMÜR DAMARI",
-          "VİNÇ KUYUSU",
-          "KIZIL TÜNEL",
-          "ÜÇ RAY",
-          "CEVHER HATTI",
-          "ESKİ ŞAFT",
-          "VAGON DEPOSU",
-          "DERİN MADEN",
+          L("KÖMÜR DAMARI"),
+          L("VİNÇ KUYUSU"),
+          L("KIZIL TÜNEL"),
+          L("ÜÇ RAY"),
+          L("CEVHER HATTI"),
+          L("ESKİ ŞAFT"),
+          L("VAGON DEPOSU"),
+          L("DERİN MADEN"),
         ][variant],
         "#ffd18a",
         d,
@@ -79696,7 +80187,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         box(0.12, 1, 3, mat("#eb806a"), side * 5.68, 3, z - 2, d);
       }
       sign(
-        side < 0 ? "M2 · SON İSTASYON" : "ÇIKIŞ →",
+        side < 0 ? L("M2 · SON İSTASYON") : L("ÇIKIŞ →"),
         "#78ffdc",
         d,
         side * 3.9,
@@ -79708,10 +80199,10 @@ function dressRoute(g, kind, variant = 0, district = 0) {
       box(7, 0.1, 0.4, mat("#d8fffa", 0.3, 0.1, "#8bded5"), 0, 6.65, z, d);
     if (variant >= 4) {
       let names = [
-        "M4 · AKTARMA İSTASYONU",
-        "ESKİ TAŞ TÜNEL",
-        "KARGO METROSU",
-        "M7 · MAVİ HAT",
+        L("M4 · AKTARMA İSTASYONU"),
+        L("ESKİ TAŞ TÜNEL"),
+        L("KARGO METROSU"),
+        L("M7 · MAVİ HAT"),
       ];
       for (let side of [-1, 1]) {
         for (let z of [-5, -13, -21]) {
@@ -79754,7 +80245,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         );
       for (let side of [-1, 1])
         box(0.34, 0.34, 25, mat("#cf704e"), side * 4.9, 4.7, -14, d);
-      sign("BAKIM TÜNELİ", "#ffad67", d, 0, 4.3, -17);
+      sign(L("BAKIM TÜNELİ"), "#ffad67", d, 0, 4.3, -17);
     } else if (variant === 2) {
       for (let side of [-1, 1]) {
         box(
@@ -79770,7 +80261,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         for (let z of [-4, -11, -18, -25])
           orb(0.2, mat("#8bf4e2", 0.2, 0.1, "#45aa9e"), side * 4.8, 0.35, z, d);
       }
-      sign("SU SERVİS GALERİSİ", "#8beee5", d, 0, 5, -12);
+      sign(L("SU SERVİS GALERİSİ"), "#8beee5", d, 0, 5, -12);
     } else if (variant === 3) {
       for (let side of [-1, 1])
         for (let z of [-4, -10, -16, -22])
@@ -79789,7 +80280,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
             z,
             d,
           );
-      sign("NEON TERMİNAL", "#ff8bd0", d, 0, 4.7, -18);
+      sign(L("NEON TERMİNAL"), "#ff8bd0", d, 0, 4.7, -18);
     }
   } else {
     d.userData.rooftop = true;
@@ -79848,7 +80339,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
           d,
         );
     }
-    sign("GÖKYÜZÜ BAHÇELERİ", "#ffe1a0", d, 0, 4.6, -23);
+    sign(L("GÖKYÜZÜ BAHÇELERİ"), "#ffe1a0", d, 0, 4.6, -23);
     box(10, 0.12, 0.12, mat("#395262"), 0, 5, -23, d);
     for (let x = -4; x <= 4; x += 2)
       orb(
@@ -79866,10 +80357,10 @@ function dressRoute(g, kind, variant = 0, district = 0) {
       );
     if (variant >= 4) {
       let names = [
-        "ANTEN ÇATILARI",
-        "SU KULELERİ",
-        "RENKLİ TERASLAR",
-        "YÜKSEK KÖPRÜLER",
+        L("ANTEN ÇATILARI"),
+        L("SU KULELERİ"),
+        L("RENKLİ TERASLAR"),
+        L("YÜKSEK KÖPRÜLER"),
       ];
       for (let side of [-1, 1]) {
         for (let z of [-5, -18]) {
@@ -79913,7 +80404,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         for (let side of [-1, 1])
           box(1.1, 0.65, 2.2, mat("#55ac93"), side * 5.6, 0.4, z, d);
       }
-      sign("AÇIK BAHÇELER", "#91fff0", d, 0, 5.3, -19);
+      sign(L("AÇIK BAHÇELER"), "#91fff0", d, 0, 5.3, -19);
     } else if (variant === 2) {
       for (let side of [-1, 1])
         for (let z of [-5, -12, -19]) {
@@ -79937,7 +80428,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         fan.position.set(side * 4.2, 0.35, -14);
         d.add(fan);
       }
-      sign("GÜNEŞ TERASI", "#ffd074", d, 0, 4.8, -22);
+      sign(L("GÜNEŞ TERASI"), "#ffd074", d, 0, 4.8, -22);
     } else if (variant === 3) {
       for (let z of [-4, -10, -16, -22]) {
         box(9, 0.08, 0.08, mat("#5b506f"), 0, 4.1, z, d);
@@ -79956,7 +80447,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
             d,
           );
       }
-      sign("GÖK PAZARI", "#ff9bcf", d, 0, 5.2, -16);
+      sign(L("GÖK PAZARI"), "#ff9bcf", d, 0, 5.2, -16);
     }
     for (let o of d.children) {
       let shape = o.geometry?.parameters;
@@ -80028,7 +80519,7 @@ function generateRegion(i) {
     if (i === 4) {
       for (let side of [-1, 1]) {
         box(1.1, 2.1, 0.5, mat("#c3bda9"), side * 6.4, 1.2, -10, decor);
-        sign("QUARANTINE", "#f69e87", decor, side * 8, 4, -14);
+        sign(L("QUARANTINE"), "#f69e87", decor, side * 8, 4, -14);
       }
     }
     if (i === 5) {
@@ -80261,7 +80752,13 @@ function createObject(o, tracked = true) {
       g.userData.train = true;
     }
   }
-  if (o.type === "laser") {
+  if (o.type === "laser" && settings.landscape === "western") {
+    // Western: same slide-under hazard, drawn as a low wooden beam on posts.
+    const beam = mat("#8a5a32", 0.05, 0.9);
+    for (let s of [-1, 1]) box(0.3, 3.3, 0.3, mat("#5e4029", 0.05, 0.9), s * 1.4, 1.65, 0, g);
+    box(3.1, 0.45, 0.4, beam, 0, 1.85, 0, g);
+    box(2.6, 0.12, 0.42, mat("#f0b871", 0.3, 0.4, "#91613a"), 0, 1.55, 0, g);
+  } else if (o.type === "laser") {
     for (let s of [-1, 1]) box(0.15, 3.3, 0.35, metal, s * 1.4, 1.65, 0, g);
     for (let y of [1.6, 2.05])
       box(2.8, 0.1, 0.15, mat("#eb9a85", 0.2, 0.3, "#e56150"), 0, y, 0, g);
@@ -80423,7 +80920,7 @@ function createObject(o, tracked = true) {
   if (o.type === "panel") {
     box(0.25, 2.6, 0.4, metal, 0, 1.3, 0, g);
     box(1, 1.1, 0.2, mat("#59babc", 0.3, 0.2, "#367e83"), 0, 1.9, 0.3, g);
-    sign("KAPI", "#94ece0", g, 0, 1.9, 0.42);
+    sign(L("KAPI"), "#94ece0", g, 0, 1.9, 0.42);
   }
   if (tracked) {
     scene.add(g);
@@ -80453,7 +80950,7 @@ for (let side of [-1, 1]) {
       );
     }
     sign(
-      settings.landscape === "western" ? "MADEN OCAĞI" : "M2 · METRO",
+      settings.landscape === "western" ? L("MADEN OCAĞI") : L("M2 · METRO"),
       "#ffd396",
       entry,
       0,
@@ -80476,12 +80973,12 @@ for (let side of [-1, 1]) {
       );
       for (let z of [-9, -20]) orb(0.8, mat("#5baa83"), x, 3, z, entry);
     }
-    sign("ÇATI BAHÇELERİ ↑", "#ffd393", entry, 0, 5, -5);
+    sign(L("ÇATI BAHÇELERİ ↑"), "#ffd393", entry, 0, 5, -5);
   }
   let road = box(4, 0.08, 45, roadMat, side * 5, -0.05, -4, forkVisual);
   road.rotation.y = side * -0.22;
   sign(
-    side < 0 ? "MADEN ↓ +70m" : "ÇATILAR ↑ −90m",
+    side < 0 ? L("MADEN ↓ +70m") : L("ÇATILAR ↑ −90m"),
     side < 0 ? "#8ce7d2" : "#f2b18c",
     forkVisual,
     side * 3.5,
@@ -80490,7 +80987,7 @@ for (let side of [-1, 1]) {
   );
   box(0.15, 4, 0.15, mat("#667f89"), side * 3.5, 2, 0, forkVisual);
 }
-sign("SOKAK ↑ · ◆ ELMAS", "#c9afff", forkVisual, 0, 6.7, -8);
+sign(L("SOKAK ↑ · ◆ ELMAS"), "#c9afff", forkVisual, 0, 6.7, -8);
 // Directions are drawn once in the viewport-safe HTML strip, above GPU glows.
 const redundantSigns = [];
 forkVisual.traverse((o) => {
@@ -80584,14 +81081,14 @@ function openMission(id, endless = false) {
   initAmbient();
   notice(
     id === 0
-      ? "YUKARI KAYDIR: ZIPLA · SAĞ/SOL: KAÇ"
-      : stageName(run.mission).toLocaleUpperCase("tr") +
+      ? L("YUKARI KAYDIR: ZIPLA · SAĞ/SOL: KAÇ")
+      : stageName(run.mission).toLocaleUpperCase(UPPER) +
           " · " +
           cargoLabel(run.mission.cargo),
     3,
   );
   $("#hint").textContent =
-    "KAYDIR: KAÇ / ZIPLA / KAY · HEDEFE DOKUN VEYA BASILI TUT: ATEŞ";
+    L("KAYDIR: KAÇ / ZIPLA / KAY · HEDEFE DOKUN VEYA BASILI TUT: ATEŞ");
   updateHud();
 }
 function showMenu() {
@@ -80630,15 +81127,15 @@ function showMenu() {
     contract = dailyContract(),
     dailyDone = settings.daily.day === contract.key && settings.daily.done;
   $("#menu").innerHTML =
-    '<div class="card campaign"><div class="quick-tools"><button id="armoryShortcut">SİLAH DEPOSU ↗</button></div><div class="eyebrow">KÜLHAT · SON TESLİMAT</div><h1>Şehir sustu. <br>Sen <em>durma.</em></h1><p class="intro">Yükünü koru. Takipçiyi atlat. Kestirmeyi seç ya da güvenli yoldan git. Çevreyi silaha dönüştür.</p><div class="menu-summary"><span>◈ ' +
+    L('<div class="card campaign"><div class="quick-tools"><button id="armoryShortcut">SİLAH DEPOSU ↗</button></div><div class="eyebrow">KÜLHAT · SON TESLİMAT</div><h1>Şehir sustu. <br>Sen <em>durma.</em></h1><p class="intro">Yükünü koru. Takipçiyi atlat. Kestirmeyi seç ya da güvenli yoldan git. Çevreyi silaha dönüştür.</p><div class="menu-summary"><span>◈ ') +
     settings.coins +
-    " altın</span><span>◆ " +
+    L(" altın</span><span>◆ ") +
     settings.diamonds +
-    " elmas</span><span>★ " +
+    L(" elmas</span><span>★ ") +
     starCount +
     " / 120</span><span>" +
     Object.keys(mapRecords()).length +
-    ' / 40 teslimat</span></div><div class="retention-grid"><div class="retention-card"><b>KAYIP YAYIN · ' +
+    L(' / 40 teslimat</span></div><div class="retention-grid"><div class="retention-card"><b>KAYIP YAYIN · ') +
     signalCount +
     "/8</b><span>" +
     TRANSMISSIONS[signalCount] +
@@ -80646,9 +81143,9 @@ function showMenu() {
     (signalCount / 8) * 100 +
     '%"></i></div><div class="retention-card ' +
     (dailyDone ? "complete" : "") +
-    '"><b>BUGÜNÜN KONTRATI</b><span>' +
+    L('"><b>BUGÜNÜN KONTRATI</b><span>') +
     contract.text +
-    (dailyDone ? " · TAMAMLANDI" : " · ÖDÜL ◈120 + ◆1") +
+    (dailyDone ? L(" · TAMAMLANDI") : L(" · ÖDÜL ◈120 + ◆1")) +
     '</span><i style="width:' +
     (dailyDone ? 100 : 0) +
     '%"></i></div></div><div class="district-tabs">' +
@@ -80659,15 +81156,15 @@ function showMenu() {
         '" class="' +
         (page === i ? "active" : "") +
         '" aria-label="' +
-        "Etap grubu " +
+        L("Etap grubu ") +
         (i + 1) +
         '">0' +
         (i + 1) +
         "</button>",
     ).join("") +
     '</div><div class="district-name">' +
-    (settings.landscape === "western" ? "WESTERN KASABASI" : "DAĞ PATİKASI") +
-    " · ETAP GRUBU " +
+    (settings.landscape === "western" ? L("WESTERN KASABASI") : L("DAĞ PATİKASI")) +
+    L(" · ETAP GRUBU ") +
     String(page + 1).padStart(2, "0") +
     '</div><div class="mission-list">' +
     MISSIONS.filter((m) => m.district === page)
@@ -80688,26 +81185,26 @@ function showMenu() {
           " · " +
           Math.round(m.length / 100) / 10 +
           " km " +
-          "· TEHDİT " +
+          L("· TEHDİT ") +
           m.threat +
           "/8 " +
-          (m.boss ? "· TAKİP" : "") +
+          (m.boss ? L("· TAKİP") : "") +
           "</small><span>" +
           (mapRecords()[m.id]
             ? "★".repeat(mapRecords()[m.id].stars)
             : m.id >= settings.unlocked && !settings.freePlay
-              ? "KİLİTLİ"
-              : "HAZIR") +
+              ? L("KİLİTLİ")
+              : L("HAZIR")) +
           "</span></button>",
       )
       .join("") +
-    '</div><div class="mission-objective">★ YAN HEDEF: ' +
+    L('</div><div class="mission-objective">★ YAN HEDEF: ') +
     objective(MISSIONS[selected]).text +
-    '</div><div class="mode-groups"><div class="choice-group"><h2>ZORLUK</h2><div class="row contract-options" role="group" aria-label="Zorluk">' +
+    L('</div><div class="mode-groups"><div class="choice-group"><h2>ZORLUK</h2><div class="row contract-options" role="group" aria-label="Zorluk">') +
     [
-      ["standard", "STANDART · ×1"],
-      ["bounty", "AVCI · +%10 HIZ · ×1,5 ALTIN"],
-      ["elite", "ELİT · +%20 HIZ · ×2 ALTIN"],
+      ["standard", L("STANDART · ×1")],
+      ["bounty", L("AVCI · +%10 HIZ · ×1,5 ALTIN")],
+      ["elite", L("ELİT · +%20 HIZ · ×2 ALTIN")],
     ]
       .map(
         ([id, label]) =>
@@ -80722,10 +81219,10 @@ function showMenu() {
           "</button>",
       )
       .join("") +
-    '</div></div><div class="choice-group"><h2>HARİTA</h2><div class="row landscape-options" role="group" aria-label="Harita">' +
+    L('</div></div><div class="choice-group"><h2>HARİTA</h2><div class="row landscape-options" role="group" aria-label="Harita">') +
     [
-      ["western", "WESTERN KASABASI"],
-      ["trail", "DAĞ PATİKASI"],
+      ["western", L("WESTERN KASABASI")],
+      ["trail", L("DAĞ PATİKASI")],
     ]
       .map(
         ([id, label]) =>
@@ -80742,17 +81239,17 @@ function showMenu() {
       .join("") +
     '</div></div></div><div class="row"><button id="freeplay">' +
     (settings.freePlay
-      ? "SERBEST KEŞİF · 40 ETAP AÇIK"
-      : "TÜM ETAPLARI DENE · SERBEST KEŞİF") +
+      ? L("SERBEST KEŞİF · 40 ETAP AÇIK")
+      : L("TÜM ETAPLARI DENE · SERBEST KEŞİF")) +
     '</button></div><div class="row"><button class="primary" id="launch" ' +
     (selected >= settings.unlocked && !settings.freePlay ? "disabled" : "") +
     ">" +
     String(selected + 1).padStart(2, "0") +
-    ' · TESLİMATA BAŞLA ↗</button><button id="openArmory">SİLAH DEPOSU</button>' +
-    (settings.records[39] || settings.trailRecords[39] ? '<button id="endless">Sonsuz koşu</button>' : "") +
-    '</div><section id="armory-panel" class="armory-panel" role="dialog" aria-modal="true" aria-label="Silah deposu" ' +
+    L(' · TESLİMATA BAŞLA ↗</button><button id="openArmory">SİLAH DEPOSU</button>') +
+    (settings.records[39] || settings.trailRecords[39] ? L('<button id="endless">Sonsuz koşu</button>') : "") +
+    L('</div><section id="armory-panel" class="armory-panel" role="dialog" aria-modal="true" aria-label="Silah deposu" ') +
     (armoryOpen ? "" : "hidden") +
-    '><div class="armory-heading"><h2>SİLAH DEPOSU</h2><button id="closeArmory">KAPAT ✕</button></div><div class="arsenal">' +
+    L('><div class="armory-heading"><h2>SİLAH DEPOSU</h2><button id="closeArmory">KAPAT ✕</button></div><div class="arsenal">') +
     Object.entries(COURIER_WEAPONS)
       .map(([id, w]) => {
         let owned = settings.ownedWeapons.includes(id),
@@ -80765,9 +81262,9 @@ function showMenu() {
           (settings.weapon === id ? "selected" : "") +
           '"><b>' +
           w.name +
-          " · SV " +
+          L(" · SV ") +
           (level + 1) +
-          " · USTALIK " +
+          L(" · USTALIK ") +
           masteryLevel(settings.weaponMastery[id]) +
           "/4</b><small>" +
           w.desc +
@@ -80776,26 +81273,26 @@ function showMenu() {
           '">' +
           (owned
             ? settings.weapon === id
-              ? "KUŞANILDI"
-              : "KUŞAN"
-            : "SATIN AL · " + price) +
+              ? L("KUŞANILDI")
+              : L("KUŞAN")
+            : L("SATIN AL · ") + price) +
           '</button><button data-weapon-upgrade="' +
           id +
           '" ' +
           (!owned || level >= 4 ? "disabled" : "") +
           ">" +
           (level >= 4
-            ? "AZAMİ SEVİYE"
-            : "GÜÇLENDİR · " +
+            ? L("AZAMİ SEVİYE")
+            : L("GÜÇLENDİR · ") +
               (upgradeCoins ? "◈ " + upgradeCoins : "◆ " + upgradeDiamonds)) +
           "</button></div></div>"
         );
       })
       .join("") +
-    '</div><div class="district-name">ZIRH VE YÜK</div><div class="upgrade">' +
+    L('</div><div class="district-name">ZIRH VE YÜK</div><div class="upgrade">') +
     [
-      ["shield", "Kalkan", 40, 3],
-      ["cargo", "Yük koruması", 60, 3],
+      ["shield", L("Kalkan"), 40, 3],
+      ["cargo", L("Yük koruması"), 60, 3],
     ]
       .map(
         ([key, title, cost, max]) =>
@@ -80814,15 +81311,15 @@ function showMenu() {
           "</small></button>",
       )
       .join("") +
-    '</div></section><div class="tip">Telefonda doğrudan kaydır. Hedefe dokunarak ateş et.<br>PC: WASD / oklar · Space ateş · Esc duraklat.<br>40 görev + 120 yıldız + kampanya sonrası sonsuz koşu.</div><div class="menu-settings"><button id="sound">SES ' +
-    (muted ? "KAPALI" : "AÇIK") +
+    L('</div></section><div class="tip">Telefonda doğrudan kaydır. Hedefe dokunarak ateş et.<br>PC: WASD / oklar · Space ateş · Esc duraklat.<br>40 görev + 120 yıldız + kampanya sonrası sonsuz koşu.</div><div class="menu-settings"><button id="sound">SES ') +
+    (muted ? L("KAPALI") : L("AÇIK")) +
     '</button><button id="display">' +
-    (quality === "low" ? "GÖRÜNTÜ: EKONOMİK" : "GÖRÜNTÜ: YÜKSEK") +
-    '</button><button id="controls">NASIL OYNANIR?</button><button id="dailyHub">GÜNLÜK ÖDÜLLER</button><button id="costumeHub">KOSTÜMLER</button></div><div id="storage" class="storage">İlerleme bu tarayıcıda saklanır.</div><div class="build-label">Yayın adayı · Cihaz ve platform kontrolleri bekleniyor.</div></div>';
+    (quality === "low" ? L("GÖRÜNTÜ: EKONOMİK") : L("GÖRÜNTÜ: YÜKSEK")) +
+    L('</button><button id="controls">NASIL OYNANIR?</button><button id="dailyHub">GÜNLÜK ÖDÜLLER</button><button id="costumeHub">KOSTÜMLER</button></div><div id="storage" class="storage">İlerleme bu tarayıcıda saklanır.</div><div class="build-label">Yayın adayı · Cihaz ve platform kontrolleri bekleniyor.</div></div>');
   const scorePanel =
-    '<aside class="scoreboard"><h2>PUAN TABLOSU · BU CİHAZ</h2><p>En iyi 10 koşun</p>' +
+    L('<aside class="scoreboard"><h2>PUAN TABLOSU · BU CİHAZ</h2><p>En iyi 10 koşun</p>') +
     (settings.leaderboard.length
-      ? '<table style="width:100%;text-align:left"><tr><th>#</th><th>Bölüm</th><th>Puan</th></tr>' +
+      ? L('<table style="width:100%;text-align:left"><tr><th>#</th><th>Bölüm</th><th>Puan</th></tr>') +
         settings.leaderboard
           .map(
             (r, i) =>
@@ -80832,12 +81329,12 @@ function showMenu() {
               missionName(MISSIONS[r.mission], r.landscape || "western") +
               (r.success ? " ★" : "") +
               "</td><td>" +
-              r.score.toLocaleString("tr-TR") +
+              r.score.toLocaleString(NUMBERS) +
               "</td></tr>",
           )
           .join("") +
         "</table>"
-      : "<p>İlk koşunu tamamlayınca puanın burada görünecek.</p>") +
+      : L("<p>İlk koşunu tamamlayınca puanın burada görünecek.</p>")) +
     "</aside>";
   const panelEnd = $("#menu").innerHTML.lastIndexOf("</div>");
   $("#menu").innerHTML =
@@ -80970,11 +81467,25 @@ function showMenu() {
           }
         }),
     );
+  if (!inPlayables) {
+    // Language toggle (outside YouTube only; inside, the YouTube language is used).
+    $("#menu .menu-settings")?.insertAdjacentHTML(
+      "beforeend",
+      '<button id="langToggle" lang="' + (LANG === "en" ? "tr" : "en") + '">' +
+        (LANG === "en" ? "TÜRKÇE" : "ENGLISH") + "</button>",
+    );
+    $("#langToggle").onclick = () => {
+      try {
+        localStorage.setItem("kulhat-lang", LANG === "en" ? "tr" : "en");
+      } catch {}
+      location.reload();
+    };
+  }
   if (inPlayables) {
     // YouTube's own mute control is the overall switch inside Playables.
     $("#sound").hidden = true;
     const storageNote = $("#storage");
-    if (storageNote) storageNote.textContent = "İlerleme YouTube'da saklanır.";
+    if (storageNote) storageNote.textContent = L("İlerleme YouTube'da saklanır.");
   }
   $("#sound").onclick = () => {
     muted = !muted;
@@ -81006,15 +81517,15 @@ function showProfile(tab = "daily") {
       })();
   const content =
     tab === "daily"
-      ? '<h2>7 GÜNLÜK GİRİŞ ÖDÜLÜ</h2><div class="login-calendar">' +
+      ? L('<h2>7 GÜNLÜK GİRİŞ ÖDÜLÜ</h2><div class="login-calendar">') +
         LOGIN_REWARDS.map(
           (coins, i) =>
             '<div class="login-day ' +
             (i + 1 === currentDay ? "today " : "") +
             (loginTaken && i < profile.login.streak ? "claimed" : "") +
             '"><b>' +
-            (i + 1) +
-            ". GÜN</b><span>◈ " +
+            (LANG === "en" ? "DAY " + (i + 1) : i + 1 + ". GÜN") +
+            "</b><span>◈ " +
             coins +
             "</span>" +
             (loginTaken && i + 1 === currentDay ? "✓" : "") +
@@ -81023,8 +81534,8 @@ function showProfile(tab = "daily") {
         '</div><button id="claimLogin" class="primary" ' +
         (loginTaken ? "disabled" : "") +
         ">" +
-        (loginTaken ? "BUGÜN ALINDI" : "BUGÜNÜN ÖDÜLÜNÜ AL") +
-        '</button><h2>BUGÜNÜN 3 GÖREVİ</h2><p>Koşu bitince ilerleme kaydedilir. Her gün yenilenir.</p><div class="daily-tasks">' +
+        (loginTaken ? L("BUGÜN ALINDI") : L("BUGÜNÜN ÖDÜLÜNÜ AL")) +
+        L('</button><h2>BUGÜNÜN 3 GÖREVİ</h2><p>Koşu bitince ilerleme kaydedilir. Her gün yenilenir.</p><div class="daily-tasks">') +
         TASKS.map(
           (task, i) =>
             "<div><b>" +
@@ -81046,11 +81557,11 @@ function showProfile(tab = "daily") {
               ? "disabled"
               : "") +
             ">" +
-            (state.claimed.includes(i) ? "ALINDI" : "ÖDÜLÜ AL") +
+            (state.claimed.includes(i) ? L("ALINDI") : L("ÖDÜLÜ AL")) +
             "</button></div>",
         ).join("") +
         "</div>"
-      : '<h2>KURYE KOSTÜMLERİ</h2><p>Yalnızca görünüm değişir. Güç ve hız aynıdır.</p><div class="costume-grid">' +
+      : L('<h2>KURYE KOSTÜMLERİ</h2><p>Yalnızca görünüm değişir. Güç ve hız aynıdır.</p><div class="costume-grid">') +
         COSTUMES.map(
           (c) =>
             '<button data-costume="' +
@@ -81071,9 +81582,9 @@ function showProfile(tab = "daily") {
             c.name +
             "</b><small>" +
             (profile.costume === c.id
-              ? "KUŞANILDI"
+              ? L("KUŞANILDI")
               : profile.costumes.includes(c.id)
-                ? "KUŞAN"
+                ? L("KUŞAN")
                 : "◈ " + c.price) +
             "</small></button>",
         ).join("") +
@@ -81081,15 +81592,15 @@ function showProfile(tab = "daily") {
   const extras = $("#extras");
   extras.hidden = false;
   extras.innerHTML =
-    '<div class="card profile-card" role="dialog" aria-modal="true" aria-label="Ödüller ve kostümler"><div class="profile-heading"><b>◈ ' +
+    L('<div class="card profile-card" role="dialog" aria-modal="true" aria-label="Ödüller ve kostümler"><div class="profile-heading"><b>◈ ') +
     settings.coins +
     " · ◆ " +
     settings.diamonds +
-    '</b><button id="closeProfile" aria-label="Kapat">✕</button></div><div class="row"><button id="profileDaily" class="' +
+    L('</b><button id="closeProfile" aria-label="Kapat">✕</button></div><div class="row"><button id="profileDaily" class="') +
     (tab === "daily" ? "choice-selected" : "") +
-    '">GÜNLÜK ÖDÜLLER</button><button id="profileCostumes" class="' +
+    L('">GÜNLÜK ÖDÜLLER</button><button id="profileCostumes" class="') +
     (tab === "costumes" ? "choice-selected" : "") +
-    '">KOSTÜMLER</button></div>' +
+    L('">KOSTÜMLER</button></div>') +
     content +
     "</div>";
   $("#closeProfile").onclick = () => {
@@ -81162,14 +81673,14 @@ function drawTutorial() {
   const overlay = $("#tutorial");
   overlay.hidden = false;
   const names = [
-    "Sağa kaydır",
-    "Yukarı kaydırarak zıpla",
-    "Hedefe dokunarak ateş et",
+    L("Sağa kaydır"),
+    L("Yukarı kaydırarak zıpla"),
+    L("Hedefe dokunarak ateş et"),
   ];
   overlay.innerHTML =
     '<div class="tutorial-card" role="dialog" aria-modal="true" aria-label="' +
     names[tutorialStep] +
-    '"><button id="skipTutorial" aria-label="Öğreticiyi atla">✕</button><div class="gesture-scene gesture-' +
+    L('"><button id="skipTutorial" aria-label="Öğreticiyi atla">✕</button><div class="gesture-scene gesture-') +
     tutorialStep +
     '"><div class="gesture-lanes"><i></i><i></i><i></i></div><div class="gesture-player"></div><div class="gesture-target">◎</div><svg class="tutorial-hand" viewBox="0 0 80 100" aria-hidden="true"><path d="M24 49V13c0-10 14-10 14 0v28-9c0-9 13-9 13 0v9-5c0-8 13-8 13 0v10-4c0-7 12-7 12 0v29c0 15-9 25-23 25H39c-9 0-14-5-18-13L7 60c-6-11 5-18 12-9l5 6Z" fill="#fff0d4" stroke="#173b48" stroke-width="4"/></svg><div class="gesture-arrow">' +
     ["↔", "↑", "◉"][tutorialStep] +
@@ -81207,12 +81718,12 @@ function drawTutorial() {
 }
 function showControls() {
   $("#menu").innerHTML =
-    '<div class="card help-card"><div class="eyebrow">KURYE EL KİTABI</div><h1>Akıllı koş.<br><em>Sağ çık.</em></h1><div class="help-grid"><p><b>Hareket</b>Sağa/sola kaydır: şerit. Yukarı: zıpla. Aşağı: lazerin altından kay.</p><p><b>Çatışma</b>Drona veya çevre hedefine dokun. Basılı tutarak seri ateş et. Şarjör otomatik dolar.</p><p><b>Çevre</b>Turuncu varil: alan patlaması. Turkuaz ızgara: dronları devre dışı bırakır. KAPI paneli: ilerideki engeli açar.</p><p><b>Yollar</b>İlk görevde bile yol ayrımı var. Solda kal: kapalı metroya in, lazerlerin altından kay. Sağda kal: bahçeli çatılara yüksel, döşeme boşluklarından atla. Ortada kal: yeni sokaktan devam et. Her rotada elmas topla; turuncu güç çekirdekleri bu koşudaki silah hasarını artırır.</p><p><b>Yük</b>Ağır yükle zıplama alçalır. Cam yük darbede daha çok hasar alır. Hasarsız teslimat üç yıldız kazandırır.</p><p><b>Takipçi</b>Darbe aradaki mesafeyi kapatır. Dronları vurmak ve çevre hedefleri takipçiyi yavaşlatır.</p></div><button class="primary" id="backMenu">Anladım ↗</button></div>';
+    L('<div class="card help-card"><div class="eyebrow">KURYE EL KİTABI</div><h1>Akıllı koş.<br><em>Sağ çık.</em></h1><div class="help-grid"><p><b>Hareket</b>Sağa/sola kaydır: şerit. Yukarı: zıpla. Aşağı: lazerin altından kay.</p><p><b>Çatışma</b>Drona veya çevre hedefine dokun. Basılı tutarak seri ateş et. Şarjör otomatik dolar.</p><p><b>Çevre</b>Turuncu varil: alan patlaması. Turkuaz ızgara: dronları devre dışı bırakır. KAPI paneli: ilerideki engeli açar.</p><p><b>Yollar</b>İlk görevde bile yol ayrımı var. Solda kal: kapalı metroya in, lazerlerin altından kay. Sağda kal: bahçeli çatılara yüksel, döşeme boşluklarından atla. Ortada kal: yeni sokaktan devam et. Her rotada elmas topla; turuncu güç çekirdekleri bu koşudaki silah hasarını artırır.</p><p><b>Yük</b>Ağır yükle zıplama alçalır. Cam yük darbede daha çok hasar alır. Hasarsız teslimat üç yıldız kazandırır.</p><p><b>Takipçi</b>Darbe aradaki mesafeyi kapatır. Dronları vurmak ve çevre hedefleri takipçiyi yavaşlatır.</p></div><button class="primary" id="backMenu">Anladım ↗</button></div>');
   $("#menu").innerHTML = westernText($("#menu").innerHTML);
   $("#menu .help-grid p:nth-child(4)").innerHTML =
-    "<b>Yollar</b>" +
+    L("<b>Yollar</b>") +
     routeHint() +
-    ". Sol geçitte alçak engellere, sağ geçitte boşluklara dikkat et. Her rotada elmas ve güç çekirdeği topla.";
+    L(". Sol geçitte alçak engellere, sağ geçitte boşluklara dikkat et. Her rotada elmas ve güç çekirdeği topla.");
   $("#backMenu").onclick = showMenu;
 }
 function pause() {
@@ -81229,7 +81740,7 @@ function pause() {
     gameAudio.stop();
     $("#menu").hidden = false;
     $("#menu").innerHTML =
-      '<div class="card"><div class="eyebrow">TESLİMAT DURAKLATILDI</div><h1>Nefes al.<br><em>Devam et.</em></h1><div class="row"><button class="primary" id="resume">Devam et ↗</button><button id="base">Üsse dön</button></div><p>Üsse dönersen bu koşudaki altın ve görev ilerlemesi kaydedilmez.</p></div>';
+      L('<div class="card"><div class="eyebrow">TESLİMAT DURAKLATILDI</div><h1>Nefes al.<br><em>Devam et.</em></h1><div class="row"><button class="primary" id="resume">Devam et ↗</button><button id="base">Üsse dön</button></div><p>Üsse dönersen bu koşudaki altın ve görev ilerlemesi kaydedilmez.</p></div>');
     $("#resume").onclick = resume;
     $("#base").onclick = showMenu;
   }
@@ -81246,21 +81757,23 @@ function resume() {
 // Explains how the end score and stars were reached.
 function resultBreakdown(r) {
   if (!r.success || !Number.isFinite(r.runScore)) return "";
-  const n = (x) => x.toLocaleString("tr-TR");
+  const n = (x) => x.toLocaleString(NUMBERS);
   return (
-    '<p class="score-breakdown">Koşu ' +
+    L('<p class="score-breakdown">Koşu ') +
     n(r.runScore) +
-    " + teslimat bonusu " +
+    L(" + teslimat bonusu ") +
     n(r.deliveryBonus) +
-    " + yıldız bonusu " +
+    L(" + yıldız bonusu ") +
     n(r.starBonus) +
     " (" +
     r.stars +
-    " × 1.000) = <b>" +
+    " × " +
+    n(1000) +
+    ") = <b>" +
     n(r.score) +
-    '</b></p><p class="star-rules">★ Teslimat ✓ · ★ Yük %75+ ' +
+    L('</b></p><p class="star-rules">★ Teslimat ✓ · ★ Yük %75+ ') +
     (r.cargoStar ? "✓" : "✗") +
-    " · ★ Yan hedef " +
+    L(" · ★ Yan hedef ") +
     (r.objective ? "✓" : "✗") +
     "</p>"
   );
@@ -81298,17 +81811,17 @@ function results(r) {
   $("#menu").hidden = false;
   let reason =
     {
-      health: "Zırhın tükendi.",
-      cargo: "Yük kurtarılamadı.",
-      hunter: "Takipçi sana ulaştı.",
+      health: L("Zırhın tükendi."),
+      cargo: L("Yük kurtarılamadı."),
+      hunter: L("Takipçi sana ulaştı."),
     }[r.reason] || "";
   $("#menu").innerHTML =
     '<div class="card result-card"><div class="eyebrow">' +
-    (r.success ? "TESLİMAT TAMAMLANDI" : "KOŞU SONA ERDİ") +
+    (r.success ? L("TESLİMAT TAMAMLANDI") : L("KOŞU SONA ERDİ")) +
     "</div><h1>" +
     (r.success
-      ? "Hat açık.<br><em>Şehir yaşıyor.</em>"
-      : "Planı değiştir.<br><em>Yeniden koş.</em>") +
+      ? L("Hat açık.<br><em>Şehir yaşıyor.</em>")
+      : L("Planı değiştir.<br><em>Yeniden koş.</em>")) +
     '</h1><div class="result-stars">' +
     (r.success ? "★".repeat(r.stars) + "☆".repeat(3 - r.stars) : "") +
     "</div><p>" +
@@ -81317,46 +81830,47 @@ function results(r) {
     (lastDamage || "") +
     '</p><div class="result-grid"><span><b>' +
     Math.floor(r.distance) +
-    " m</b>mesafe</span><span><b>%" +
-    Math.round(r.cargo) +
-    "</b>yük sağlamlığı</span><span><b>" +
+    (LANG === "en"
+      ? " m</b>distance</span><span><b>" + Math.round(r.cargo) + "%"
+      : " m</b>mesafe</span><span><b>%" + Math.round(r.cargo)) +
+    L("</b>yük sağlamlığı</span><span><b>") +
     r.kills +
     (settings.landscape === "western"
-      ? "</b>durdurulan araba</span><span><b>"
-      : "</b>dron</span><span><b>") +
+      ? L("</b>durdurulan araba</span><span><b>")
+      : L("</b>dron</span><span><b>")) +
     r.environment +
-    "</b>çevre hedefi</span><span><b>" +
+    L("</b>çevre hedefi</span><span><b>") +
     r.coins +
-    "</b>toplanan altın</span><span><b>◆ " +
+    L("</b>toplanan altın</span><span><b>◆ ") +
     (r.gems || 0) +
-    "</b>toplanan elmas</span><span><b>" +
+    L("</b>toplanan elmas</span><span><b>") +
     (r.power || 0) +
-    "/5</b>silah gücü</span><span><b>" +
+    L("/5</b>silah gücü</span><span><b>") +
     r.routes.length +
-    "</b>rota seçimi</span><span><b>" +
-    r.score.toLocaleString("tr-TR") +
-    "</b>puan</span></div>" +
+    L("</b>rota seçimi</span><span><b>") +
+    r.score.toLocaleString(NUMBERS) +
+    L("</b>puan</span></div>") +
     resultBreakdown(r) +
     "<p>★ " +
-    (r.objective ? "Yan hedef tamamlandı." : r.objectiveText || "") +
+    (r.objective ? L("Yan hedef tamamlandı.") : r.objectiveText || "") +
     "</p>" +
     (dailyReward
-      ? '<p class="reward-callout">BUGÜNÜN KONTRATI TAMAM · ◈120 + ◆1</p>'
+      ? L('<p class="reward-callout">BUGÜNÜN KONTRATI TAMAM · ◈120 + ◆1</p>')
       : "") +
     (newTransmission
-      ? '<p class="story-callout">YENİ KAYIP YAYIN: ' +
+      ? L('<p class="story-callout">YENİ KAYIP YAYIN: ') +
         TRANSMISSIONS[transmissionCount()] +
         "</p>"
       : "") +
     "<p>" +
     (r.success
       ? r.mission === 39
-        ? "Kampanya tamamlandı. Sonsuz koşu üste açıldı."
-        : run.mission.story
-      : "Kalkan ve yük koruması darbeleri hafifletir. Yol çatallarında güvenli rotayı seçebilirsin.") +
+        ? L("Kampanya tamamlandı. Sonsuz koşu üste açıldı.")
+        : storyText(run.mission, settings.landscape)
+      : L("Kalkan ve yük koruması darbeleri hafifletir. Yol çatallarında güvenli rotayı seçebilirsin.")) +
     '</p><div class="row"><button id="retry" class="primary">' +
-    (r.success && r.mission < 39 ? "Sonraki teslimat ↗" : "Yeniden dene ↗") +
-    '</button><button id="back">Üs ve yükseltmeler</button></div></div>';
+    (r.success && r.mission < 39 ? L("Sonraki teslimat ↗") : L("Yeniden dene ↗")) +
+    L('</button><button id="back">Üs ve yükseltmeler</button></div></div>');
   $("#menu").innerHTML = westernText($("#menu").innerHTML);
   $("#retry").classList.add("retry-large");
   const resultCard = $("#menu .result-card");
@@ -81366,15 +81880,15 @@ function results(r) {
       '<p class="best-score ' +
         (newRecord ? "record-celebration" : "") +
         '">' +
-        (newRecord ? "✦ YENİ REKOR! ✦ · " : "EN İYİ SKOR · ") +
-        Math.max(previousBest, r.score).toLocaleString("tr-TR") +
+        (newRecord ? L("✦ YENİ REKOR! ✦ · ") : L("EN İYİ SKOR · ")) +
+        Math.max(previousBest, r.score).toLocaleString(NUMBERS) +
         "</p>" +
-        '<div class="ad-placements"><button id="adContinue" disabled>Devam et (reklam)</button><button id="adDouble" disabled>Altını 2 katına çıkar (reklam)</button><small>Reklamlar bu sürümde kapalı.</small></div>',
+        L('<div class="ad-placements"><button id="adContinue" disabled>Devam et (reklam)</button><button id="adDouble" disabled>Altını 2 katına çıkar (reklam)</button><small>Reklamlar bu sürümde kapalı.</small></div>'),
     );
   // No placements are enabled until a real SDK and platform review are complete.
   // One mock entry point is exported by profile.js for later SDK integration.
   if (REWARDED_ADS_ENABLED)
-    console.warn("Reklam yerleri için platform entegrasyonu gerekli.");
+    console.warn(L("Reklam yerleri için platform entegrasyonu gerekli."));
   const retryRow = $("#retry").parentNode;
   const resultHeading = $("#menu .result-card h1");
   if (retryRow && resultHeading?.parentNode)
@@ -81413,46 +81927,49 @@ function events() {
       burst(pos, "#ffda70", 4);
     }
     if (e.type === "power") {
-      notice("SİLAH GÜCÜ " + e.level + "/5 · HASAR ARTTI", 1.2);
+      notice(L("SİLAH GÜCÜ ") + e.level + L("/5 · HASAR ARTTI"), 1.2);
       sound(760, 0.08, "square");
     }
     if (e.type === "gem") {
       burst(pos, "#a8f6ff", 5);
-      notice("ELMAS ALINDI · ◆ " + e.total, 1.2);
+      notice(L("ELMAS ALINDI · ◆ ") + e.total, 1.2);
       sound(1450, 0.08, "triangle");
     }
-    if (e.type === "shield") notice("KALKAN ALINDI", 1);
-    if (e.type === "repair") notice("YÜK ONARILDI", 1);
-    if (e.type === "supply") notice("ARA İKMAL · +1 CAN · YÜK ONARILDI", 2);
+    if (e.type === "shield") notice(L("KALKAN ALINDI"), 1);
+    if (e.type === "repair") notice(L("YÜK ONARILDI"), 1);
+    if (e.type === "supply") notice(L("ARA İKMAL · +1 CAN · YÜK ONARILDI"), 2);
     if (
       e.type === "warning" &&
       (run.mission.id < 3 || ["saw", "rock", "wagon", "cart"].includes(e.kind))
     ) {
       notice(
         {
-          barrier: "BARİYER · ZIPLA VEYA KAÇ",
+          barrier: L("BARİYER · ZIPLA VEYA KAÇ"),
           rock:
             (settings.landscape === "western"
-              ? "YUVARLANAN FIÇI → "
-              : "YUVARLANAN KAYA → ") +
-            ["SOL", "ORTA", "SAĞ"][e.lane + 1] +
-            " ŞERİT · ŞERİT DEĞİŞTİR",
+              ? L("YUVARLANAN FIÇI → ")
+              : L("YUVARLANAN KAYA → ")) +
+            [L("SOL"), L("ORTA"), L("SAĞ")][e.lane + 1] +
+            L(" ŞERİT · ŞERİT DEĞİŞTİR"),
           wagon:
-            "AT ARABASI → " +
-            ["SOL", "ORTA", "SAĞ"][e.lane + 1] +
-            " ŞERİT · KENARA KAÇ",
+            L("AT ARABASI → ") +
+            [L("SOL"), L("ORTA"), L("SAĞ")][e.lane + 1] +
+            L(" ŞERİT · KENARA KAÇ"),
           cart:
-            "AĞIR MADEN VAGONU → " +
-            ["SOL", "ORTA", "SAĞ"][e.lane + 1] +
-            " · ŞERİT DEĞİŞTİR",
+            L("AĞIR MADEN VAGONU → ") +
+            [L("SOL"), L("ORTA"), L("SAĞ")][e.lane + 1] +
+            L(" · ŞERİT DEĞİŞTİR"),
           saw:
-            (e.side < 0 ? "SOLDAN" : "SAĞDAN") +
-            " TESTERE → " +
-            ["SOL", "ORTA", "SAĞ"][e.lane + 1] +
-            " ŞERİT · ZIPLA / KAÇ",
-          laser: "LAZER · KAY VEYA KAÇ",
-          wall: "KAPALI YOL · ŞERİT DEĞİŞTİR",
-          bolt: "DRON ATEŞİ · KAÇ",
+            (e.side < 0 ? L("SOLDAN") : L("SAĞDAN")) +
+            L(" TESTERE → ") +
+            [L("SOL"), L("ORTA"), L("SAĞ")][e.lane + 1] +
+            L(" ŞERİT · ZIPLA / KAÇ"),
+          laser:
+            settings.landscape === "western"
+              ? L("ALÇAK KİRİŞ · KAY VEYA KAÇ")
+              : L("LAZER · KAY VEYA KAÇ"),
+          wall: L("KAPALI YOL · ŞERİT DEĞİŞTİR"),
+          bolt: L("DRON ATEŞİ · KAÇ"),
         }[e.kind] || "",
         0.8,
       );
@@ -81466,29 +81983,32 @@ function events() {
       flashTimer = 0.2;
       $("#flash").classList.add("hit");
       lastDamage = {
-        barrier: "Bariyere çarptın; yukarı kaydırarak zıpla.",
+        barrier: L("Bariyere çarptın; yukarı kaydırarak zıpla."),
         rock:
           settings.landscape === "western"
-            ? "Yuvarlanan fıçıya çarptın; açık şeride geç."
-            : "Yuvarlanan kayaya çarptın; açık şeride geç.",
-        cart: "Ağır vagon iki can götürür; başka raya geç.",
-        saw: "Dönen testereye yakalandın; daha erken zıpla.",
-        laser: "Lazere yakalandın; aşağı kaydır.",
-        wall: "Kapalı şeritten zamanında çıkamadın.",
-        train: "Tren hattından kaçman gerekiyor.",
-        gap: "Çatı boşluğunu zıplayarak geç.",
+            ? L("Yuvarlanan fıçıya çarptın; açık şeride geç.")
+            : L("Yuvarlanan kayaya çarptın; açık şeride geç."),
+        cart: L("Ağır vagon iki can götürür; başka raya geç."),
+        saw: L("Dönen testereye yakalandın; daha erken zıpla."),
+        laser:
+          settings.landscape === "western"
+            ? L("Alçak kirişe çarptın; aşağı kaydır.")
+            : L("Lazere yakalandın; aşağı kaydır."),
+        wall: L("Kapalı şeritten zamanında çıkamadın."),
+        train: L("Tren hattından kaçman gerekiyor."),
+        gap: L("Çatı boşluğunu zıplayarak geç."),
         drone:
           settings.landscape === "western"
-            ? "At arabasının yolundan çekil."
-            : "Dronu vur veya yanından kaç.",
-        bolt: "Dron ateşinden kaçınmak için şerit değiştir.",
+            ? L("At arabasının yolundan çekil.")
+            : L("Dronu vur veya yanından kaç."),
+        bolt: L("Dron ateşinden kaçınmak için şerit değiştir."),
       }[e.kind];
       notice(lastDamage, 2);
       sound(110, 0.15, "sawtooth");
     }
     if (e.type === "blocked") {
       burst(pos, "#a6f4ec");
-      notice("KALKAN DARBESİ", 0.8);
+      notice(L("KALKAN DARBESİ"), 0.8);
     }
     if (e.type === "explode" || e.type === "environment") {
       burst(
@@ -81501,13 +82021,13 @@ function events() {
         20,
       );
       sound(e.kind === "wagon" ? 190 : 130, 0.17, "sawtooth");
-      if (e.kind === "wagon") notice("AT ARABASI DURDURULDU · ◈3", 1);
+      if (e.kind === "wagon") notice(L("AT ARABASI DURDURULDU · ◈3"), 1);
       if (e.type === "environment")
         notice(
           {
-            barrel: "ZİNCİRLEME PATLAMA",
-            vent: "DRONLAR DEVRE DIŞI",
-            panel: "GEÇİT AÇILDI",
+            barrel: L("ZİNCİRLEME PATLAMA"),
+            vent: L("DRONLAR DEVRE DIŞI"),
+            panel: L("GEÇİT AÇILDI"),
           }[e.kind],
           1.2,
         );
@@ -81517,10 +82037,10 @@ function events() {
     if (e.type === "route")
       notice(
         e.choice === "safe"
-          ? routeLabels().left + " · GEÇİDE DİKKAT / +70m"
+          ? routeLabels().left + L(" · GEÇİDE DİKKAT / +70m")
           : e.choice === "street"
-            ? routeLabels().middle + " · ENGELLERİ AŞ / +20 ALTIN"
-            : routeLabels().right + " · BOŞLUKLARDAN ATLA / +30 ALTIN",
+            ? routeLabels().middle + L(" · ENGELLERİ AŞ / +20 ALTIN")
+            : routeLabels().right + L(" · BOŞLUKLARDAN ATLA / +30 ALTIN"),
         2,
       );
     if (e.type === "end") results(e.result);
@@ -81531,7 +82051,7 @@ function routeGoalNote() {
   if (!run || run.endless) return "";
   const delta = Math.round(run.goal - run.mission.length);
   return delta
-    ? " · ROTA\u00a0" + (delta > 0 ? "+" : "−") + Math.abs(delta) + "\u00a0m"
+    ? L(" · ROTA\u00a0") + (delta > 0 ? "+" : "−") + Math.abs(delta) + "\u00a0m"
     : "";
 }
 function updateHud() {
@@ -81539,7 +82059,7 @@ function updateHud() {
   $("#sector").textContent =
     String(run.mission.id + 1).padStart(2, "0") +
     " · " +
-    stageName(run.mission).toLocaleUpperCase("tr");
+    stageName(run.mission).toLocaleUpperCase(UPPER);
   $("#distance").textContent =
     Math.floor(run.distance) +
     " / " +
@@ -81550,13 +82070,13 @@ function updateHud() {
     ? "100%"
     : Math.min(100, (run.distance / run.goal) * 100) + "%";
   $("#hp").textContent = "▰ ".repeat(Math.max(0, run.health));
-  $("#shield").textContent = "KALKAN " + run.shield;
+  $("#shield").textContent = L("KALKAN ") + run.shield;
   $("#coins").textContent =
     "◈ " +
     run.coins +
     " · ◆ " +
     run.gems +
-    " · PUAN " +
+    L(" · PUAN ") +
     Math.floor(
       run.distance * 10 +
         run.coins * 25 +
@@ -81564,29 +82084,30 @@ function updateHud() {
         run.kills * 200 +
         run.environment * 100,
     );
-  $("#cargo").textContent = "YÜK %" + Math.round(run.cargo);
+  $("#cargo").textContent =
+    LANG === "en" ? "CARGO " + Math.round(run.cargo) + "%" : "YÜK %" + Math.round(run.cargo);
   $("#ammo").textContent =
     run.reload > 0
-      ? "DOLDURULUYOR"
-      : COURIER_WEAPONS[run.weapon].name.toLocaleUpperCase("tr") +
+      ? L("DOLDURULUYOR")
+      : COURIER_WEAPONS[run.weapon].name.toLocaleUpperCase(UPPER) +
         " · " +
         run.ammo +
         " / " +
         run.ammoMax;
   $("#hunter").textContent = run.mission.pursuit
-    ? "TAKİPÇİ " + Math.max(0, Math.round(run.hunter)) + " m"
-    : "TAKİP YOK";
+    ? L("TAKİPÇİ ") + Math.max(0, Math.round(run.hunter)) + " m"
+    : L("TAKİP YOK");
   $("#hunter").classList.toggle("danger", run.hunter < 30);
   $("#objective").textContent = "★ " + westernText(objective(run.mission).text);
   $("#route").textContent = westernText(
     run.fork
-      ? "YOL AYRIMI " + Math.ceil(run.fork.at - run.distance) + " m"
+      ? L("YOL AYRIMI ") + Math.ceil(run.fork.at - run.distance) + " m"
       : run.route === "safe"
-        ? routeLabels().left + " · ALÇAK KİRİŞLER"
+        ? routeLabels().left + L(" · ALÇAK KİRİŞLER")
         : run.route === "risk"
-          ? routeLabels().right + " · BOŞLUKLARA DİKKAT"
+          ? routeLabels().right + L(" · BOŞLUKLARA DİKKAT")
           : run.route === "street"
-            ? routeLabels().middle + " · ALTIN VE ELMAS TOPLA"
+            ? routeLabels().middle + L(" · ALTIN VE ELMAS TOPLA")
             : "",
   );
 }
@@ -82123,7 +82644,7 @@ function frame(now) {
       slowTime += fpsTime;
       if (slowTime >= 6 && quality !== "low") {
         setQuality("low");
-        notice("AKICILIK İÇİN GÖRÜNTÜ AYARLANDI", 2);
+        notice(L("AKICILIK İÇİN GÖRÜNTÜ AYARLANDI"), 2);
       }
     } else slowTime = 0;
     fpsTime = frameCount = 0;
@@ -82132,6 +82653,7 @@ function frame(now) {
 }
 let frameHandle = 0;
 setQuality(settings.quality === "low" ? "low" : "high");
+setStaticText();
 showMenu();
 $("#loading").hidden = true;
 frameHandle = requestAnimationFrame(frame);
@@ -82140,7 +82662,7 @@ platform?.gameReady();
 window.addEventListener("error", (e) => {
   platform?.logError();
   if (e.filename?.endsWith("game.js"))
-    notice("Bir hata oluştu; sayfayı yenileyebilirsin.", 10);
+    notice(L("Bir hata oluştu; sayfayı yenileyebilirsin."), 10);
 });
 
 return {};

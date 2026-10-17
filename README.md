@@ -44,7 +44,12 @@ Web sürümünü güncellemek için `rebuilt/` içindeki `index.html`, `js/` ve 
 - Ses, `isAudioEnabled()` ve `onAudioEnabledChange()` ile YouTube ses ayarına uyar. Oyun içi SES düğmesi YouTube'da gizlenir.
 - En iyi puan `sendScore()` ile gönderilir ve kayıttaki en iyi puanla aynıdır.
 - Titreşim YouTube içinde kapalıdır, çünkü Playables kuralları titreşim için ayrı bir aç/kapa düğmesi ister.
+- Playables paketinde tarayıcı dili okunmaz (`navigator.language` derleme sırasında çıkarılır).
 - Reklamlar kapalıdır: `showRewardedAd()` yalnızca bir test fonksiyonudur ve `REWARDED_ADS_ENABLED = false`.
+
+## Dil
+
+Oyun Türkçe ve İngilizce'dir. Dil açılışta bir kez seçilir: YouTube içinde `ytgame.system.getLanguage()` kullanılır (`tr` ile başlayan dil kodları Türkçe, diğerleri İngilizce). YouTube dışında menüdeki ENGLISH / TÜRKÇE düğmesiyle seçilen dil, seçim yoksa tarayıcı dili geçerlidir. YouTube içinde dil düğmesi gizlidir; çünkü dil YouTube ayarına uymalı ve dil tercihi bulut kaydına yazılmamalıdır. Çeviriler `source/dist/i18n.js` dosyasındadır: Türkçe metin anahtar, İngilizce karşılığı değerdir. Kaynakta görünen her Türkçe metin `L("...")` ile sarılıdır.
 
 ## Kontroller
 

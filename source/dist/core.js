@@ -1,7 +1,8 @@
+import { L, LANG } from "./i18n.js";
 export const TITLE = "KÜLHAT";
 export const DISTRICTS = [
   {
-    name: "Yağmur Çarşısı",
+    name: L("Yağmur Çarşısı"),
     sky: "#293e4f",
     fog: "#293e4f",
     light: "#f4cab2",
@@ -17,7 +18,7 @@ export const DISTRICTS = [
     kind: "rail",
   },
   {
-    name: "Yüksek Bahçeler",
+    name: L("Yüksek Bahçeler"),
     sky: "#344e58",
     fog: "#344e58",
     light: "#d2e5c1",
@@ -25,7 +26,7 @@ export const DISTRICTS = [
     kind: "roof",
   },
   {
-    name: "Su Altındaki Şehir",
+    name: L("Su Altındaki Şehir"),
     sky: "#223a4e",
     fog: "#223a4e",
     light: "#a9d5ee",
@@ -33,7 +34,7 @@ export const DISTRICTS = [
     kind: "flood",
   },
   {
-    name: "Karantina",
+    name: L("Karantina"),
     sky: "#233446",
     fog: "#233446",
     light: "#c6c6ee",
@@ -41,19 +42,19 @@ export const DISTRICTS = [
     kind: "quarantine",
   },
   {
-    name: "Aktarım Kalesi",
+    name: L("Aktarım Kalesi"),
     sky: "#443c50",
     fog: "#443c50",
     light: "#f5c6a4",
     rain: false,
     kind: "citadel",
   },
-  { name: "Kızıl Maden", sky: "#554332", fog: "#70553c", light: "#ffd39a", rain: false, kind: "mine" },
-  { name: "Kartal Kanyonu", sky: "#a3b8ba", fog: "#b7a38a", light: "#ffe2ae", rain: false, kind: "canyon" },
+  { name: L("Kızıl Maden"), sky: "#554332", fog: "#70553c", light: "#ffd39a", rain: false, kind: "mine" },
+  { name: L("Kartal Kanyonu"), sky: "#a3b8ba", fog: "#b7a38a", light: "#ffe2ae", rain: false, kind: "canyon" },
 ];
 const NAMES = [
   ["İlk Paket", "Dar Geçit", "Çarşıdaki Göz", "İki Yol", "İlk Takip"],
-  ["Ağır Yük", "Son Vagon", "Kırmızı Varil", "Makası Değiştir", "Demir Avcı"],
+  ["Ağır Yük", L("Son Vagon"), "Kırmızı Varil", "Makası Değiştir", "Demir Avcı"],
   ["Cam Çekirdek", "Çatı Arası", "Soğutucu", "Rüzgâr Hattı", "Yüksek Takip"],
   [
     "Tıbbi Sevkiyat",
@@ -66,42 +67,68 @@ const NAMES = [
     "Sessiz Bölge",
     "Zırhlı Göz",
     "Kararsız Hücre",
-    "Kapanan Çember",
+    L("Kapanan Çember"),
     "Karantina Avcısı",
   ],
   [
-    "Geri Dönüş Yok",
-    "Üçüncü Kapı",
+    L("Geri Dönüş Yok"),
+    L("Üçüncü Kapı"),
     "Son Kesinti",
     "Çekirdek Yolu",
-    "Son Teslimat",
+    L("Son Teslimat"),
   ],
-  ["Maden Girişi", "Kopan Vinç", "Üç Ray", "Kömür Konvoyu", "Çöküşten Kaçış"],
-  ["Dar Kanyon", "Taş Yağmuru", "Asma Geçit", "Son Konvoy", "Kartal Geçidi"],
+  ["Maden Girişi", "Kopan Vinç", L("Üç Ray"), "Kömür Konvoyu", "Çöküşten Kaçış"],
+  [L("Dar Kanyon"), L("Taş Yağmuru"), "Asma Geçit", "Son Konvoy", "Kartal Geçidi"],
 ];
 // Per-map stage names. NAMES above stays as the neutral city default.
 const MAP_NAMES = {
   western: [
-    ["İlk Posta", "Dar Sokak", "Salondaki Göz", "İki Patika", "İlk Kovalamaca"],
-    ["Ağır Sandık", "Son Vagon", "Barut Fıçısı", "Makas Değişimi", "Demir Şerif"],
-    ["Cam Fener", "Çatı Katı", "Su Kulesi", "Yel Değirmeni", "Çatılarda Takip"],
-    ["Doktorun Çantası", "Yıkık Köprü", "Kuru Dere", "Ahır Geçidi", "Taşkın Avcısı"],
-    ["Sessiz Kasaba", "Zırhlı Posta Arabası", "Kararsız Barut", "Kapanan Çember", "Kanun Kaçağı Avcısı"],
-    ["Dönüş Yok", "Üçüncü Kapı", "Son Telgraf", "Kale Yolu", "Son Teslimat"],
-    ["Kızıl Ocak", "Kopan Makara", "Üç Ray", "Kömür Arabası", "Göçükten Kaçış"],
-    ["Dar Kanyon", "Kızgın Kayalar", "Asma Köprü", "Son Kervan", "Kartal Kayası"],
+    [L("İlk Posta"), L("Dar Sokak"), L("Salondaki Göz"), L("İki Patika"), L("İlk Kovalamaca")],
+    [L("Ağır Sandık"), L("Son Vagon"), L("Barut Fıçısı"), L("Makas Değişimi"), L("Demir Şerif")],
+    [L("Cam Fener"), L("Çatı Katı"), L("Su Kulesi"), L("Yel Değirmeni"), L("Çatılarda Takip")],
+    [L("Doktorun Çantası"), L("Yıkık Köprü"), L("Kuru Dere"), L("Ahır Geçidi"), L("Taşkın Avcısı")],
+    [L("Sessiz Kasaba"), L("Zırhlı Posta Arabası"), L("Kararsız Barut"), L("Kapanan Çember"), L("Kanun Kaçağı Avcısı")],
+    [L("Dönüş Yok"), L("Üçüncü Kapı"), L("Son Telgraf"), L("Kale Yolu"), L("Son Teslimat")],
+    [L("Kızıl Ocak"), L("Kopan Makara"), L("Üç Ray"), L("Kömür Arabası"), L("Göçükten Kaçış")],
+    [L("Dar Kanyon"), L("Kızgın Kayalar"), L("Asma Köprü"), L("Son Kervan"), L("Kartal Kayası")],
   ],
   trail: [
-    ["İlk Yük", "Dar Patika", "Kayadaki Göz", "İki Dere", "Çam Altı Takibi"],
-    ["Ağır Heybe", "Son Teleferik", "Gaz Tüpü", "Yol Ayrımı", "Sarp Yokuş Avcısı"],
-    ["Cam Termos", "Kaya Çıkıntısı", "Buzul Suyu", "Rüzgâr Sırtı", "Zirve Takibi"],
-    ["Sağlık Çantası", "Halat Köprü", "Şelale Üstü", "Sisli Koridor", "Çağlayan Avcısı"],
-    ["Sessiz Yayla", "Zırhlı Gözcü", "Oynak Kaya", "Kapanan Vadi", "Sis Avcısı"],
-    ["Geri Dönüş Yok", "Üçüncü Geçit", "Son Kamp", "Zirve Yolu", "Son Teslimat"],
-    ["Terk Edilmiş Ocak", "Kopan Halat", "Üç Tünel", "Cevher Konvoyu", "Heyelandan Kaçış"],
-    ["Derin Boğaz", "Taş Yağmuru", "Kartal Yuvası", "Kervan Yolu", "Doruk Geçidi"],
+    [L("İlk Yük"), L("Dar Patika"), L("Kayadaki Göz"), L("İki Dere"), L("Çam Altı Takibi")],
+    [L("Ağır Heybe"), L("Son Teleferik"), L("Gaz Tüpü"), L("Yol Ayrımı"), L("Sarp Yokuş Avcısı")],
+    [L("Cam Termos"), L("Kaya Çıkıntısı"), L("Buzul Suyu"), L("Rüzgâr Sırtı"), L("Zirve Takibi")],
+    [L("Sağlık Çantası"), L("Halat Köprü"), L("Şelale Üstü"), L("Sisli Koridor"), L("Çağlayan Avcısı")],
+    [L("Sessiz Yayla"), L("Zırhlı Gözcü"), L("Oynak Kaya"), L("Kapanan Vadi"), L("Sis Avcısı")],
+    [L("Geri Dönüş Yok"), L("Üçüncü Geçit"), L("Son Kamp"), L("Zirve Yolu"), L("Son Teslimat")],
+    [L("Terk Edilmiş Ocak"), L("Kopan Halat"), L("Üç Tünel"), L("Cevher Konvoyu"), L("Heyelandan Kaçış")],
+    [L("Derin Boğaz"), L("Taş Yağmuru"), L("Kartal Yuvası"), L("Kervan Yolu"), L("Doruk Geçidi")],
   ],
 };
+// Per-map story lines shown on the result screen (city lines stay on MISSIONS.story).
+const MAP_STORIES = {
+  western: [
+    L("Kasabanın son postası sende. Çantayı istasyona ulaştır."),
+    L("Ağır sandıklar treni bekliyor; hattı açık tut."),
+    L("Cam fenerler en küçük sarsıntıda çatlar. Yumuşak koş."),
+    L("Doktorun ilaçları dere taşmadan karşıya geçmeli."),
+    L("Barut sandığı kararsız ve kanun kaçakları peşinde."),
+    L("Son telgrafı kaleye götür. Kasabanın sesi sende."),
+    L("Kızıl Ocak'ın vinçlerini aş; kaçış rayını açık tut."),
+    L("Son kervanı kanyondan geçir. Kartal Kayası'ndan sonra yol özgür."),
+  ],
+  trail: [
+    L("Yayla köyünün tek yükü sende. Patikadan aşağı indir."),
+    L("Teleferik durdu; heybeleri sırtlayıp yokuşu aş."),
+    L("Cam termoslar buzul suyu taşıyor. Taşlara dikkat."),
+    L("Sağlık çantası şelalenin öbür yakasında bekleniyor."),
+    L("Sis çöktü, kayalar oynuyor. Gözcüler seni izliyor."),
+    L("Zirve kampına son yükü çıkar. Dağın ışıkları yeniden yansın."),
+    L("Terk edilmiş ocakta halatlar kopuyor; tünelden çıkışı bul."),
+    L("Derin boğazdan geç. Doruk Geçidi'nden sonra yol açık."),
+  ],
+};
+export function storyText(m, landscape) {
+  return MAP_STORIES[landscape]?.[m.district] || m.story;
+}
 export function missionName(m, landscape) {
   return MAP_NAMES[landscape]?.[m.district]?.[m.id % 5] || m.name;
 }
@@ -139,29 +166,29 @@ export const MISSIONS = Array.from({ length: 40 }, (_, i) => {
     threat: 1 + district,
     reward: 80 + i * 7,
     story: [
-      "Veri çekirdeği bulundu. Çarşının son kuryesisin.",
-      "Aktarım istasyonuna giden tren hattını aç.",
-      "Cam çekirdek tek bir sert darbeye bile duyarlı.",
-      "Tıbbi paketler suya teslim olmayacak.",
-      "Karantinanın enerji kaynağını taşıyorsun.",
-      "Çekirdeği kaleye ulaştır. Şehrin ışıklarını geri getir.",
-      "Kızıl Maden'in vinçlerini aş; kaçış rayını açık tut.",
-      "Son konvoyu Kartal Kanyonu'ndan geçir.",
+      L("Veri çekirdeği bulundu. Çarşının son kuryesisin."),
+      L("Aktarım istasyonuna giden tren hattını aç."),
+      L("Cam çekirdek tek bir sert darbeye bile duyarlı."),
+      L("Tıbbi paketler suya teslim olmayacak."),
+      L("Karantinanın enerji kaynağını taşıyorsun."),
+      L("Çekirdeği kaleye ulaştır. Şehrin ışıklarını geri getir."),
+      L("Kızıl Maden'in vinçlerini aş; kaçış rayını açık tut."),
+      L("Son konvoyu Kartal Kanyonu'ndan geçir."),
     ][district],
   };
 });
 export const CARGOS = {
-  data: { name: "Veri çekirdeği", damage: 12, jump: 9, speed: 1 },
-  heavy: { name: "Ağır batarya", damage: 10, jump: 8.3, speed: 0.93 },
-  fragile: { name: "Cam çekirdek", damage: 25, jump: 9, speed: 1 },
-  medical: { name: "Tıbbi paket", damage: 16, jump: 9, speed: 1 },
-  volatile: { name: "Kararsız hücre", damage: 20, jump: 9, speed: 1 },
-  core: { name: "Son çekirdek", damage: 18, jump: 9, speed: 1 },
+  data: { name: L("Veri çekirdeği"), damage: 12, jump: 9, speed: 1 },
+  heavy: { name: L("Ağır batarya"), damage: 10, jump: 8.3, speed: 0.93 },
+  fragile: { name: L("Cam çekirdek"), damage: 25, jump: 9, speed: 1 },
+  medical: { name: L("Tıbbi paket"), damage: 16, jump: 9, speed: 1 },
+  volatile: { name: L("Kararsız hücre"), damage: 20, jump: 9, speed: 1 },
+  core: { name: L("Son çekirdek"), damage: 18, jump: 9, speed: 1 },
 };
 export const COURIER_WEAPONS = {
   sidearm: {
-    name: "Kurye Tabancası",
-    desc: "Dengeli ve güvenilir",
+    name: L("Kurye Tabancası"),
+    desc: L("Dengeli ve güvenilir"),
     coinCost: 0,
     diamondCost: 0,
     damage: 1,
@@ -170,8 +197,8 @@ export const COURIER_WEAPONS = {
     rounds: 1,
   },
   burst: {
-    name: "Üçlü Atım",
-    desc: "Her dokunuşta üç mermi",
+    name: L("Üçlü Atım"),
+    desc: L("Her dokunuşta üç mermi"),
     coinCost: 220,
     diamondCost: 0,
     damage: 0.85,
@@ -180,8 +207,8 @@ export const COURIER_WEAPONS = {
     rounds: 3,
   },
   ion: {
-    name: "İyon İğnesi",
-    desc: "Hızlı ve yüksek hasarlı",
+    name: L("İyon İğnesi"),
+    desc: L("Hızlı ve yüksek hasarlı"),
     coinCost: 0,
     diamondCost: 8,
     damage: 1.7,
@@ -190,8 +217,8 @@ export const COURIER_WEAPONS = {
     rounds: 1,
   },
   rail: {
-    name: "Ray Kırıcı",
-    desc: "Yavaş ama zırh parçalayan",
+    name: L("Ray Kırıcı"),
+    desc: L("Yavaş ama zırh parçalayan"),
     coinCost: 0,
     diamondCost: 16,
     damage: 4.2,
@@ -200,8 +227,8 @@ export const COURIER_WEAPONS = {
     rounds: 1,
   },
   repeater: {
-    name: "Kasırga Makineli",
-    desc: "Geniş şarjör · kesintisiz baskı ateşi",
+    name: L("Kasırga Makineli"),
+    desc: L("Geniş şarjör · kesintisiz baskı ateşi"),
     coinCost: 380,
     diamondCost: 0,
     damage: 0.75,
@@ -210,8 +237,8 @@ export const COURIER_WEAPONS = {
     rounds: 1,
   },
   storm: {
-    name: "Fırtına Beşlisi",
-    desc: "Tek dokunuşta beşli ağır yaylım",
+    name: L("Fırtına Beşlisi"),
+    desc: L("Tek dokunuşta beşli ağır yaylım"),
     coinCost: 580,
     diamondCost: 0,
     damage: 1.05,
@@ -365,25 +392,28 @@ export function rewardRun(save, result) {
 export function objective(m) {
   let slot = m.id % 5;
   if (m.id === 0)
-    return { kind: "clean", count: 0, text: "Hiç darbe almadan teslim et" };
+    return { kind: "clean", count: 0, text: L("Hiç darbe almadan teslim et") };
   if (slot === 4)
     return {
       kind: "hunter",
       count: 55,
-      text: "Takipçi mesafesini 55 metrenin üstünde tut",
+      text: L("Takipçi mesafesini 55 metrenin üstünde tut"),
     };
   if (slot === 3)
-    return { kind: "risk", count: 1, text: "En az bir kestirme rota kullan" };
+    return { kind: "risk", count: 1, text: L("En az bir kestirme rota kullan") };
   if (m.environment && slot === 2)
     return {
       kind: "environment",
       count: 2,
-      text: "İki çevre hedefini etkinleştir",
+      text: L("İki çevre hedefini etkinleştir"),
     };
   return {
     kind: "kills",
     count: Math.max(1, Math.min(7, Math.floor(m.id / 5) + 1)),
-    text: Math.max(1, Math.min(7, Math.floor(m.id / 5) + 1)) + " dron düşür",
+    text:
+      LANG === "en"
+        ? "Shoot down " + Math.max(1, Math.min(7, Math.floor(m.id / 5) + 1)) + " drones"
+        : Math.max(1, Math.min(7, Math.floor(m.id / 5) + 1)) + " dron düşür",
   };
 }
 export function signature(m) {
