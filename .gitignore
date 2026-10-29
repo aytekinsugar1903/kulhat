@@ -2,4 +2,13 @@ node_modules/
 source/release/
 rebuilt/
 playables/
+www/
 *.zip
+*.keystore
+*.jks
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/captures/
+.idea/

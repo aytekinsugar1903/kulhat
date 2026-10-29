@@ -7,6 +7,7 @@ import {
   validateSave,
   rewardRun,
   rng,
+  signature,
 } from "../dist/core.js";
 import { pilot } from "./pilot.js";
 test("heavy mine carts descend into the track, approach and deal two damage", () => {
@@ -327,6 +328,64 @@ test("first mission exposes metro and roof branches with distinct encounters", (
     );
     assert.ok(hazards.every((o) => o.at < r.goal));
   }
+});
+test("scripted encounters are postponed past the opening fork instead of deleted", () => {
+  const r = new Run(0, {}, 1);
+  const planned = signature(r.mission);
+  let placed = 0;
+  const orig = r.add.bind(r);
+  r.add = (type, lane, at, extra = {}) => {
+    const o = orig(type, lane, at, extra);
+    if (extra.authored && o) placed++;
+    return o;
+  };
+  r.damage = () => {};
+  r.end = () => {};
+  let guard = 0;
+  while (guard++ < 12000 && r.scriptIndex < r.script.length) r.step(0.04);
+  for (let i = 0; i < 80; i++) r.step(0.04);
+  assert.equal(placed, planned.length);
+  assert.equal(
+    r.objects.filter((o) => o.authored && r.fork && Math.abs(o.at - r.fork.at) < 65).length,
+    0,
+  );
+});
+test("a committed lane still hits when the body is visually between lanes", () => {
+  const r = new Run(0);
+  r.script = [];
+  r.nextWave = r.nextFork = Infinity;
+  r.add("rock", 0, 0.15);
+  r.x = 2.8;
+  r.step(0.04);
+  assert.equal(r.health, 2);
+});
+test("jumping does not skip a coin in the same lane", () => {
+  const r = new Run(0);
+  r.script = [];
+  r.nextWave = r.nextFork = Infinity;
+  r.y = 1.6;
+  r.add("coin", 0, 0.2, { value: 1 });
+  r.step(0.04);
+  assert.equal(r.coins, 1);
+});
+test("clean runs survive late pursuit stages and bosses stay short of a free third star", () => {
+  for (const i of [4, 34, 39]) {
+    const r = new Run(i, {}, 3);
+    r.damage = () => {
+      r.inv = 0.2;
+    };
+    let guard = 0;
+    while (r.phase === "play" && guard++ < 200000) r.step(0.04);
+    assert.equal(r.result?.reason, "delivered", "mission " + i);
+    assert.ok(r.hunter > 8, "mission " + i + " hunter " + r.hunter);
+  }
+  const boss = new Run(39, {}, 3);
+  boss.damage = () => {
+    boss.inv = 0.2;
+  };
+  let guard = 0;
+  while (boss.phase === "play" && guard++ < 200000) boss.step(0.04);
+  assert.ok(boss.hunter < 55);
 });
 test("middle fork selects a reward-bearing street route and all routes contain gems", () => {
   for (let choice of ["safe", "risk", "street"]) {

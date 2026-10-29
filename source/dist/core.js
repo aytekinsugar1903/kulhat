@@ -10,7 +10,7 @@ export const DISTRICTS = [
     kind: "city",
   },
   {
-    name: "Demir Hatlar",
+    name: L("Demir Hatlar"),
     sky: "#55463e",
     fog: "#55463e",
     light: "#ffcb92",
@@ -139,9 +139,11 @@ export const MISSIONS = Array.from({ length: 40 }, (_, i) => {
     id: i,
     district,
     name: NAMES[district][step],
-    length: i === 0 ? 1800 : 2800 + i * 140,
-    speed: 26 + Math.min(10, i * 0.35),
-    spacing: Math.max(32, 48 - i * 0.55),
+    // Smooth ramp: stage 1 is a short lesson, later stages grow steadily
+    // instead of jumping from 1.8 km to 2.9 km. Threat still lands on 6 at stage 30.
+    length: 1600 + i * 170,
+    speed: 26 + i * 0.26,
+    spacing: 52 - i * 0.5,
     cargo:
       i < 5
         ? "data"
@@ -163,7 +165,7 @@ export const MISSIONS = Array.from({ length: 40 }, (_, i) => {
     train: district === 1,
     gap: district === 2,
     armored: i >= 21,
-    threat: 1 + district,
+    threat: 1 + Math.floor((i * 7) / 39),
     reward: 80 + i * 7,
     story: [
       L("Veri çekirdeği bulundu. Çarşının son kuryesisin."),
@@ -364,8 +366,8 @@ export function validateSave(v) {
 }
 export function rewardRun(save, result) {
   let s = validateSave(save);
-  s.coins += result.coins;
-  s.diamonds += Math.max(0, Math.floor(result.gems || 0));
+  s.coins += Number.isFinite(result?.coins) ? Math.max(0, Math.round(result.coins)) : 0;
+  s.diamonds += Math.max(0, Math.floor(result?.gems || 0));
   if (Number.isFinite(result.score))
     s.leaderboard = [...s.leaderboard, {score:result.score, mission:result.mission,
       distance:Math.floor(result.distance), success:result.success,
@@ -587,6 +589,19 @@ const HAZARDS = new Set([
   "gap",
   "bolt",
 ]);
+// Fork corridors clear these. Saws belong here too; they used to be left in the junction.
+const CORRIDOR = [
+  "barrier",
+  "rock",
+  "cart",
+  "saw",
+  "laser",
+  "wall",
+  "train",
+  "gap",
+  "drone",
+  "bolt",
+];
 const TARGETS = new Set(["drone", "barrel", "vent", "panel"]);
 export function rng(seed) {
   let v = seed >>> 0;
@@ -680,19 +695,9 @@ export class Run {
   add(type, lane, at, extra = {}) {
     if (
       this.fork &&
+      !extra.authored &&
       Math.abs(at - this.fork.at) < 65 &&
-      [
-        "barrier",
-        "rock",
-        "cart",
-        "saw",
-        "laser",
-        "wall",
-        "train",
-        "gap",
-        "drone",
-        "bolt",
-      ].includes(type)
+      CORRIDOR.includes(type)
     )
       return null;
     let o = {
@@ -927,8 +932,26 @@ export class Run {
       end: this.routeEnds,
     });
     // Clear the old street encounters: the new route gets its own authored rhythm.
+    // Scripted beats move past the route together so their spacing stays intact.
+    const carried = this.objects.filter(
+      (o) => o.authored && o.at >= this.distance + 65 && o.at <= this.routeEnds,
+    );
+    if (carried.length) {
+      const minAt = Math.min(...carried.map((o) => o.at));
+      const moving = this.objects.filter(
+        (o) => o.authored && o.at >= minAt - 30,
+      );
+      const earliest = Math.min(...moving.map((o) => o.at));
+      const delta = this.routeEnds + 48 - earliest;
+      for (const o of moving) {
+        o.at += delta;
+        o.hit = false;
+        o.warned = false;
+      }
+      this._scriptShift = (this._scriptShift || 0) + delta;
+    }
     this.objects = this.objects.filter(
-      (o) => o.at < this.distance + 65 || o.at > this.routeEnds,
+      (o) => o.authored || o.at < this.distance + 65 || o.at > this.routeEnds,
     );
     for (let k = 0; k < (westernMine ? 8 : 4); k++) {
       let at = this.distance + 95 + k * 58,
@@ -969,6 +992,28 @@ export class Run {
     this.fork = null;
     this.nextFork = Math.max(this.distance + 480, this.routeEnds + 70);
   }
+  // Slide a scripted beat past a fork or a chosen route. The same shift applies
+  // to later beats so a gate panel and its wall stay linked.
+  placeAuthored(item) {
+    let at = item.at + (this._scriptShift || 0);
+    let guard = 0;
+    while (guard++ < 4) {
+      let next = at;
+      for (const section of this.routeSections)
+        if (at >= section.start + 65 && at <= section.end)
+          next = Math.max(next, section.end + 48);
+      if (this.fork && Math.abs(at - this.fork.at) < 70)
+        next = Math.max(next, this.fork.at + 78);
+      if (next <= at) break;
+      this._scriptShift = (this._scriptShift || 0) + (next - at);
+      at = next;
+    }
+    const extra = { authored: true };
+    if (item.hp) extra.hp = item.hp;
+    if (item.linked) extra.linked = true;
+    if (item.drop) extra.drop = true;
+    return this.add(item.type, item.lane, at, extra);
+  }
   step(dt) {
     if (this.phase !== "play") return;
     dt = Math.min(0.04, Math.max(0, dt));
@@ -1007,8 +1052,12 @@ export class Run {
       if (this.y === 0) this.vy = 0;
     }
     if (this.mission.pursuit) {
-      this.hunter -=
-        dt * (this.mission.boss ? 0.32 + this.mission.id * 0.008 : 0.14);
+      // A fixed distance budget, so a clean dodge still finishes. Bosses end
+      // just under the 55 m star line unless the player fights back.
+      const budget = this.mission.boss ? 46 : 20;
+      const base = Math.max(18, this.mission.speed);
+      const rate = (budget * base) / this.mission.length;
+      this.hunter -= dt * rate * (this.speed / base);
       if (this.hunter <= 0) {
         this.end(false, "hunter");
         return;
@@ -1021,20 +1070,31 @@ export class Run {
       (this.endless || this.distance < this.goal - 500)
     ) {
       this.fork = { at: this.distance + 170, chosen: false };
+      const carried = this.objects.filter(
+        (o) =>
+          o.authored &&
+          Math.abs(o.at - this.fork.at) < 65 &&
+          CORRIDOR.includes(o.type),
+      );
+      if (carried.length) {
+        const minAt = Math.min(...carried.map((o) => o.at));
+        const moving = this.objects.filter(
+          (o) => o.authored && o.at >= minAt - 30,
+        );
+        const earliest = Math.min(...moving.map((o) => o.at));
+        const delta = this.fork.at + 78 - earliest;
+        for (const o of moving) {
+          o.at += delta;
+          o.hit = false;
+          o.warned = false;
+        }
+        this._scriptShift = (this._scriptShift || 0) + delta;
+      }
       this.objects = this.objects.filter(
         (o) =>
+          o.authored ||
           Math.abs(o.at - this.fork.at) >= 65 ||
-          ![
-            "barrier",
-            "rock",
-            "cart",
-            "laser",
-            "wall",
-            "train",
-            "gap",
-            "drone",
-            "bolt",
-          ].includes(o.type),
+          !CORRIDOR.includes(o.type),
       );
       this.emit("fork");
     }
@@ -1049,12 +1109,7 @@ export class Run {
       this.script[this.scriptIndex].at < this.distance + 155
     ) {
       let item = this.script[this.scriptIndex++];
-      if (
-        !this.routeSections.some(
-          (s) => item.at >= s.start + 65 && item.at <= s.end,
-        )
-      )
-        this.add(item.type, item.lane, item.at, item);
+      this.placeAuthored(item);
     }
     if (this.distance >= this.nextWave) {
       let curated = this.script.some(
@@ -1120,15 +1175,18 @@ export class Run {
       ) {
         o.fired = true;
         let at = this.distance + Math.max(18, ahead * 0.48);
-        this.add("bolt", this.lane, at, { x: this.x });
-        this.emit("enemyFire", { object: o.id, targetAt: at, targetX: this.x });
+        this.add("bolt", this.lane, at, { x: this.lane * 3.2 });
+        this.emit("enemyFire", { object: o.id, targetAt: at, targetX: this.lane * 3.2 });
       }
       if (!o.hit && prev <= previousAt && this.distance >= o.at) {
         o.hit = true;
-        let same = Math.abs(this.x - o.x) <
-          (o.type === "bolt" ? 0.62 : o.type === "rock" ? 1.5 : 1.2);
+        // Lane is chosen instantly; the body only eases toward it. Collide with
+        // the committed lane so a dodge cannot phase through, and a successful
+        // lane change is not punished while the mesh is still sliding over.
+        let radius = o.type === "bolt" ? 0.62 : o.type === "rock" ? 1.5 : 1.2;
+        let same = Math.abs(this.lane * 3.2 - o.x) < radius;
         if (same) {
-          if (o.type === "coin" && this.y < 1.5) {
+          if (o.type === "coin" && this.y < 2.2) {
             this.coins += o.value || 1;
             o.dead = true;
             this.emit("coin", { object: o.id });
