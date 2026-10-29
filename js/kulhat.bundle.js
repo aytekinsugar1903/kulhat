@@ -77268,6 +77268,20 @@ function pickLanguage() {
 const LANG = pickLanguage();
 const EN = {
  "Yağmur Çarşısı": "Rain Bazaar",
+ "Demir Hatlar": "Iron Rails",
+ "KARANTİNA": "QUARANTINE",
+ "ŞERİT SEÇ": "PICK A LANE",
+ "Çevrimdışı · Reklamsız · Kayıt bu cihazda": "Offline · No ads · Saved on this device",
+ "MAĞARA AĞZI": "CAVE MOUTH",
+ "KÖK KÖPRÜ": "ROOT BRIDGE",
+ "BUZUL TÜNELİ": "GLACIER TUNNEL",
+ "ESKİ OCAK": "OLD PIT",
+ "SİS GEÇİDİ": "MIST PASS",
+ "ÇAM TÜNELİ": "PINE TUNNEL",
+ "DERİN YARIK": "DEEP CREVICE",
+ "KAYA SALONU": "ROCK HALL",
+ "KARTAL SIĞINAĞI": "EAGLE PERCH",
+ "ÇATI KATLARI": "ROOFTOPS",
  "Yüksek Bahçeler": "High Gardens",
  "Su Altındaki Şehir": "Sunken City",
  "Aktarım Kalesi": "Relay Citadel",
@@ -77902,6 +77916,7 @@ class GameAudio {
         this.map === "western"
           ? [57, 64, 69, 64, 60, 67, 72, 67, 62, 69, 74, 69, 64, 71, 76, 71]
           : [62, 69, 74, 76, 65, 72, 77, 74, 60, 67, 72, 74, 57, 64, 69, 72];
+      if (this.next < this.context.currentTime) this.next = this.context.currentTime;
       while (this.next < this.context.currentTime + 0.2) {
         const n = notes[this.step % notes.length],
           western = this.map === "western";
@@ -77961,7 +77976,7 @@ const DISTRICTS = [
     kind: "city",
   },
   {
-    name: "Demir Hatlar",
+    name: L("Demir Hatlar"),
     sky: "#55463e",
     fog: "#55463e",
     light: "#ffcb92",
@@ -78090,9 +78105,11 @@ const MISSIONS = Array.from({ length: 40 }, (_, i) => {
     id: i,
     district,
     name: NAMES[district][step],
-    length: i === 0 ? 1800 : 2800 + i * 140,
-    speed: 26 + Math.min(10, i * 0.35),
-    spacing: Math.max(32, 48 - i * 0.55),
+    // Smooth ramp: stage 1 is a short lesson, later stages grow steadily
+    // instead of jumping from 1.8 km to 2.9 km. Threat still lands on 6 at stage 30.
+    length: 1600 + i * 170,
+    speed: 26 + i * 0.26,
+    spacing: 52 - i * 0.5,
     cargo:
       i < 5
         ? "data"
@@ -78114,7 +78131,7 @@ const MISSIONS = Array.from({ length: 40 }, (_, i) => {
     train: district === 1,
     gap: district === 2,
     armored: i >= 21,
-    threat: 1 + district,
+    threat: 1 + Math.floor((i * 7) / 39),
     reward: 80 + i * 7,
     story: [
       L("Veri çekirdeği bulundu. Çarşının son kuryesisin."),
@@ -78315,8 +78332,8 @@ function validateSave(v) {
 }
 function rewardRun(save, result) {
   let s = validateSave(save);
-  s.coins += result.coins;
-  s.diamonds += Math.max(0, Math.floor(result.gems || 0));
+  s.coins += Number.isFinite(result?.coins) ? Math.max(0, Math.round(result.coins)) : 0;
+  s.diamonds += Math.max(0, Math.floor(result?.gems || 0));
   if (Number.isFinite(result.score))
     s.leaderboard = [...s.leaderboard, {score:result.score, mission:result.mission,
       distance:Math.floor(result.distance), success:result.success,
@@ -78538,6 +78555,19 @@ const HAZARDS = new Set([
   "gap",
   "bolt",
 ]);
+// Fork corridors clear these. Saws belong here too; they used to be left in the junction.
+const CORRIDOR = [
+  "barrier",
+  "rock",
+  "cart",
+  "saw",
+  "laser",
+  "wall",
+  "train",
+  "gap",
+  "drone",
+  "bolt",
+];
 const TARGETS = new Set(["drone", "barrel", "vent", "panel"]);
 function rng(seed) {
   let v = seed >>> 0;
@@ -78631,19 +78661,9 @@ class Run {
   add(type, lane, at, extra = {}) {
     if (
       this.fork &&
+      !extra.authored &&
       Math.abs(at - this.fork.at) < 65 &&
-      [
-        "barrier",
-        "rock",
-        "cart",
-        "saw",
-        "laser",
-        "wall",
-        "train",
-        "gap",
-        "drone",
-        "bolt",
-      ].includes(type)
+      CORRIDOR.includes(type)
     )
       return null;
     let o = {
@@ -78878,8 +78898,26 @@ class Run {
       end: this.routeEnds,
     });
     // Clear the old street encounters: the new route gets its own authored rhythm.
+    // Scripted beats move past the route together so their spacing stays intact.
+    const carried = this.objects.filter(
+      (o) => o.authored && o.at >= this.distance + 65 && o.at <= this.routeEnds,
+    );
+    if (carried.length) {
+      const minAt = Math.min(...carried.map((o) => o.at));
+      const moving = this.objects.filter(
+        (o) => o.authored && o.at >= minAt - 30,
+      );
+      const earliest = Math.min(...moving.map((o) => o.at));
+      const delta = this.routeEnds + 48 - earliest;
+      for (const o of moving) {
+        o.at += delta;
+        o.hit = false;
+        o.warned = false;
+      }
+      this._scriptShift = (this._scriptShift || 0) + delta;
+    }
     this.objects = this.objects.filter(
-      (o) => o.at < this.distance + 65 || o.at > this.routeEnds,
+      (o) => o.authored || o.at < this.distance + 65 || o.at > this.routeEnds,
     );
     for (let k = 0; k < (westernMine ? 8 : 4); k++) {
       let at = this.distance + 95 + k * 58,
@@ -78920,6 +78958,28 @@ class Run {
     this.fork = null;
     this.nextFork = Math.max(this.distance + 480, this.routeEnds + 70);
   }
+  // Slide a scripted beat past a fork or a chosen route. The same shift applies
+  // to later beats so a gate panel and its wall stay linked.
+  placeAuthored(item) {
+    let at = item.at + (this._scriptShift || 0);
+    let guard = 0;
+    while (guard++ < 4) {
+      let next = at;
+      for (const section of this.routeSections)
+        if (at >= section.start + 65 && at <= section.end)
+          next = Math.max(next, section.end + 48);
+      if (this.fork && Math.abs(at - this.fork.at) < 70)
+        next = Math.max(next, this.fork.at + 78);
+      if (next <= at) break;
+      this._scriptShift = (this._scriptShift || 0) + (next - at);
+      at = next;
+    }
+    const extra = { authored: true };
+    if (item.hp) extra.hp = item.hp;
+    if (item.linked) extra.linked = true;
+    if (item.drop) extra.drop = true;
+    return this.add(item.type, item.lane, at, extra);
+  }
   step(dt) {
     if (this.phase !== "play") return;
     dt = Math.min(0.04, Math.max(0, dt));
@@ -78958,8 +79018,12 @@ class Run {
       if (this.y === 0) this.vy = 0;
     }
     if (this.mission.pursuit) {
-      this.hunter -=
-        dt * (this.mission.boss ? 0.32 + this.mission.id * 0.008 : 0.14);
+      // A fixed distance budget, so a clean dodge still finishes. Bosses end
+      // just under the 55 m star line unless the player fights back.
+      const budget = this.mission.boss ? 46 : 20;
+      const base = Math.max(18, this.mission.speed);
+      const rate = (budget * base) / this.mission.length;
+      this.hunter -= dt * rate * (this.speed / base);
       if (this.hunter <= 0) {
         this.end(false, "hunter");
         return;
@@ -78972,20 +79036,31 @@ class Run {
       (this.endless || this.distance < this.goal - 500)
     ) {
       this.fork = { at: this.distance + 170, chosen: false };
+      const carried = this.objects.filter(
+        (o) =>
+          o.authored &&
+          Math.abs(o.at - this.fork.at) < 65 &&
+          CORRIDOR.includes(o.type),
+      );
+      if (carried.length) {
+        const minAt = Math.min(...carried.map((o) => o.at));
+        const moving = this.objects.filter(
+          (o) => o.authored && o.at >= minAt - 30,
+        );
+        const earliest = Math.min(...moving.map((o) => o.at));
+        const delta = this.fork.at + 78 - earliest;
+        for (const o of moving) {
+          o.at += delta;
+          o.hit = false;
+          o.warned = false;
+        }
+        this._scriptShift = (this._scriptShift || 0) + delta;
+      }
       this.objects = this.objects.filter(
         (o) =>
+          o.authored ||
           Math.abs(o.at - this.fork.at) >= 65 ||
-          ![
-            "barrier",
-            "rock",
-            "cart",
-            "laser",
-            "wall",
-            "train",
-            "gap",
-            "drone",
-            "bolt",
-          ].includes(o.type),
+          !CORRIDOR.includes(o.type),
       );
       this.emit("fork");
     }
@@ -79000,12 +79075,7 @@ class Run {
       this.script[this.scriptIndex].at < this.distance + 155
     ) {
       let item = this.script[this.scriptIndex++];
-      if (
-        !this.routeSections.some(
-          (s) => item.at >= s.start + 65 && item.at <= s.end,
-        )
-      )
-        this.add(item.type, item.lane, item.at, item);
+      this.placeAuthored(item);
     }
     if (this.distance >= this.nextWave) {
       let curated = this.script.some(
@@ -79071,15 +79141,18 @@ class Run {
       ) {
         o.fired = true;
         let at = this.distance + Math.max(18, ahead * 0.48);
-        this.add("bolt", this.lane, at, { x: this.x });
-        this.emit("enemyFire", { object: o.id, targetAt: at, targetX: this.x });
+        this.add("bolt", this.lane, at, { x: this.lane * 3.2 });
+        this.emit("enemyFire", { object: o.id, targetAt: at, targetX: this.lane * 3.2 });
       }
       if (!o.hit && prev <= previousAt && this.distance >= o.at) {
         o.hit = true;
-        let same = Math.abs(this.x - o.x) <
-          (o.type === "bolt" ? 0.62 : o.type === "rock" ? 1.5 : 1.2);
+        // Lane is chosen instantly; the body only eases toward it. Collide with
+        // the committed lane so a dodge cannot phase through, and a successful
+        // lane change is not punished while the mesh is still sliding over.
+        let radius = o.type === "bolt" ? 0.62 : o.type === "rock" ? 1.5 : 1.2;
+        let same = Math.abs(this.lane * 3.2 - o.x) < radius;
         if (same) {
-          if (o.type === "coin" && this.y < 1.5) {
+          if (o.type === "coin" && this.y < 2.2) {
             this.coins += o.value || 1;
             o.dead = true;
             this.emit("coin", { object: o.id });
@@ -79192,12 +79265,17 @@ const mapRecords = () =>
 const stageName = (m) => missionName(m, settings.landscape);
 const $ = (s) => document.querySelector(s),
   view = $("#view");
+const mobileGpu =
+  matchMedia("(pointer: coarse)").matches ||
+  Math.min(screen.width || innerWidth, screen.height || innerHeight) <= 520 ||
+  (navigator.deviceMemory || 8) <= 4;
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let renderer;
 try {
   renderer = new T.WebGLRenderer({
-    antialias: true,
+    antialias: !mobileGpu,
     preserveDrawingBuffer: false,
-    powerPreference: "high-performance",
+    powerPreference: mobileGpu ? "default" : "high-performance",
   });
 } catch (e) {
   $("#loading").hidden = true;
@@ -79247,6 +79325,7 @@ const scene = new T.Scene();
 scene.background = new T.Color("#263443");
 scene.fog = new T.FogExp2("#263443", 0.012);
 const camera = new T.PerspectiveCamera(57, innerWidth / innerHeight, 0.1, 250);
+const paletteColor = [new T.Color(), new T.Color(), new T.Color()];
 camera.position.set(0, 5.5, 13);
 const hemi = new T.HemisphereLight("#b5d5ee", "#283641", 2.3);
 scene.add(hemi);
@@ -79658,6 +79737,7 @@ let selected = Math.min(MISSIONS.length - 1, settings.unlocked - 1),
   paused = false,
   sessionRewarded = false,
   shake = 0,
+  hitStop = 0,
   alertTimer = 0,
   flashTimer = 0,
   visuals = new Map(),
@@ -79694,11 +79774,13 @@ function initAmbient() {
 function setQuality(q) {
   quality = q;
   let low = q === "low";
-  renderer.setPixelRatio(low ? 0.7 : Math.min(devicePixelRatio, 1.6));
-  renderer.shadowMap.enabled = !low;
-  camera.far = low ? 105 : 250;
+  const cap = low ? (mobileGpu ? 0.75 : 0.85) : mobileGpu ? 1 : 1.35;
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, cap));
+  renderer.shadowMap.enabled = !low && !mobileGpu;
+  camera.far = low || mobileGpu ? 120 : 220;
   camera.updateProjectionMatrix();
-  sun.castShadow = !low;
+  sun.shadow.mapSize.set(512, 512);
+  sun.castShadow = !low && !mobileGpu;
   fill.visible = !low;
   skyline.visible = !low;
   dust.children.forEach((cloud, i) => (cloud.visible = !low || i < 2));
@@ -79756,31 +79838,41 @@ function batchStaticDecor(group) {
   }
   group.userData.batched = true;
 }
-function burst(position, color, count = 16) {
-  if (quality === "low") count = Math.min(2, Math.ceil(count / 6));
-  for (
-    let i = 0;
-    i < count && particles.length < (quality === "low" ? 12 : 120);
-    i++
-  ) {
-    let mesh = box(
-      0.08,
-      0.08,
-      0.08,
-      mat(color, 0.3, 0.3, color),
-      position.x,
-      position.y,
-      position.z,
+const particlePool = [];
+function takeSpark() {
+  let s = particlePool.pop();
+  if (!s) {
+    s = new T.Sprite(
+      new T.SpriteMaterial({
+        map: glowTex,
+        transparent: true,
+        depthWrite: false,
+        blending: T.AdditiveBlending,
+      }),
     );
-    mesh.castShadow = false;
+    s.userData.pooled = true;
+    scene.add(s);
+  }
+  s.visible = true;
+  return s;
+}
+function burst(position, color, count = 12) {
+  if (quality === "low") count = Math.min(3, Math.ceil(count / 5));
+  const cap = quality === "low" ? 18 : 72;
+  for (let i = 0; i < count && particles.length < cap; i++) {
+    const mesh = takeSpark();
+    mesh.material.color.set(color);
+    mesh.material.opacity = 0.95;
+    mesh.position.copy(position);
+    mesh.scale.setScalar(0.45 + Math.random() * 0.35);
     particles.push({
       mesh,
       v: new T.Vector3(
-        (Math.random() - 0.5) * 7,
-        Math.random() * 5,
-        (Math.random() - 0.5) * 7,
+        (Math.random() - 0.5) * 8,
+        1.5 + Math.random() * 4,
+        (Math.random() - 0.5) * 8,
       ),
-      life: 0.6,
+      life: 0.48,
     });
   }
 }
@@ -79844,6 +79936,12 @@ function cargoLabel(kind) {
 function notice(text, duration = 2) {
   $("#callout").textContent = westernText(text);
   alertTimer = duration;
+}
+function fadeThrough() {
+  const el = $("#fade");
+  if (!el || reduceMotion) return;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 240);
 }
 function pathX(ahead) {
   if (!run) return 0;
@@ -79969,10 +80067,16 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         }
       }
       for (let z of [-3, -13, -24]) {
-        orb(0.38, mat("#8a7863", 0, 1), side * 5.8, 0.25, z, d);
-        let cactus = mat("#667d43", 0.95, 0);
-        box(0.28, 1.9, 0.3, cactus, side * 6.2, 0.9, z - 2, d);
-        if (!trail) {
+        if (trail) {
+          const pine = mat(variant % 2 ? "#3e6a45" : "#2f5538", 0.9, 0);
+          box(0.16, 2.4, 0.16, mat("#6b5340"), side * 6.1, 1.2, z - 2, d);
+          orb(0.7, pine, side * 6.1, 2.15, z - 2, d);
+          orb(0.45, pine, side * 6.1, 2.85, z - 2, d);
+          orb(0.55, mat("#8d8472", 1, 0), side * 7.4, 0.55, z, d);
+        } else {
+          orb(0.38, mat("#8a7863", 0, 1), side * 5.8, 0.25, z, d);
+          let cactus = mat("#667d43", 0.95, 0);
+          box(0.28, 1.9, 0.3, cactus, side * 6.2, 0.9, z - 2, d);
           box(0.9, 0.23, 0.25, cactus, side * 6.2, 1.25, z - 2, d);
           box(0.22, 0.75, 0.24, cactus, side * 6.2 + 0.4, 1.55, z - 2, d);
         }
@@ -80157,6 +80261,48 @@ function dressRoute(g, kind, variant = 0, district = 0) {
       );
       return;
     }
+    // Trail safe-route is a cave. The old neon metro stayed on this path and
+    // made the mountain map look like a different game.
+    d.name = "cave-" + variant;
+    box(11, 0.35, 28, mat("#5c5348", 1, 0), 0, -0.16, -14, d);
+    box(14, 1.1, 28, mat("#3a342c", 1, 0), 0, 6.6, -14, d);
+    for (let side of [-1, 1]) {
+      box(
+        2.4,
+        7.2,
+        28,
+        mat(variant % 2 ? "#6d6256" : "#7a6e60", 1, 0),
+        side * 6.5,
+        3.1,
+        -14,
+        d,
+      );
+      for (let z of [-4, -12, -20]) {
+        box(0.35, 5.8, 0.45, mat("#6a4e34"), side * 5.15, 2.9, z, d);
+        orb(0.22, mat("#ffc56d", 0.4, 0.1, "#b36d22"), side * 4.85, 3.5, z, d);
+        orb(0.85, mat("#4e5b49", 1, 0), side * 7.3, 1.05, z, d);
+      }
+    }
+    for (let z of [-6, -18])
+      box(10.2, 0.32, 0.45, mat("#5a4634"), 0, 5.7, z, d);
+    sign(
+      [
+        L("MAĞARA AĞZI"),
+        L("KÖK KÖPRÜ"),
+        L("BUZUL TÜNELİ"),
+        L("ESKİ OCAK"),
+        L("SİS GEÇİDİ"),
+        L("ÇAM TÜNELİ"),
+        L("DERİN YARIK"),
+        L("KAYA SALONU"),
+      ][variant],
+      "#f0d7a4",
+      d,
+      0,
+      4.6,
+      -16,
+    );
+    return;
     box(11, 0.3, 28, mat("#264b59"), 0, -0.18, -14, d);
     box(13, 0.5, 28, mat("#19313f"), 0, 7, -14, d);
     for (let side of [-1, 1]) {
@@ -80291,7 +80437,15 @@ function dressRoute(g, kind, variant = 0, district = 0) {
           3.2,
           0.45,
           2,
-          mat(n % 2 ? "#d68a67" : "#bd755d"),
+          mat(
+            settings.landscape === "trail"
+              ? n % 2
+                ? "#8a8174"
+                : "#6e675c"
+              : n % 2
+                ? "#a56b45"
+                : "#8a5534",
+          ),
           lane * 3.2,
           -0.25,
           -1 - n * 2,
@@ -80301,12 +80455,29 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         g.userData.tiles.push(tile);
       }
     for (let side of [-1, 1]) {
-      box(0.3, 0.65, 28, mat("#f2ba7d"), side * 5, 0.2, -14, d);
+      box(
+        0.3,
+        0.65,
+        28,
+        mat(settings.landscape === "trail" ? "#cbb892" : "#e2b07a"),
+        side * 5,
+        0.2,
+        -14,
+        d,
+      );
       box(
         1.8,
         9,
         28,
-        mat(side < 0 ? "#277b8c" : "#a95479"),
+        mat(
+          settings.landscape === "trail"
+            ? side < 0
+              ? "#6a6258"
+              : "#7d7364"
+            : side < 0
+              ? "#7a5a3c"
+              : "#8d6844",
+        ),
         side * 7,
         -4.6,
         -14,
@@ -80434,20 +80605,22 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         box(9, 0.08, 0.08, mat("#5b506f"), 0, 4.1, z, d);
         for (let x of [-4, -2, 0, 2, 4])
           orb(
-            0.28,
-            mat(
-              x % 4 ? "#ff92c8" : "#77f3e0",
-              0.2,
-              0.1,
-              x % 4 ? "#a84377" : "#318b82",
-            ),
+            0.22,
+            mat("#ffd39a", 0.3, 0.1, "#c47a32"),
             x,
             3.9,
             z,
             d,
           );
       }
-      sign(L("GÖK PAZARI"), "#ff9bcf", d, 0, 5.2, -16);
+      sign(
+        settings.landscape === "trail" ? L("KARTAL SIĞINAĞI") : L("ÇATI KATLARI"),
+        "#ffd7a2",
+        d,
+        0,
+        5.2,
+        -16,
+      );
     }
     for (let o of d.children) {
       let shape = o.geometry?.parameters;
@@ -80519,7 +80692,7 @@ function generateRegion(i) {
     if (i === 4) {
       for (let side of [-1, 1]) {
         box(1.1, 2.1, 0.5, mat("#c3bda9"), side * 6.4, 1.2, -10, decor);
-        sign(L("QUARANTINE"), "#f69e87", decor, side * 8, 4, -14);
+        sign(L("KARANTİNA"), "#f69e87", decor, side * 8, 4, -14);
       }
     }
     if (i === 5) {
@@ -81027,13 +81200,19 @@ function clearVisuals() {
   visuals.clear();
   bulletMeshes.forEach(cleanup);
   bulletMeshes.clear();
-  particles.forEach((p) => cleanup(p.mesh));
+  particles.forEach((p) => {
+    if (p.mesh.userData.pooled) {
+      p.mesh.visible = false;
+      particlePool.push(p.mesh);
+    } else cleanup(p.mesh);
+  });
   particles = [];
   effects.forEach((e) => cleanup(e.mesh));
   effects = [];
   forkVisual.visible = false;
 }
 function openMission(id, endless = false) {
+  fadeThrough();
   document.body.classList.remove("menu-open");
   armoryOpen = false;
   clearVisuals();
@@ -81092,6 +81271,7 @@ function openMission(id, endless = false) {
   updateHud();
 }
 function showMenu() {
+  if (mode === "play" || mode === "pause" || mode === "end") fadeThrough();
   document.body.classList.add("menu-open");
   mode = "menu";
   run = null;
@@ -81241,7 +81421,7 @@ function showMenu() {
     (settings.freePlay
       ? L("SERBEST KEŞİF · 40 ETAP AÇIK")
       : L("TÜM ETAPLARI DENE · SERBEST KEŞİF")) +
-    '</button></div><div class="row"><button class="primary" id="launch" ' +
+    '</button></div><div class="row launch-row"><button class="primary" id="launch" ' +
     (selected >= settings.unlocked && !settings.freePlay ? "disabled" : "") +
     ">" +
     String(selected + 1).padStart(2, "0") +
@@ -81342,6 +81522,9 @@ function showMenu() {
     scorePanel +
     $("#menu").innerHTML.slice(panelEnd);
   $("#menu").innerHTML = westernText($("#menu").innerHTML);
+  const buildLabel = $("#menu .build-label");
+  if (buildLabel)
+    buildLabel.textContent = L("Çevrimdışı · Reklamsız · Kayıt bu cihazda");
   const choices = $("#menu .mode-groups"),
     chapters = $("#menu .district-tabs");
   if (choices?.parentNode && choices.parentNode === chapters?.parentNode)
@@ -81736,6 +81919,7 @@ function pause() {
     keys = {};
     holding = false;
     pointer = null;
+    pointers.clear();
     if (run) run.hold = false;
     gameAudio.stop();
     $("#menu").hidden = false;
@@ -81779,6 +81963,7 @@ function resultBreakdown(r) {
   );
 }
 function results(r) {
+  fadeThrough();
   mode = "end";
   holding = false;
   pointer = null;
@@ -81874,7 +82059,7 @@ function results(r) {
   $("#menu").innerHTML = westernText($("#menu").innerHTML);
   $("#retry").classList.add("retry-large");
   const resultCard = $("#menu .result-card");
-  if (resultCard?.insertAdjacentHTML)
+  if (REWARDED_ADS_ENABLED && resultCard?.insertAdjacentHTML)
     resultCard.insertAdjacentHTML(
       "beforeend",
       '<p class="best-score ' +
@@ -81979,8 +82164,11 @@ function events() {
         // Playables require a haptics toggle; vibration stays off there.
         if (!inPlayables) globalThis.navigator?.vibrate?.(45);
       } catch {}
-      shake = 0.35;
-      flashTimer = 0.2;
+      if (!reduceMotion) {
+        shake = Math.min(0.72, shake + 0.5);
+        hitStop = 0.045;
+      }
+      flashTimer = 0.22;
       $("#flash").classList.add("hit");
       lastDamage = {
         barrier: L("Bariyere çarptın; yukarı kaydırarak zıpla."),
@@ -82033,7 +82221,7 @@ function events() {
         );
     }
     if (e.type === "spark") burst(pos, "#b8e7e4", 4);
-    if (e.type === "fork") notice(routeHint(), 3);
+    if (e.type === "fork") notice(L("ŞERİT SEÇ"), 1.6);
     if (e.type === "route")
       notice(
         e.choice === "safe"
@@ -82212,7 +82400,8 @@ function syncObjects() {
       bulletMeshes.delete(id);
     }
   });
-  if (run.fork) {
+  const forkNear = run.fork && run.fork.at - run.distance < 92;
+  if (forkNear) {
     $("#fork-signs").hidden = false;
     const names = routeLabels();
     $("#fork-left-title").textContent = names.left;
@@ -82274,11 +82463,19 @@ function aimed(e) {
     })?.[0] ?? null
   );
 }
+const pointers = new Map();
+function retargetHold() {
+  pointer = [...pointers.values()].find((p) => !p.moved) || null;
+  if (!pointer && !keys[" "] && !keys.Space) {
+    holding = false;
+    if (run) run.hold = false;
+  }
+}
 view.onpointerdown = (e) => {
   if (mode !== "play") return;
   e.preventDefault();
-  view.setPointerCapture(e.pointerId);
-  pointer = {
+  view.setPointerCapture?.(e.pointerId);
+  const entry = {
     id: e.pointerId,
     x: e.clientX,
     y: e.clientY,
@@ -82286,21 +82483,17 @@ view.onpointerdown = (e) => {
     moved: false,
     target: aimed(e),
   };
+  pointers.set(e.pointerId, entry);
+  pointer = entry;
 };
 view.onpointermove = (e) => {
-  if (
-    !pointer ||
-    pointer.id !== e.pointerId ||
-    pointer.moved ||
-    mode !== "play"
-  )
-    return;
-  let dx = e.clientX - pointer.x,
-    dy = e.clientY - pointer.y;
-  if (Math.max(Math.abs(dx), Math.abs(dy)) > 28) {
-    pointer.moved = true;
-    holding = false;
-    run.hold = false;
+  const current = pointers.get(e.pointerId);
+  if (!current || current.moved || mode !== "play") return;
+  let dx = e.clientX - current.x,
+    dy = e.clientY - current.y;
+  if (Math.max(Math.abs(dx), Math.abs(dy)) > 24) {
+    current.moved = true;
+    retargetHold();
     run.action(
       Math.abs(dx) > Math.abs(dy)
         ? dx > 0
@@ -82313,21 +82506,20 @@ view.onpointermove = (e) => {
   }
 };
 view.onpointerup = (e) => {
+  const current = pointers.get(e.pointerId);
+  pointers.delete(e.pointerId);
   if (
-    pointer &&
-    pointer.id === e.pointerId &&
-    !pointer.moved &&
-    mode === "play"
+    current &&
+    !current.moved &&
+    mode === "play" &&
+    performance.now() - current.at < 220
   )
-    run.fire(pointer.target);
-  pointer = null;
-  holding = false;
-  if (run) run.hold = false;
+    run.fire(current.target);
+  retargetHold();
 };
-view.onpointercancel = () => {
-  pointer = null;
-  holding = false;
-  if (run) run.hold = false;
+view.onpointercancel = (e) => {
+  pointers.delete(e.pointerId);
+  retargetHold();
 };
 let keys = {};
 addEventListener(
@@ -82343,9 +82535,12 @@ addEventListener(
       }
       if (
         (tutorialStep === 0 &&
-          ["ArrowLeft", "ArrowRight", "a", "d"].includes(e.key)) ||
-        (tutorialStep === 1 && ["ArrowUp", "w"].includes(e.key)) ||
-        (tutorialStep === 2 && e.key === " ")
+          ["ArrowLeft", "ArrowRight", "KeyA", "KeyD"].includes(e.code)) ||
+        (tutorialStep === 0 &&
+          ["a", "d", "A", "D"].includes(e.key)) ||
+        (tutorialStep === 1 &&
+          (e.code === "ArrowUp" || e.code === "KeyW" || e.key.toLowerCase() === "w")) ||
+        (tutorialStep === 2 && (e.key === " " || e.code === "Space"))
       )
         advanceTutorial();
       return;
@@ -82367,29 +82562,35 @@ addEventListener(
       if (!e.repeat) pause();
       return;
     }
-    let action = {
-      ArrowLeft: "left",
-      a: "left",
-      ArrowRight: "right",
-      d: "right",
-      ArrowUp: "jump",
-      w: "jump",
-      ArrowDown: "slide",
-      s: "slide",
-      " ": "fire",
-    }[e.key];
+    const letter = e.key.length === 1 ? e.key.toLowerCase() : "";
+    let action =
+      {
+        ArrowLeft: "left",
+        ArrowRight: "right",
+        ArrowUp: "jump",
+        ArrowDown: "slide",
+        KeyA: "left",
+        KeyD: "right",
+        KeyW: "jump",
+        KeyS: "slide",
+        Space: "fire",
+      }[e.code] ||
+      { a: "left", d: "right", w: "jump", s: "slide", " ": "fire" }[letter];
     if (action) {
       e.preventDefault();
-      if (mode === "play" && !keys[e.key]) run.action(action);
-      keys[e.key] = true;
-      if (e.key === " " && mode === "play") holding = true;
+      const stamp = e.code || letter;
+      if (mode === "play" && !keys[stamp]) run.action(action);
+      keys[stamp] = true;
+      if (action === "fire" && mode === "play") holding = true;
     }
   },
   { capture: true },
 );
 addEventListener("keyup", (e) => {
-  keys[e.key] = false;
-  if (e.key === " ") {
+  const letter = e.key.length === 1 ? e.key.toLowerCase() : "";
+  keys[e.code] = false;
+  if (letter) keys[letter] = false;
+  if (e.code === "Space" || e.key === " ") {
     holding = false;
     if (run) run.hold = false;
   }
@@ -82404,6 +82605,7 @@ function lostFocus() {
   gameAudio.stop();
   keys = {};
   pointer = null;
+  pointers.clear();
   holding = false;
   if (run) run.hold = false;
   if (mode === "play") pause();
@@ -82440,12 +82642,14 @@ addEventListener("resize", () => {
 });
 function stepSimulation(dt) {
   if (mode === "play" && run) {
-    if (pointer && !pointer.moved && performance.now() - pointer.at > 200)
+    const held = [...pointers.values()].find(
+      (p) => !p.moved && performance.now() - p.at > 180,
+    );
+    if (held) {
       holding = true;
-    if (holding) {
-      if (pointer?.target) run.fire(pointer.target);
-      else run.fire();
+      pointer = held;
     }
+    if (holding) run.fire(held?.target ?? pointer?.target ?? null);
     run.step(dt);
     events();
   }
@@ -82472,15 +82676,21 @@ function update(dt, simulate = true) {
     activeTerrain === "metro"
       ? settings.landscape === "western"
         ? ["#3b342c", "#66523b", "#ffd394"]
-        : ["#123d51", "#246578", "#85ffdf"]
+        : ["#6d6558", "#7a7164", "#ffe2ae"]
       : activeTerrain === "roof"
-        ? ["#c2ac8b", "#c4a882", "#ffe0ac"]
+        ? settings.landscape === "trail"
+          ? ["#9aa4a0", "#b3aea0", "#ffe6b8"]
+          : ["#c4a27a", "#b99268", "#ffd7a4"]
         : settings.landscape === "trail"
           ? ["#a8bec0", "#b8b2a0", "#ffe2ae"]
           : ["#c9b18d", "#c0a17a", "#ffdda3"];
-  scene.background.lerp(new T.Color(palette[0]), Math.min(1, dt * 2));
-  scene.fog.color.lerp(new T.Color(palette[1]), Math.min(1, dt * 2));
-  sun.color.lerp(new T.Color(palette[2]), Math.min(1, dt * 2));
+  paletteColor[0].set(palette[0]);
+  paletteColor[1].set(palette[1]);
+  paletteColor[2].set(palette[2]);
+  const blend = Math.min(1, dt * 2);
+  scene.background.lerp(paletteColor[0], blend);
+  scene.fog.color.lerp(paletteColor[1], blend);
+  sun.color.lerp(paletteColor[2], blend);
   rain.visible = false;
   dust.visible = activeTerrain !== "metro";
   dust.position.x = run?.offset || 0;
@@ -82590,9 +82800,9 @@ function update(dt, simulate = true) {
     1.8 + groundAt((run?.distance || 0) + 20) + (run?.y || 0) * 0.1,
     -17,
   );
-  if (shake > 0) {
-    camera.position.x += (Math.random() - 0.5) * shake;
-    camera.position.y += (Math.random() - 0.5) * shake;
+  if (shake > 0 && !reduceMotion) {
+    camera.position.x += (Math.random() - 0.5) * shake * 1.4;
+    camera.position.y += (Math.random() - 0.5) * shake * 1.1;
   }
   for (let p of particles) {
     p.mesh.position.addScaledVector(p.v, dt);
@@ -82601,11 +82811,12 @@ function update(dt, simulate = true) {
     p.mesh.scale.setScalar(Math.max(0.05, p.life * 1.5));
   }
   particles = particles.filter((p) => {
-    if (p.life <= 0) {
-      cleanup(p.mesh);
-      return false;
-    }
-    return true;
+    if (p.life > 0) return true;
+    if (p.mesh.userData.pooled) {
+      p.mesh.visible = false;
+      particlePool.push(p.mesh);
+    } else cleanup(p.mesh);
+    return false;
   });
   for (let i = 0; rain.visible && i < rainCount; i++) {
     rainPos[i * 3 + 1] -= dt * 13;
@@ -82626,6 +82837,10 @@ let accumulator = 0;
 function frame(now) {
   let real = Math.min(0.1, Math.max(0, (now - last) / 1000));
   last = now;
+  if (hitStop > 0) {
+    hitStop = Math.max(0, hitStop - real);
+    real = 0;
+  }
   if (mode === "play") accumulator += real;
   else accumulator = 0;
   let steps = 0;
@@ -82640,9 +82855,9 @@ function frame(now) {
   if (fpsTime >= 2) {
     let fps = Math.round(frameCount / fpsTime);
     $("#fps").textContent = fps + " FPS";
-    if (settings.quality === "auto" && mode === "play" && fps < 32) {
+    if (settings.quality === "auto" && mode === "play" && fps < 55 && quality !== "low") {
       slowTime += fpsTime;
-      if (slowTime >= 6 && quality !== "low") {
+      if (slowTime >= 3) {
         setQuality("low");
         notice(L("AKICILIK İÇİN GÖRÜNTÜ AYARLANDI"), 2);
       }
@@ -82652,7 +82867,11 @@ function frame(now) {
   if (!systemPaused) frameHandle = requestAnimationFrame(frame);
 }
 let frameHandle = 0;
-setQuality(settings.quality === "low" ? "low" : "high");
+setQuality(
+  settings.quality === "low" || (settings.quality === "auto" && mobileGpu)
+    ? "low"
+    : "high",
+);
 setStaticText();
 showMenu();
 $("#loading").hidden = true;

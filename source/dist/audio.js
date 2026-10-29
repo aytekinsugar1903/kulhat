@@ -64,6 +64,7 @@ export class GameAudio {
         this.map === "western"
           ? [57, 64, 69, 64, 60, 67, 72, 67, 62, 69, 74, 69, 64, 71, 76, 71]
           : [62, 69, 74, 76, 65, 72, 77, 74, 60, 67, 72, 74, 57, 64, 69, 72];
+      if (this.next < this.context.currentTime) this.next = this.context.currentTime;
       while (this.next < this.context.currentTime + 0.2) {
         const n = notes[this.step % notes.length],
           western = this.map === "western";

@@ -44,7 +44,7 @@ Oyun döngüsünde GPU piksel okuması veya ekran görüntüsü çıkarma işlem
 
 ## Doğrulama ve yayın durumu
 
-Bu bir bağımsız HTML5 **yayın adayıdır**. YouTube Playables SDK entegrasyonu, platform kabul testi, Play Store Android/AAB paketi ve gerçek telefon QA'sı tamamlanmış sayılmaz. Otomatik simülasyon/DOM/sahne bağlantısı testleri gerçek GPU görüntüsü, ses kalitesi, dokunmatik donanım veya 30 FPS garantisi değildir. Çalışma ortamındaki yönetilen görsel önizleme `bwrap: Can't mount proc` hatasıyla engellendi; gerçek cihazda son görsel/işitsel ve performans kontrolü gereklidir.
+Bu bir bağımsız HTML5 sürümüdür. Android AAB, `android/` Capacitor projesinden ve `RELEASE-CHECKLIST.md` adımlarından üretilir; imza ortam değişkenlerindedir ve mağazaya yükleme bu paketin parçası değildir. Gerçek telefon üzerinde kare hızı ölçümü ayrıca yapılmalıdır. Otomatik simülasyon/DOM/sahne bağlantısı testleri gerçek GPU görüntüsü, ses kalitesi, dokunmatik donanım veya 30 FPS garantisi değildir. Çalışma ortamındaki yönetilen görsel önizleme `bwrap: Can't mount proc` hatasıyla engellendi; gerçek cihazda son görsel/işitsel ve performans kontrolü gereklidir.
 
 Yayın öncesi kontrol: 360 × 800 dikey, 800 × 360 yatay, 1280 × 800; iki harita; üç öğretici hareketi; tekrar girişte öğreticinin atlanması; ses aç/kapat; sekme değiştirip dönme; Esc; ölüm ve yeniden deneme; kayıt sonrası yeniden yükleme; günlük ödül/görev ve kostüm; ağ kapalı başlatma. Hedef orta seviye telefonda en az 30 FPS'tir, ölçülmüş sonuç değildir.
 

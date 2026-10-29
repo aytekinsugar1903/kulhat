@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta
       name="viewport"
-      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"
     />
     <meta name="theme-color" content="#0b141e" />
     <meta
@@ -1643,6 +1643,69 @@
           max-height: calc(100dvh - 16px);
         }
       }
+      #fade {
+        position: fixed;
+        inset: 0;
+        background: #0b141e;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 30;
+        transition: opacity 0.22s ease;
+      }
+      #fade.show {
+        opacity: 1;
+      }
+      .sub,
+      .label,
+      .hint,
+      #quality,
+      .tip,
+      .mission-card small,
+      .mission-card span,
+      .mission-objective,
+      .bottomstats,
+      .callout,
+      .route,
+      .help-grid p {
+        font-size: 12px;
+      }
+      button,
+      .status button,
+      .district-tabs button,
+      .row button,
+      .menu-settings button {
+        min-height: 44px;
+        min-width: 44px;
+      }
+      .hud {
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+      }
+      .hint,
+      .bottomstats,
+      .fork-signs {
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
+      }
+      .fork-signs {
+        top: max(112px, calc(env(safe-area-inset-top) + 96px));
+      }
+      @media (orientation: landscape) and (max-height: 520px) {
+        .launch-row {
+          position: sticky;
+          bottom: 0;
+          z-index: 4;
+          background: linear-gradient(#09182100, #091821 28%);
+          padding-top: 8px;
+        }
+        .fork-signs {
+          top: max(8px, env(safe-area-inset-top));
+          width: min(560px, 72vw);
+        }
+        .hint {
+          font-size: 12px;
+        }
+      }
       @media (prefers-reduced-motion: reduce) {
         #wind {
           display: none;
@@ -1723,6 +1786,27 @@
     <div class="veil" id="menu"></div>
     <div id="extras" hidden></div>
     <div id="tutorial" hidden></div>
+    <div id="fade"></div>
+    <script>
+      // Android back: pause a run, or close the panel that is open. No-op in a browser.
+      window.addEventListener("DOMContentLoaded", () => {
+        const cap = window.Capacitor;
+        const App = cap && cap.isNativePlatform && cap.isNativePlatform() && cap.Plugins && cap.Plugins.App;
+        if (!App) return;
+        App.addListener("backButton", () => {
+          const base = document.querySelector("#base");
+          const close =
+            document.querySelector("#closeProfile") ||
+            document.querySelector("#closeArmory") ||
+            document.querySelector("#backMenu") ||
+            document.querySelector("#back");
+          if (base) base.click();
+          else if (close) close.click();
+          else if (!document.body.classList.contains("menu-open"))
+            document.querySelector("#pause")?.click();
+        });
+      });
+    </script>
     <div class="loading" id="loading">
       <img src="./assets/icon.svg" alt="KÜLHAT" />KÜLHAT<small>Şehir uyanıyor…</small>
     </div>

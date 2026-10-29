@@ -36,6 +36,15 @@ Web sürümünü güncellemek için `rebuilt/` içindeki `index.html`, `js/` ve 
 
 `--playables` seçeneği YouTube Playables SDK'sını (`https://www.youtube.com/game_api/v1`) oyun kodundan önce yükler ve yalnızca oynanabilir dosyaları çıkarır. Bu klasörü zip'leyip (`index.html` zip'in kökünde olacak şekilde) Playables geliştirici portalına yükleyin.
 
+## Android (Google Play)
+
+Capacitor sarmalayıcı `android/` altındadır. `targetSdk` 36. İmzalı AAB yalnızca ortam değişkenlerinden üretilir (`ANDROID_KEYSTORE_PATH`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`). Anahtar depoya yazılmaz. Mağaza metinleri `store/` içindedir. Yayın adımları `RELEASE-CHECKLIST.md` dosyasındadır. Bu depo mağazaya yükleme yapmaz.
+
+```bash
+npm test
+npm run build:aab
+```
+
 ## YouTube Playables entegrasyonu
 
 - Yükleme ekranı görünürken `firstFrameReady()`, ana menü tıklanabilir olunca `gameReady()` çağrılır.
