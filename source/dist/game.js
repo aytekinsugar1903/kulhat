@@ -16,6 +16,7 @@ import {
   showRewardedAd,
 } from "./profile.js";
 import { GameAudio } from "./audio.js";
+import * as V from "./visuals.js";
 import { L, LANG, setStaticText } from "./i18n.js";
 import {
   Run,
@@ -55,7 +56,7 @@ renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = T.PCFSoftShadowMap;
 renderer.toneMapping = T.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.25;
+renderer.toneMappingExposure = 1.05;
 renderer.outputColorSpace = T.SRGBColorSpace;
 view.append(renderer.domElement);
 // Observe readbacks without issuing one. Captures a bounded, local-only trace
@@ -93,12 +94,13 @@ scene.background = new T.Color("#263443");
 scene.fog = new T.FogExp2("#263443", 0.012);
 const camera = new T.PerspectiveCamera(57, innerWidth / innerHeight, 0.1, 250);
 camera.position.set(0, 5.5, 13);
-const hemi = new T.HemisphereLight("#b5d5ee", "#283641", 2.3);
+const hemi = new T.HemisphereLight("#cfe0ee", "#8a6a4c", 1.7);
 scene.add(hemi);
-const sun = new T.DirectionalLight("#ffceb2", 3.2);
+const sun = new T.DirectionalLight("#ffe2b8", 3.4);
 sun.position.set(-12, 24, -35);
 sun.castShadow = true;
-sun.shadow.mapSize.set(1024, 1024);
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.normalBias = 0.03;
 Object.assign(sun.shadow.camera, {
   left: -22,
   right: 22,
@@ -206,13 +208,21 @@ const roadTex = tex(
       c.fillStyle = "rgba(" + v + "," + v + "," + v + ",.1)";
       c.fillRect(Math.random() * w, Math.random() * h, 1, 2);
     }
-    c.strokeStyle = "#8b704f";
-    c.lineWidth = 2;
-    for (let i = 0; i < 12; i++) {
+    c.strokeStyle = "rgba(120,92,62,.35)";
+    c.lineWidth = 1.5;
+    for (let i = 0; i < 40; i++) {
+      let x = Math.random() * w,
+        y = Math.random() * h;
       c.beginPath();
-      c.moveTo(Math.random() * w, 0);
-      c.lineTo(Math.random() * w, h);
+      c.moveTo(x, y);
+      c.lineTo(x + (Math.random() - 0.5) * 6, y + 14 + Math.random() * 20);
       c.stroke();
+    }
+    for (let i = 0; i < 18; i++) {
+      c.fillStyle = "rgba(95,72,48,.28)";
+      c.beginPath();
+      c.ellipse(Math.random() * w, Math.random() * h, 2 + Math.random() * 3, 1.5, 0, 0, 7);
+      c.fill();
     }
   },
   256,
@@ -229,22 +239,14 @@ const roadMat = new T.MeshStandardMaterial({
   bumpScale: 0.12,
 });
 const skyline = new T.Group();
-for (let i = 0; i < 45; i++) {
-  let side = i % 2 ? 1 : -1,
-    x = side * (25 + Math.random() * 70),
-    h = 18 + Math.random() * 34,
-    z = -70 - Math.random() * 130;
-  let peak = new T.Mesh(
-    (geo.mountainPeak ??= new T.ConeGeometry(1, 1, 6)),
-    mat(i % 2 ? "#927e65" : "#b09a7b", 0, 1),
-  );
-  peak.scale.set(14 + (i % 5) * 3, h, 18);
-  peak.position.set(x, h / 2 - 4, z);
-  skyline.add(peak);
-}
+const horizons = { western: new T.Group(), trail: new T.Group() };
+V.fillHorizon(horizons.western, "western");
+V.fillHorizon(horizons.trail, "trail");
+skyline.add(horizons.western, horizons.trail);
 scene.add(skyline);
-orb(12, new T.MeshBasicMaterial({ color: "#f3bd9e" }), -55, 50, -190);
-glow("#ffd1ae", -55, 50, -180, 70);
+const sky = V.createSky(scene);
+const desertFloor = V.createDesertFloor(scene);
+
 let segments = [];
 const SEG = 28;
 function sign(text, color, parent, x, y, z) {
@@ -309,81 +311,9 @@ const suit = mat("#174c5c", 0.5, 0.15).clone(),
   armor = mat("#66d7cb", 0.35, 0.25).clone(),
   accent = mat("#ff9b62", 0.3, 0.35, "#9d4327"),
   boot = mat("#253040");
-let torso = orb(0.58, suit, 0, 1.52, 0, body);
-torso.scale.set(0.9, 1.2, 0.72);
-orb(0.38, mat("#d7f1d5"), 0, 1.48, -0.35, body).scale.set(0.9, 1.15, 0.45);
-// Cargo harness gives the rear silhouette depth instead of a flat backpack.
-box(0.62, 0.5, 0.34, mat("#c76f4b"), 0, 1.52, 0.48, body);
-box(0.08, 0.58, 0.08, accent, -0.23, 1.5, 0.68, body).rotation.z = -0.25;
-box(0.08, 0.58, 0.08, accent, 0.23, 1.5, 0.68, body).rotation.z = 0.25;
-const head = orb(0.43, armor, 0.08, 2.18, -0.05, body);
-head.scale.set(0.92, 1.08, 0.9);
-let hood = orb(0.49, suit, 0.08, 2.18, 0.03, body);
-hood.scale.set(1, 1.08, 0.92);
-box(
-  0.61,
-  0.16,
-  0.13,
-  mat("#a1fff0", 0.2, 0.5, "#3a9c94"),
-  0.08,
-  2.26,
-  -0.4,
-  body,
-);
-for (let s of [-1, 1])
-  orb(
-    0.075,
-    mat("#142535", 0.25, 0.2, "#83eade"),
-    s * 0.22 + 0.08,
-    2.3,
-    -0.33,
-    body,
-  );
-for (let s of [-1, 1]) {
-  let tail = box(
-    0.2,
-    0.18,
-    0.3,
-    s < 0 ? armor : accent,
-    s * 0.18,
-    0.95,
-    0.25,
-    body,
-  );
-  tail.scale.y = 3;
-  tail.rotation.x = -0.18;
-  tail.rotation.z = s * 0.18;
-}
-const arms = [],
-  legs = [];
-for (let s of [-1, 1]) {
-  let leg = new T.Group();
-  leg.position.set(s * 0.24, 1.05, 0);
-  box(0.16, 0.56, 0.18, accent, 0, -0.26, 0, leg);
-  box(0.18, 0.5, 0.2, armor, 0, -0.72, 0.02, leg);
-  box(0.3, 0.14, 0.62, boot, 0, -1, -0.13, leg);
-  body.add(leg);
-  legs.push(leg);
-  let arm = new T.Group();
-  arm.position.set(s * 0.53, 1.82, 0);
-  let wing = box(0.32, 0.62, 0.22, s < 0 ? armor : suit, 0, -0.27, 0, arm);
-  wing.rotation.z = s * 0.12;
-  box(0.2, 0.42, 0.18, accent, 0, -0.72, -0.03, arm);
-  body.add(arm);
-  arms.push(arm);
-}
-let weapon = box(
-  0.18,
-  0.21,
-  0.6,
-  mat("#516775", 0.25, 0.7),
-  0.55,
-  1.27,
-  -0.48,
-  body,
-);
-box(0.08, 0.08, 0.25, accent, 0.55, 1.27, -0.85, body);
-const muzzleFlash = glow("#ffce6c", 0.55, 1.27, -1.05, 1.7, body);
+const courier = V.buildCourier(body, suit, armor, accent);
+const { arms, legs, weapon, head, torso } = courier;
+const muzzleFlash = glow("#ffce6c", 0.55, 1.27, -0.95, 1.7, body);
 muzzleFlash.visible = false;
 let shieldBubble = new T.Mesh(
   new T.SphereGeometry(1.5, 20, 16),
@@ -435,6 +365,7 @@ for (let i = 0; i < 28; i++) {
 }
 scene.add(dust);
 const clamp = T.MathUtils.clamp;
+const ambient = V.createAmbient(scene, glowTex);
 // platform.js (YouTube Playables cloud save or localStorage) when present.
 const platform = globalThis.KULHAT_PLATFORM || null,
   inPlayables = !!platform?.inPlayables;
@@ -708,6 +639,17 @@ function groundAt(distance) {
   let t = Math.min(1, (distance - s.start) / 65, (s.end - distance) / 65);
   return (s.kind === "roof" ? 9 : -3) * t * t * (3 - 2 * t);
 }
+const WESTERN_SIGNS = () => [
+  L("SALOON"),
+  L("ŞERİF"),
+  L("GENEL MAĞAZA"),
+  L("POSTA"),
+  L("AHIR"),
+  L("DEMİRCİ"),
+  L("İSTASYON"),
+  L("ESKİ HAN"),
+];
+V.setSignNames(WESTERN_SIGNS());
 function dressRoute(g, kind, variant = 0, district = 0) {
   let routeKey =
     kind +
@@ -735,97 +677,12 @@ function dressRoute(g, kind, variant = 0, district = 0) {
   if (kind === "street") {
     let trail = settings.landscape === "trail";
     d.userData.landscape = trail ? "trail" : "western";
-    for (let side of [-1, 1]) {
-      box(7, 0.2, 28, mat("#bda078", 0, 1), side * 8.8, -0.12, -14, d);
-      for (let z of quality === "low" ? [-14] : [-6, -20]) {
-        if (trail) {
-          let cliff = new T.Mesh(
-            (geo.trailCliff ??= new T.IcosahedronGeometry(1, 1)),
-            mat(variant % 2 ? "#9d8a71" : "#b5a083", 0, 1),
-          );
-          cliff.scale.set(5 + (variant % 3), 8 + (variant % 4) * 2, 7);
-          cliff.position.set(side * 13, 4, z);
-          d.add(cliff);
-          box(0.15, 1.2, 0.15, mat("#796548"), side * 5.8, 0.6, z, d);
-          box(0.12, 0.12, 12, mat("#b39a70"), side * 5.8, 1.1, z - 2, d);
-        } else {
-          let wood = mat(
-            ["#a66d3d", "#ba8150", "#85522f", "#b46d3d"][variant % 4],
-            0.95,
-            0,
-          );
-          box(6, 4.2, 9.5, wood, side * 10, 2.1, z, d);
-          box(6.3, 0.3, 10, mat("#604b38"), side * 10, 4.35, z, d);
-          box(6.3, 1.1, 0.3, wood, side * 10, 4.75, z + 4.9, d);
-          box(1.25, 2.3, 0.12, mat("#40342a"), side * 10, 1.2, z + 4.82, d);
-          for (let dx of [-1.9, 1.9]) {
-            box(
-              1.1,
-              1.3,
-              0.14,
-              mat("#d0b17c"),
-              side * 10 + dx,
-              1.9,
-              z + 4.87,
-              d,
-            );
-            box(0.8, 1, 0.17, mat("#3b463e"), side * 10 + dx, 1.9, z + 4.95, d);
-            box(0.06, 1.1, 0.19, wood, side * 10 + dx, 1.9, z + 5, d);
-          }
-          box(0.25, 1.25, 9.8, wood, side * 6.9, 4.7, z, d);
-          box(2.7, 0.18, 10.6, mat("#6f5236"), side * 6, 3.25, z, d).rotation.z =
-            side * 0.22;
-          box(2.8, 0.22, 10.6, mat("#8c6d4d"), side * 6, 0.1, z, d);
-          for (let dz of quality === "low" ? [-3.8, 3.8] : [-3.8, 0, 3.8]) {
-            box(0.16, 3.05, 0.16, mat("#73573c"), side * 5.5, 1.52, z + dz, d);
-            box(0.1, 1.3, 1.1, mat("#352e28"), side * 6.94, 1.5, z + dz, d);
-            box(0.13, 0.1, 1.35, mat("#c5a575"), side * 6.88, 2.2, z + dz, d);
-          }
-          for (let y of quality === "low" ? [] : [0.6, 1.2, 1.8, 2.4, 3, 3.6])
-            box(0.04, 0.035, 9.4, mat("#614a35"), side * 6.96, y, z, d);
-          let barrel = new T.Mesh(
-            (geo.westernBarrel ??= new T.CylinderGeometry(0.43, 0.4, 1.05, 10)),
-            mat("#9d663c", 0.98, 0),
-          );
-          barrel.position.set(side * 5.7, 0.55, z + 4);
-          d.add(barrel);
-          for (let y of [0.25, 0.8])
-            box(0.86, 0.07, 0.86, mat("#544431"), side * 5.7, y, z + 4, d);
-          box(0.18, 1.9, 0.18, mat("#85542f"), side * 6.3, 0.9, z - 5, d);
-          for (let y of [0.6, 1.25])
-            box(0.15, 0.12, 7, mat("#ad774a"), side * 6.3, y, z - 5, d);
-          sign(
-            [
-              L("SALOON"),
-              L("ŞERİF"),
-              L("GENEL MAĞAZA"),
-              L("POSTA"),
-              L("AHIR"),
-              L("DEMİRCİ"),
-              L("İSTASYON"),
-              L("ESKİ HAN"),
-            ][variant],
-            "#eacb91",
-            d,
-            side * 8.2,
-            3,
-            z,
-          );
-        }
-      }
-      for (let z of [-3, -13, -24]) {
-        orb(0.38, mat("#8a7863", 0, 1), side * 5.8, 0.25, z, d);
-        let cactus = mat("#667d43", 0.95, 0);
-        box(0.28, 1.9, 0.3, cactus, side * 6.2, 0.9, z - 2, d);
-        if (!trail) {
-          box(0.9, 0.23, 0.25, cactus, side * 6.2, 1.25, z - 2, d);
-          box(0.22, 0.75, 0.24, cactus, side * 6.2 + 0.4, 1.55, z - 2, d);
-        }
-      }
-    }
-    // Wheel ruts replace road paint; the playable centre stays unobstructed.
-    for (let x of [-2, 2])
-      box(0.2, 0.015, 28, mat("#94764f", 0, 1), x, 0.015, -14, d);
+    V.partsToGroup(
+      trail
+        ? V.trailParts(variant, quality)
+        : V.westernStreetParts(variant, quality, WESTERN_SIGNS()[variant]),
+      d,
+    );
     return;
   }
   if (kind === "legacy-street") {
@@ -1129,6 +986,7 @@ function dressRoute(g, kind, variant = 0, district = 0) {
     }
   } else {
     d.userData.rooftop = true;
+    const westernRoof = settings.landscape === "western";
     // Individual roof slabs: danger gaps remove real floor geometry.
     for (let lane of [-1, 0, 1])
       for (let n = 0; n < 14; n++) {
@@ -1136,7 +994,9 @@ function dressRoute(g, kind, variant = 0, district = 0) {
           3.2,
           0.45,
           2,
-          mat(n % 2 ? "#d68a67" : "#bd755d"),
+          westernRoof
+            ? mat(n % 2 ? "#9a7550" : "#8a6845", 0.95, 0)
+            : mat(n % 2 ? "#d68a67" : "#bd755d"),
           lane * 3.2,
           -0.25,
           -1 - n * 2,
@@ -1145,6 +1005,10 @@ function dressRoute(g, kind, variant = 0, district = 0) {
         tile.userData.lane = lane;
         g.userData.tiles.push(tile);
       }
+    if (westernRoof) {
+      V.partsToGroup(V.westernRoofParts(variant, quality), d);
+      return;
+    }
     for (let side of [-1, 1]) {
       box(0.3, 0.65, 28, mat("#f2ba7d"), side * 5, 0.2, -14, d);
       box(
@@ -2878,7 +2742,7 @@ function events() {
         );
     }
     if (e.type === "spark") burst(pos, "#b8e7e4", 4);
-    if (e.type === "fork") notice(routeHint(), 3);
+    // The fork signs already name each route; a second banner only covered the road.
     if (e.type === "route")
       notice(
         e.choice === "safe"
@@ -3321,13 +3185,31 @@ function update(dt, simulate = true) {
       : activeTerrain === "roof"
         ? ["#c2ac8b", "#c4a882", "#ffe0ac"]
         : settings.landscape === "trail"
-          ? ["#a8bec0", "#b8b2a0", "#ffe2ae"]
-          : ["#c9b18d", "#c0a17a", "#ffdda3"];
+          ? ["#c9d6d6", "#cfd2c4", "#fff0cf"]
+          : ["#e7c99c", "#e2c194", "#ffe6b8"];
   scene.background.lerp(new T.Color(palette[0]), Math.min(1, dt * 2));
   scene.fog.color.lerp(new T.Color(palette[1]), Math.min(1, dt * 2));
   sun.color.lerp(new T.Color(palette[2]), Math.min(1, dt * 2));
   rain.visible = false;
   dust.visible = activeTerrain !== "metro";
+  scene.fog.density = T.MathUtils.damp(
+    scene.fog.density,
+    activeTerrain === "metro" ? 0.022 : 0.0068,
+    2,
+    dt,
+  );
+  horizons.western.visible = settings.landscape !== "trail";
+  horizons.trail.visible = settings.landscape === "trail";
+  for (const c of skyline.children.flatMap((h) => h.children))
+    if (c.userData.cloud) {
+      c.position.x += c.userData.drift * dt;
+      if (c.position.x > 140) c.position.x = -140;
+    }
+  desertFloor.position.x = run?.offset || 0;
+  desertFloor.visible = activeTerrain !== "metro";
+  desertFloor.children.forEach((f) =>
+    f.material.color.set(settings.landscape === "trail" ? "#c4b596" : "#d8b98f"),
+  );
   dust.position.x = run?.offset || 0;
   dust.position.y = groundAt(run?.distance || 0);
   let motion = mode === "play" ? run.speed : mode === "menu" ? 4 : 0;
@@ -3463,6 +3345,20 @@ function update(dt, simulate = true) {
   rain.position.x = offset;
   if (rain.visible) rainGeo.attributes.position.needsUpdate = true;
   skyline.position.x = offset * 0.6;
+  sky.update(
+    camera,
+    scene.fog.color,
+    activeTerrain === "metro" ? "mine" : settings.landscape,
+  );
+  ambient.update(dt, time, {
+    runner,
+    speed: mode === "play" && run ? run.speed : 0,
+    playing: mode === "play",
+    quality,
+    landscape: settings.landscape,
+    terrain: activeTerrain,
+    offset,
+  });
   sun.position.x = -12 + offset;
   sun.target.position.x = offset;
   fill.position.x = offset;
