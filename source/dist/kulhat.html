@@ -1656,7 +1656,115 @@
         min-width: 44px;
         min-height: 44px;
       }
-    </style>
+    
+      /* --- 2026-11 visual pass: give the road back to the player --- */
+      .status,
+      .mission,
+      .bottomstats > div,
+      .route,
+      .hint {
+        background: rgba(20, 14, 10, 0.55);
+        border-color: #f3d9a933;
+        backdrop-filter: blur(3px);
+      }
+      .fork-signs {
+        top: calc(max(12px, env(safe-area-inset-top)) + 64px);
+        width: min(520px, calc(100% - 24px));
+      }
+      .fork-signs > div {
+        padding: 7px 6px;
+        background: linear-gradient(#6b4528f0, #4b2f1cf0);
+        border: 2px solid #e7c58a;
+        border-radius: 6px;
+      }
+      .fork-signs b {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 15px;
+        letter-spacing: 0.5px;
+        color: #fff1d2;
+      }
+      .fork-signs small {
+        margin-top: 3px;
+        font-size: 11px;
+      }
+      body:has(#fork-signs:not([hidden])) #route {
+        display: none;
+      }
+      @media (max-height: 500px) and (orientation: landscape) {
+        .hud {
+          padding: max(8px, env(safe-area-inset-top)) 14px 8px;
+        }
+        .brand img {
+          width: 26px;
+          height: 26px;
+        }
+        .brand {
+          font-size: 14px;
+        }
+        .sub {
+          display: none;
+        }
+        .status {
+          padding: 5px 8px;
+          font-size: 12px;
+          max-width: 46%;
+          flex: 0 1 auto;
+        }
+        .status button {
+          min-height: 30px;
+          padding: 4px 8px;
+          font-size: 10px;
+        }
+        .mission {
+          width: 175px;
+          padding: 6px 9px;
+          margin-top: 6px;
+        }
+        .mission b {
+          font-size: 14px;
+        }
+        .label,
+        .vitals {
+          font-size: 11px;
+        }
+        .fork-signs {
+          top: 58px;
+          width: min(420px, calc(100% - 420px));
+          min-width: 300px;
+        }
+        .fork-signs b {
+          font-size: 12px;
+        }
+        .fork-signs small {
+          font-size: 10px;
+        }
+        .bottomstats {
+          bottom: 8px;
+          font-size: 11px;
+        }
+        .bottomstats > div {
+          padding: 5px 9px;
+          max-width: 30%;
+        }
+        #objective {
+          font-size: 10px;
+        }
+        .route {
+          top: 64px;
+          font-size: 11px;
+          padding: 6px;
+        }
+      }
+      @media (max-width: 600px) {
+        .fork-signs {
+          top: calc(max(12px, env(safe-area-inset-top)) + 178px);
+        }
+        .bottomstats > div {
+          padding: 6px 9px;
+          font-size: 12px;
+        }
+      }
+</style>
   </head>
   <body class="menu-open">
     <div id="view"></div>
