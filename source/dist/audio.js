@@ -101,9 +101,10 @@ export class GameAudio {
         this.sfxBus.gain.value = 0.8;
         this.sfxBus.connect(this.out);
         this.ambBus = ctx.createGain();
-        this.ambBus.gain.value = 0.22;
+        this.ambBus.gain.value = 0.12;
         this.ambBus.connect(this.out);
         this.noise = this.makeNoise();
+        this.brown = this.makeBrown();
         this.reverb = this.makeReverb();
       }
       if (!this.connected) {
@@ -127,6 +128,32 @@ export class GameAudio {
       for (let i = 0; i < len; i++) {
         seed = (seed * 1664525 + 1013904223) >>> 0;
         data[i] = seed / 2147483648 - 1;
+      }
+    }
+    return buf;
+  }
+  // Brown (red) noise: energy falls 6 dB per octave, a soft rumble instead of hiss.
+  makeBrown() {
+    const ctx = this.context;
+    if (!ctx.createBuffer) return null;
+    const len = Math.floor((ctx.sampleRate || 44100) * 4),
+      buf = ctx.createBuffer(1, len, ctx.sampleRate || 44100),
+      data = buf.getChannelData?.(0);
+    if (data) {
+      let seed = 424242,
+        last = 0,
+        peak = 0;
+      for (let i = 0; i < len; i++) {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        last = (last + 0.02 * (seed / 2147483648 - 1)) / 1.02;
+        data[i] = last;
+        peak = Math.max(peak, Math.abs(last));
+      }
+      // Fade the loop seam and normalise.
+      const fade = Math.floor(len * 0.02);
+      for (let i = 0; i < len; i++) {
+        const edge = Math.min(1, i / fade, (len - 1 - i) / fade);
+        data[i] = (data[i] / (peak || 1)) * 0.9 * edge;
       }
     }
     return buf;
@@ -420,8 +447,9 @@ export class GameAudio {
     this.hiss(t, 0.035, peak, { f, q: 9, bus });
     this.osc("sine", f * 0.5, t, 0.05, peak * 0.6, { attack: 0.001, bus });
   }
+  // Soft shaker: band-limited around 4.5 kHz (no piercing top end).
   shaker(t, peak) {
-    this.hiss(t, 0.05, peak, { type: "highpass", f: 6500, q: 0.7, bus: this.musicBus, attack: 0.008, pan: 0.4 });
+    this.hiss(t, 0.04, peak, { type: "bandpass", f: 4500, q: 1.3, bus: this.musicBus, attack: 0.006, pan: 0.4 });
   }
   kick(t, peak) {
     this.thud(t, 130, 42, 0.22, peak, this.musicBus);
@@ -464,11 +492,11 @@ export class GameAudio {
       if (s % 8 === 0) this.woodblock(t, 900, 0.16);
       if (s % 8 === 3) this.woodblock(t, 1300, 0.1);
       if (s % 8 === 4) this.woodblock(t, 1100, 0.13);
-      if (s % 2 === 1) this.shaker(t, this.tension ? 0.075 : 0.05);
+      if (s % 4 === 2) this.shaker(t, this.tension ? 0.06 : 0.035);
       if (s === 0 || s === 8) this.kick(t, 0.32);
     } else {
       // Train beat: brushed 8ths with an accent on 2 and 4.
-      if (s % 2 === 0) this.hiss(t, s % 8 === 4 ? 0.09 : 0.05, s % 8 === 4 ? 0.09 : 0.045, { type: "highpass", f: 3500, bus: this.musicBus, attack: 0.01 });
+      if (s % 2 === 0) this.hiss(t, s % 8 === 4 ? 0.08 : 0.045, s % 8 === 4 ? 0.07 : 0.03, { type: "bandpass", f: 2800, q: 0.9, bus: this.musicBus, attack: 0.01 });
       if (s === 0 || s === 10) this.kick(t, 0.3);
     }
     if (this.tension && (s === 4 || s === 12 || s === 14)) this.tom(t, s === 14 ? 110 : 85, 0.22);
@@ -507,21 +535,21 @@ export class GameAudio {
     if (this.ambFilter && this.context) {
       const t = this.now,
         mine = place === "mine";
-      this.ambFilter.type = mine ? "lowpass" : "bandpass";
-      this.ambFilter.frequency.setTargetAtTime?.(mine ? 220 : 650, t, 0.4);
+      this.ambFilter.frequency.setTargetAtTime?.(mine ? 160 : 420, t, 0.4);
     }
   }
   startAmbience() {
-    if (this.ambSource || !this.noise) return;
+    if (this.ambSource || !(this.brown || this.noise)) return;
+    // Wind: brown noise through a gentle low-pass. No high-frequency hiss.
     const ctx = this.context,
       src = ctx.createBufferSource(),
-      flt = this.filter(this.place === "mine" ? "lowpass" : "bandpass", this.place === "mine" ? 220 : 650, 0.6),
+      flt = this.filter("lowpass", this.place === "mine" ? 160 : 420, 0.5),
       g = ctx.createGain();
-    src.buffer = this.noise;
+    src.buffer = this.brown || this.noise;
     src.loop = true;
     g.gain.value = 0.0001;
     g.gain.setValueAtTime(0.0001, this.now);
-    g.gain.linearRampToValueAtTime(0.5, this.now + 1.5);
+    g.gain.linearRampToValueAtTime(0.35, this.now + 3);
     src.connect(flt);
     flt.connect(g);
     g.connect(this.ambBus);
@@ -546,8 +574,8 @@ export class GameAudio {
     if (t < this.nextGust) return;
     const mine = this.place === "mine";
     // Wind gusts swell and fall; the mine gets a steadier rumble and the odd drip.
-    const level = mine ? 0.35 + Math.random() * 0.2 : 0.25 + Math.random() * 0.75,
-      span = 1.2 + Math.random() * 2.5;
+    const level = mine ? 0.45 + Math.random() * 0.2 : 0.2 + Math.random() * 0.5,
+      span = 2.5 + Math.random() * 3.5;
     this.ambGain.gain.linearRampToValueAtTime(level, t + span);
     if (mine && Math.random() < 0.7) {
       const at = t + Math.random() * span,
@@ -613,7 +641,7 @@ export class GameAudio {
     } else {
       // Boot on packed dirt: a soft crunch with a little grit on top.
       this.hiss(t, 0.06, 0.07, { type: "bandpass", f: 600 + Math.random() * 250, q: 1.1, pan });
-      this.hiss(t + 0.01, 0.04, 0.025, { type: "highpass", f: 3500, pan });
+      this.hiss(t + 0.01, 0.03, 0.015, { type: "bandpass", f: 2500, q: 1.5, pan });
       this.thud(t, 75, 45, 0.05, 0.09);
     }
   }
