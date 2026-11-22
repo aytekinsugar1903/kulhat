@@ -77551,7 +77551,7 @@ const EN = {
  "Yukarı kaydırarak zıpla": "Swipe up to jump",
  "Hedefe dokunarak ateş et": "Tap a target to fire",
  "\"><button id=\"skipTutorial\" aria-label=\"Öğreticiyi atla\">✕</button><div class=\"gesture-scene gesture-": "\"><button id=\"skipTutorial\" aria-label=\"Skip tutorial\">✕</button><div class=\"gesture-scene gesture-",
- "<div class=\"card help-card\"><div class=\"eyebrow\">KURYE EL KİTABI</div><h1>Akıllı koş.<br><em>Sağ çık.</em></h1><div class=\"help-grid\"><p><b>Hareket</b>Sağa/sola kaydır: şerit. Yukarı: zıpla. Aşağı: lazerin altından kay.</p><p><b>Çatışma</b>Drona veya çevre hedefine dokun. Basılı tutarak seri ateş et. Şarjör otomatik dolar.</p><p><b>Çevre</b>Turuncu varil: alan patlaması. Turkuaz ızgara: dronları devre dışı bırakır. KAPI paneli: ilerideki engeli açar.</p><p><b>Yollar</b>İlk görevde bile yol ayrımı var. Solda kal: kapalı metroya in, lazerlerin altından kay. Sağda kal: bahçeli çatılara yüksel, döşeme boşluklarından atla. Ortada kal: yeni sokaktan devam et. Her rotada elmas topla; turuncu güç çekirdekleri bu koşudaki silah hasarını artırır.</p><p><b>Yük</b>Ağır yükle zıplama alçalır. Cam yük darbede daha çok hasar alır. Hasarsız teslimat üç yıldız kazandırır.</p><p><b>Takipçi</b>Darbe aradaki mesafeyi kapatır. Dronları vurmak ve çevre hedefleri takipçiyi yavaşlatır.</p></div><button class=\"primary\" id=\"backMenu\">Anladım ↗</button></div>": "<div class=\"card help-card\"><div class=\"eyebrow\">COURIER HANDBOOK</div><h1>Run smart.<br><em>Make it out.</em></h1><div class=\"help-grid\"><p><b>Moving</b>Swipe left/right: change lanes. Up: jump. Down: slide under the laser.</p><p><b>Combat</b>Tap a drone or an environment target. Hold to fire continuously. Your magazine reloads by itself.</p><p><b>Environment</b>Orange barrel: area blast. Teal grate: disables drones. GATE panel: opens the blockade ahead.</p><p><b>Routes</b>Every mission has forks, even the first. Stay left: drop into the covered metro and slide under lasers. Stay right: climb to the garden rooftops and jump the gaps. Stay center: carry on down a new street. Grab gems on every route; orange power cores boost your weapon damage for the run.</p><p><b>Cargo</b>Heavy cargo lowers your jumps. Glass cargo takes more damage per hit. A clean delivery with no damage earns all three stars.</p><p><b>Hunter</b>Every hit lets the hunter close in. Shooting drones and triggering environment targets slows it down.</p></div><button class=\"primary\" id=\"backMenu\">Got it ↗</button></div>",
+ "<div class=\"card help-card\"><div class=\"eyebrow\">KURYE EL KİTABI</div><h1>Akıllı koş.<br><em>Sağ çık.</em></h1><div class=\"help-grid\"><p><b>Hareket</b>Sağa/sola kaydır: şerit. Yukarı: zıpla. Aşağı: lazerin altından kay.</p><p><b>Vagonlar</b>Rampalı yük vagonuna koşarak çık, çatısında altın topla. Alçak vagona zıplayarak bin. Rampasız yüksek vagondan şerit değiştirerek kaç.</p><p><b>Kuyular</b>Maden ocağındaki açık kuyuların üstünden zıpla; içine düşmek can götürür.</p><p><b>Çatışma</b>Drona veya çevre hedefine dokun. Basılı tutarak seri ateş et. Şarjör otomatik dolar.</p><p><b>Çevre</b>Turuncu varil: alan patlaması. Turkuaz ızgara: dronları devre dışı bırakır. KAPI paneli: ilerideki engeli açar.</p><p><b>Yollar</b>İlk görevde bile yol ayrımı var. Solda kal: kapalı metroya in, lazerlerin altından kay. Sağda kal: bahçeli çatılara yüksel, döşeme boşluklarından atla. Ortada kal: yeni sokaktan devam et. Her rotada elmas topla; turuncu güç çekirdekleri bu koşudaki silah hasarını artırır.</p><p><b>Yük</b>Ağır yükle zıplama alçalır. Cam yük darbede daha çok hasar alır. Hasarsız teslimat üç yıldız kazandırır.</p><p><b>Takipçi</b>Darbe aradaki mesafeyi kapatır. Dronları vurmak ve çevre hedefleri takipçiyi yavaşlatır.</p></div><button class=\"primary\" id=\"backMenu\">Anladım ↗</button></div>": "<div class=\"card help-card\"><div class=\"eyebrow\">COURIER HANDBOOK</div><h1>Run smart.<br><em>Make it out.</em></h1><div class=\"help-grid\"><p><b>Moving</b>Swipe left/right: change lanes. Up: jump. Down: slide under the laser.</p><p><b>Trains</b>Run up a ramp onto a boxcar and collect the gold on its roof. Jump onto low flatcars. Steer around tall boxcars without a ramp.</p><p><b>Shafts</b>Jump over the open shafts in the mine; falling in costs health.</p><p><b>Combat</b>Tap a drone or an environment target. Hold to fire continuously. Your magazine reloads by itself.</p><p><b>Environment</b>Orange barrel: area blast. Teal grate: disables drones. GATE panel: opens the blockade ahead.</p><p><b>Routes</b>Every mission has forks, even the first. Stay left: drop into the covered metro and slide under lasers. Stay right: climb to the garden rooftops and jump the gaps. Stay center: carry on down a new street. Grab gems on every route; orange power cores boost your weapon damage for the run.</p><p><b>Cargo</b>Heavy cargo lowers your jumps. Glass cargo takes more damage per hit. A clean delivery with no damage earns all three stars.</p><p><b>Hunter</b>Every hit lets the hunter close in. Shooting drones and triggering environment targets slows it down.</p></div><button class=\"primary\" id=\"backMenu\">Got it ↗</button></div>",
  "<b>Yollar</b>": "<b>Routes</b>",
  ". Sol geçitte alçak engellere, sağ geçitte boşluklara dikkat et. Her rotada elmas ve güç çekirdeği topla.": ". On the left route, watch for low obstacles; on the right, watch for gaps. Grab gems and power cores on every route.",
  "<div class=\"card\"><div class=\"eyebrow\">TESLİMAT DURAKLATILDI</div><h1>Nefes al.<br><em>Devam et.</em></h1><div class=\"row\"><button class=\"primary\" id=\"resume\">Devam et ↗</button><button id=\"base\">Üsse dön</button></div><p>Üsse dönersen bu koşudaki altın ve görev ilerlemesi kaydedilmez.</p></div>": "<div class=\"card\"><div class=\"eyebrow\">DELIVERY PAUSED</div><h1>Catch your breath.<br><em>Then keep going.</em></h1><div class=\"row\"><button class=\"primary\" id=\"resume\">Resume ↗</button><button id=\"base\">Back to base</button></div><p>If you return to base, this run's gold and mission progress won't be saved.</p></div>",
@@ -77586,6 +77586,15 @@ const EN = {
  "</button><button id=\"back\">Üs ve yükseltmeler</button></div></div>": "</button><button id=\"back\">Base and upgrades</button></div></div>",
  "✦ YENİ REKOR! ✦ · ": "✦ NEW RECORD! ✦ · ",
  "EN İYİ SKOR · ": "BEST SCORE · ",
+ "KUYUYA DÜŞTÜN · ZIPLAMAYI UNUTMA": "YOU FELL IN A SHAFT · REMEMBER TO JUMP",
+ "RAMPA · VAGONUN ÜSTÜNE ÇIK": "RAMP · RUN UP ONTO THE TRAIN",
+ "ALÇAK VAGON · ZIPLA, ÜSTÜNDEN KOŞ": "FLATCAR · JUMP ON AND RUN ALONG IT",
+ "YÜK VAGONU → ": "BOXCAR → ",
+ "MADEN KUYUSU · ZIPLA": "MINE SHAFT · JUMP",
+ "BOŞLUK · ZIPLA": "GAP · JUMP",
+ "Yük vagonuna çarptın; rampadan çık ya da şerit değiştir.": "You hit a boxcar; take the ramp or change lanes.",
+ "Boşluğa düştün; kenara gelmeden zıpla.": "You fell into a gap; jump before the edge.",
+ " · KUYULARA DİKKAT": " · WATCH FOR SHAFTS",
  "▶ Reklam izle · altını 2 katına çıkar": "▶ Watch an ad · double your gold",
  "İsteğe bağlı. İstemezsen hemen devam edebilirsin.": "Optional. You can keep playing without it.",
  "Reklam yükleniyor…": "Loading ad…",
@@ -77860,112 +77869,586 @@ return {SAVE_KEY,loadGame,saveGame,COSTUMES,normalizeProfile,dayKey,LOGIN_REWARD
 })();
 // audio.js
 M[6]=(()=>{
-// Original procedural short loops and effects; no recordings or external assets.
+// KÜLHAT audio: original procedural music and sound effects, synthesised with
+// Web Audio at run time. No recordings, samples or network requests.
+//
+// Signal path:  voices → music / sfx bus → (reverb send) → compressor → master → out
+//
+// Music is a small step sequencer (16th-note grid, look-ahead scheduling):
+//   western  A minor, 96 BPM: gallop percussion, plucked guitar, bass, whistled lead
+//   trail    D dorian, 84 BPM: banjo-style arpeggio, train-beat brushes, harmonica lead
+// setTension(true) adds toms and a busier shaker while the hunter is close.
+
+const midi = (n) => 440 * 2 ** ((n - 69) / 12);
+
+const SONGS = {
+  western: {
+    bpm: 96,
+    // Andalusian cadence: Am G F E
+    chords: [
+      [57, 60, 64],
+      [55, 59, 62],
+      [53, 57, 60],
+      [52, 56, 59],
+    ],
+    bass: [45, 43, 41, 40],
+    // [bar, step, midi, length in 16ths]; two 4-bar phrases.
+    lead: [
+      [0, 0, 76, 6], [0, 6, 74, 2], [0, 8, 72, 4], [0, 12, 69, 4],
+      [1, 0, 74, 6], [1, 6, 71, 2], [1, 8, 67, 8],
+      [2, 0, 72, 4], [2, 4, 69, 4], [2, 8, 69, 2], [2, 10, 72, 2], [2, 12, 74, 4],
+      [3, 0, 76, 12],
+      [4, 0, 81, 6], [4, 6, 79, 2], [4, 8, 76, 4], [4, 12, 72, 4],
+      [5, 0, 74, 4], [5, 4, 76, 2], [5, 6, 74, 2], [5, 8, 71, 8],
+      [6, 0, 72, 3], [6, 3, 74, 3], [6, 6, 76, 2], [6, 8, 77, 4], [6, 12, 76, 4],
+      [7, 0, 76, 4], [7, 4, 75, 2], [7, 6, 76, 10],
+    ],
+    leadVoice: "whistle",
+  },
+  trail: {
+    bpm: 84,
+    // Dm C G Dm (dorian colour from the major IV)
+    chords: [
+      [62, 65, 69],
+      [60, 64, 67],
+      [55, 59, 62],
+      [62, 65, 69],
+    ],
+    bass: [38, 36, 43, 38],
+    lead: [
+      [0, 0, 74, 4], [0, 4, 77, 4], [0, 8, 76, 2], [0, 10, 74, 2], [0, 12, 72, 4],
+      [1, 0, 72, 6], [1, 6, 71, 2], [1, 8, 67, 8],
+      [2, 0, 71, 4], [2, 4, 74, 4], [2, 8, 79, 6], [2, 14, 77, 2],
+      [3, 0, 74, 12],
+      [4, 0, 81, 4], [4, 4, 79, 2], [4, 6, 77, 2], [4, 8, 76, 4], [4, 12, 74, 4],
+      [5, 0, 76, 4], [5, 4, 72, 4], [5, 8, 71, 4], [5, 12, 72, 4],
+      [6, 0, 74, 4], [6, 4, 71, 4], [6, 8, 67, 4], [6, 12, 71, 4],
+      [7, 0, 74, 14],
+    ],
+    leadVoice: "harmonica",
+  },
+};
+
 class GameAudio {
   constructor(host) {
     this.host = host;
     this.muted = false;
     this.playing = false;
+    this.tension = false;
     this.map = "western";
     this.step = 0;
     this.voices = new Set();
+    this.coinStreak = 0;
+    this.lastCoin = -1;
   }
+
+  // ------------------------------------------------------------------ setup
   unlock() {
     if (this.muted) return false;
     try {
-      this.context ??= new (this.host.AudioContext ||
-        this.host.webkitAudioContext)();
-      this.master ??= this.context.createGain();
-      this.master.gain.value = 0.55;
+      if (!this.context) {
+        const Ctx = this.host.AudioContext || this.host.webkitAudioContext;
+        if (!Ctx) return false;
+        const ctx = (this.context = new Ctx());
+        this.master = ctx.createGain();
+        this.master.gain.value = 1;
+        this.comp = ctx.createDynamicsCompressor?.();
+        if (this.comp) {
+          this.comp.threshold.value = -16;
+          this.comp.knee.value = 10;
+          this.comp.ratio.value = 4;
+          this.comp.attack.value = 0.004;
+          this.comp.release.value = 0.2;
+          this.comp.connect(this.master);
+        }
+        this.out = this.comp || this.master;
+        this.musicBus = ctx.createGain();
+        this.musicBus.gain.value = 0.34;
+        this.musicBus.connect(this.out);
+        this.sfxBus = ctx.createGain();
+        this.sfxBus.gain.value = 0.8;
+        this.sfxBus.connect(this.out);
+        this.noise = this.makeNoise();
+        this.reverb = this.makeReverb();
+      }
       if (!this.connected) {
         this.master.connect(this.context.destination);
         this.connected = true;
       }
-      this.context.resume()?.catch?.(() => {});
+      this.context.resume?.()?.catch?.(() => {});
       return true;
     } catch {
       return false;
     }
   }
-  tone(f, d = 0.1, type = "sine", volume = 0.04, at) {
-    if (this.muted || !this.context || this.context.state === "suspended")
-      return;
+  makeNoise() {
+    const ctx = this.context;
+    if (!ctx.createBuffer) return null;
+    const len = Math.floor((ctx.sampleRate || 44100) * 1.5),
+      buf = ctx.createBuffer(1, len, ctx.sampleRate || 44100),
+      data = buf.getChannelData?.(0);
+    if (data) {
+      let seed = 1234567;
+      for (let i = 0; i < len; i++) {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        data[i] = seed / 2147483648 - 1;
+      }
+    }
+    return buf;
+  }
+  // Short synthetic room / canyon: decaying stereo noise impulse.
+  makeReverb() {
+    const ctx = this.context;
+    if (!ctx.createConvolver || !ctx.createBuffer) return null;
+    const rate = ctx.sampleRate || 44100,
+      len = Math.floor(rate * 1.9),
+      buf = ctx.createBuffer(2, len, rate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = buf.getChannelData?.(ch);
+      if (!d) continue;
+      let seed = 99 + ch * 7919;
+      for (let i = 0; i < len; i++) {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        const t = i / len;
+        d[i] = (seed / 2147483648 - 1) * Math.pow(1 - t, 3.2) * (i < rate * 0.012 ? i / (rate * 0.012) : 1);
+      }
+    }
+    const conv = ctx.createConvolver(),
+      ret = ctx.createGain();
+    conv.buffer = buf;
+    ret.gain.value = 0.32;
+    conv.connect(ret);
+    ret.connect(this.out);
+    return conv;
+  }
+  get ready() {
+    return !this.muted && this.context && this.context.state !== "suspended";
+  }
+  get now() {
+    return this.context.currentTime;
+  }
+
+  // ------------------------------------------------------------- primitives
+  track(node, stopAt, ...chain) {
+    this.voices.add(node);
+    node.onended = () => {
+      this.voices.delete(node);
+      try {
+        node.disconnect();
+        for (const n of chain) n.disconnect();
+      } catch {}
+    };
+    node.start(Math.max(0, stopAt[0]));
+    node.stop(stopAt[1]);
+  }
+  env(gain, t, attack, peak, decay, sustain = 0.0001) {
+    const g = gain.gain;
+    g.setValueAtTime(0.0001, t);
+    g.linearRampToValueAtTime(peak, t + attack);
+    g.exponentialRampToValueAtTime(Math.max(0.0001, sustain), t + attack + decay);
+  }
+  filter(type, freq, q = 0.7) {
+    const f = this.context.createBiquadFilter();
+    f.type = type;
+    f.frequency.value = freq;
+    f.Q.value = q;
+    return f;
+  }
+  // Route a node to a bus, optionally with a reverb send.
+  send(node, bus, wet = 0) {
+    node.connect(bus);
+    if (wet > 0 && this.reverb) {
+      const s = this.context.createGain();
+      s.gain.value = wet;
+      node.connect(s);
+      s.connect(this.reverb);
+    }
+  }
+  osc(type, freq, t, dur, peak, { attack = 0.005, bus = this.sfxBus, wet = 0, to, glide, lp } = {}) {
     const ctx = this.context,
-      t = at ?? ctx.currentTime,
       o = ctx.createOscillator(),
       g = ctx.createGain();
     o.type = type;
-    o.frequency.setValueAtTime(f, t);
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(volume, t + 0.008);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + d);
-    o.connect(g);
-    g.connect(this.master);
-    this.voices.add(o);
-    o.onended = () => {
-      this.voices.delete(o);
-      o.disconnect();
-      g.disconnect();
+    o.frequency.setValueAtTime(freq, t);
+    if (to) o.frequency.exponentialRampToValueAtTime(Math.max(20, to), t + (glide ?? dur));
+    this.env(g, t, attack, peak, dur);
+    let head = o;
+    if (lp) {
+      const f = this.filter("lowpass", lp);
+      o.connect(f);
+      head = f;
+    }
+    head.connect(g);
+    this.send(g, bus, wet);
+    this.track(o, [t, t + attack + dur + 0.05], g);
+    return o;
+  }
+  // Filtered noise burst; `sweep` moves the filter from f to sweep.
+  hiss(t, dur, peak, { type = "bandpass", f = 1000, q = 1, sweep, attack = 0.003, bus = this.sfxBus, wet = 0 } = {}) {
+    if (!this.noise) return;
+    const ctx = this.context,
+      src = ctx.createBufferSource(),
+      flt = this.filter(type, f, q),
+      g = ctx.createGain();
+    src.buffer = this.noise;
+    if (sweep) flt.frequency.exponentialRampToValueAtTime(Math.max(30, sweep), t + dur);
+    this.env(g, t, attack, peak, dur);
+    src.connect(flt);
+    flt.connect(g);
+    this.send(g, bus, wet);
+    const offset = ((this.step * 0.137) % 1) * 0.5;
+    this.voices.add(src);
+    src.onended = () => {
+      this.voices.delete(src);
+      try {
+        src.disconnect();
+        flt.disconnect();
+        g.disconnect();
+      } catch {}
     };
-    o.start(t);
-    o.stop(t + d + 0.02);
+    src.start(t, offset);
+    src.stop(t + attack + dur + 0.05);
   }
-  effect(f, d = 0.1, type = "sine") {
-    if (this.unlock()) this.tone(f, d, type, 0.045);
+  thud(t, from, to, dur, peak, bus = this.sfxBus) {
+    this.osc("sine", from, t, dur, peak, { attack: 0.002, to, glide: dur * 0.7, bus });
   }
+
+  // ------------------------------------------------------------ instruments
+  pluck(t, f, dur, peak, bright = 1, bus = this.musicBus, wet = 0.12) {
+    const ctx = this.context,
+      o = ctx.createOscillator(),
+      o2 = ctx.createOscillator(),
+      flt = this.filter("lowpass", Math.min(12000, f * 9 * bright), 1.2),
+      g = ctx.createGain();
+    o.type = "sawtooth";
+    o2.type = "triangle";
+    o.frequency.setValueAtTime(f, t);
+    o2.frequency.setValueAtTime(f * 1.003, t);
+    flt.frequency.exponentialRampToValueAtTime(Math.max(f * 1.2, 200), t + dur * 0.5);
+    this.env(g, t, 0.003, peak, dur);
+    o.connect(flt);
+    o2.connect(flt);
+    flt.connect(g);
+    this.send(g, bus, wet);
+    this.track(o, [t, t + dur + 0.05], flt, g);
+    this.track(o2, [t, t + dur + 0.05]);
+  }
+  bassNote(t, f, dur, peak) {
+    this.osc("triangle", f, t, dur, peak, { attack: 0.006, bus: this.musicBus, lp: 500 });
+    this.osc("sine", f / 2, t, dur * 0.8, peak * 0.6, { attack: 0.006, bus: this.musicBus });
+  }
+  // Whistled lead: sine with a pitch scoop, delayed vibrato and breath.
+  whistle(t, f, dur, peak) {
+    const ctx = this.context,
+      o = ctx.createOscillator(),
+      g = ctx.createGain(),
+      lfo = ctx.createOscillator(),
+      depth = ctx.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(f * 0.94, t);
+    o.frequency.exponentialRampToValueAtTime(f, t + 0.06);
+    lfo.frequency.value = 5.6;
+    depth.gain.setValueAtTime(0, t);
+    depth.gain.linearRampToValueAtTime(f * 0.012, t + Math.min(0.35, dur * 0.6));
+    lfo.connect(depth);
+    depth.connect(o.frequency);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(peak, t + 0.05);
+    g.gain.setValueAtTime(peak * 0.85, t + Math.max(0.06, dur - 0.08));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.06);
+    o.connect(g);
+    this.send(g, this.musicBus, 0.5);
+    this.track(o, [t, t + dur + 0.1], g);
+    this.track(lfo, [t, t + dur + 0.1], depth);
+    this.hiss(t, dur * 0.8, peak * 0.05, { f: f * 2, q: 6, bus: this.musicBus, attack: 0.04 });
+  }
+  // Harmonica-like reed: bandpassed saw with vibrato.
+  harmonica(t, f, dur, peak) {
+    const ctx = this.context,
+      o = ctx.createOscillator(),
+      bp = this.filter("bandpass", f * 2.2, 1.4),
+      lp = this.filter("lowpass", 3200),
+      g = ctx.createGain(),
+      lfo = ctx.createOscillator(),
+      depth = ctx.createGain();
+    o.type = "sawtooth";
+    o.frequency.setValueAtTime(f, t);
+    lfo.frequency.value = 6.2;
+    depth.gain.setValueAtTime(0, t);
+    depth.gain.linearRampToValueAtTime(f * 0.01, t + 0.25);
+    lfo.connect(depth);
+    depth.connect(o.frequency);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(peak, t + 0.04);
+    g.gain.setValueAtTime(peak * 0.8, t + Math.max(0.05, dur - 0.06));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.05);
+    o.connect(bp);
+    bp.connect(lp);
+    lp.connect(g);
+    this.send(g, this.musicBus, 0.35);
+    this.track(o, [t, t + dur + 0.1], bp, lp, g);
+    this.track(lfo, [t, t + dur + 0.1], depth);
+  }
+  woodblock(t, f, peak, bus = this.musicBus) {
+    this.hiss(t, 0.035, peak, { f, q: 9, bus });
+    this.osc("sine", f * 0.5, t, 0.05, peak * 0.6, { attack: 0.001, bus });
+  }
+  shaker(t, peak) {
+    this.hiss(t, 0.05, peak, { type: "highpass", f: 6500, q: 0.7, bus: this.musicBus, attack: 0.008 });
+  }
+  kick(t, peak) {
+    this.thud(t, 130, 42, 0.22, peak, this.musicBus);
+  }
+  tom(t, f, peak) {
+    this.thud(t, f * 1.6, f, 0.25, peak, this.musicBus);
+  }
+
+  // ------------------------------------------------------------------ music
   start(map) {
-    this.map = map;
+    this.map = SONGS[map] ? map : "western";
     if (!this.unlock()) return;
     this.playing = true;
     if (this.timer) return;
     this.step = 0;
-    this.next = this.context.currentTime + 0.03;
+    this.next = this.now + 0.06;
     const tick = () => {
-      if (!this.playing || this.muted) return;
-      const notes =
-        this.map === "western"
-          ? [57, 64, 69, 64, 60, 67, 72, 67, 62, 69, 74, 69, 64, 71, 76, 71]
-          : [62, 69, 74, 76, 65, 72, 77, 74, 60, 67, 72, 74, 57, 64, 69, 72];
-      while (this.next < this.context.currentTime + 0.2) {
-        const n = notes[this.step % notes.length],
-          western = this.map === "western";
-        this.tone(
-          440 * 2 ** ((n - 69) / 12),
-          western ? 0.19 : 0.32,
-          western ? "triangle" : "sine",
-          0.025,
-          this.next,
-        );
-        if (this.step % 4 === 0)
-          this.tone(
-            440 * 2 ** ((n - 24 - 69) / 12),
-            0.42,
-            "sine",
-            0.04,
-            this.next,
-          );
+      if (!this.playing || this.muted || !this.context) return;
+      while (this.next < this.now + 0.14) {
+        this.scheduleStep(this.step, this.next);
         this.step++;
-        this.next += western ? 0.24 : 0.3;
+        this.next += 60 / SONGS[this.map].bpm / 4;
       }
     };
     tick();
-    this.timer = this.host.setInterval(tick, 80);
+    this.timer = this.host.setInterval(tick, 25);
+  }
+  scheduleStep(i, t) {
+    const song = SONGS[this.map],
+      western = this.map === "western",
+      s = i % 16,
+      bar = Math.floor(i / 16),
+      chord = song.chords[bar % 4],
+      loop = Math.floor(bar / 8);
+    // Percussion
+    if (western) {
+      // Gallop: ta-ka-TUM on each half bar.
+      if (s % 8 === 0) this.woodblock(t, 900, 0.16);
+      if (s % 8 === 3) this.woodblock(t, 1300, 0.1);
+      if (s % 8 === 4) this.woodblock(t, 1100, 0.13);
+      if (s % 2 === 1) this.shaker(t, this.tension ? 0.06 : 0.035);
+      if (s === 0 || s === 8) this.kick(t, 0.32);
+    } else {
+      // Train beat: brushed 8ths with an accent on 2 and 4.
+      if (s % 2 === 0) this.hiss(t, s % 8 === 4 ? 0.09 : 0.05, s % 8 === 4 ? 0.09 : 0.045, { type: "highpass", f: 3500, bus: this.musicBus, attack: 0.01 });
+      if (s === 0 || s === 10) this.kick(t, 0.3);
+    }
+    if (this.tension && (s === 4 || s === 12 || s === 14)) this.tom(t, s === 14 ? 110 : 85, 0.22);
+    // Bass: root on 1, fifth on 3, passing note into the next bar.
+    const root = song.bass[bar % 4];
+    if (s === 0) this.bassNote(t, midi(root), 0.45, 0.3);
+    if (s === 8) this.bassNote(t, midi(root + 7), 0.35, 0.24);
+    if (s === 14 && western) this.bassNote(t, midi(song.bass[(bar + 1) % 4] + (bar % 2 ? 2 : -1)), 0.15, 0.16);
+    // Accompaniment
+    if (western) {
+      // Off-beat strums with a light gallop between them.
+      if (s === 4 || s === 12)
+        chord.forEach((n, k) => this.pluck(t + k * 0.012, midi(n), 0.32, 0.075, 1));
+      if (s === 6 || s === 14) this.pluck(t, midi(chord[0] + 12), 0.12, 0.04, 0.6);
+    } else if (s % 2 === 0) {
+      // Banjo-style roll over the chord.
+      const roll = [chord[0] + 12, chord[1] + 12, chord[2] + 12, chord[1] + 12];
+      this.pluck(t, midi(roll[(s / 2) % 4]), 0.26, 0.085, 1.6);
+    }
+    // Lead: rests every third loop so the groove can breathe.
+    if (loop % 3 !== 2)
+      for (const [b, st, n, len] of song.lead)
+        if (b === bar % 8 && st === s) {
+          const dur = (len * 60) / song.bpm / 4;
+          if (song.leadVoice === "whistle") this.whistle(t, midi(n), dur, 0.13);
+          else this.harmonica(t, midi(n - 12), dur, 0.16);
+        }
+  }
+  setTension(on) {
+    this.tension = !!on;
   }
   stop() {
     this.playing = false;
     if (this.timer) this.host.clearInterval(this.timer);
     this.timer = null;
-    for (const o of this.voices) {
+    for (const v of this.voices) {
       try {
-        o.stop();
+        v.stop();
       } catch {}
     }
     this.voices.clear();
-    this.context?.suspend()?.catch?.(() => {});
+    this.context?.suspend?.()?.catch?.(() => {});
   }
   setMuted(value) {
     this.muted = value;
     if (value) this.stop();
+  }
+
+  // ---------------------------------------------------------------- effects
+  // Legacy tone entry point (kept for simple UI cues).
+  effect(f, d = 0.1, type = "sine") {
+    if (!this.unlock() || !this.ready) return;
+    this.osc(type === "sine" ? "triangle" : type, f, this.now, d, 0.12, { lp: 3000 });
+  }
+  // Named effects. `opt` may carry {weapon, surface, value}.
+  sfx(name, opt = {}) {
+    const fn = this["fx_" + name];
+    if (!fn || !this.unlock()) return;
+    const play = () => {
+      if (!this.ready) return;
+      try {
+        fn.call(this, this.now + 0.005, opt);
+      } catch {}
+    };
+    // After stop() the context is suspended; menu and result sounds wake it.
+    if (this.context.state === "suspended" && this.context.resume)
+      Promise.resolve(this.context.resume()).then(play, () => {});
+    else play();
+  }
+  fx_jump(t) {
+    this.hiss(t, 0.2, 0.22, { f: 500, sweep: 1800, q: 1.4 });
+    this.osc("triangle", 260, t, 0.12, 0.08, { to: 520, lp: 2000 });
+  }
+  fx_land(t, { surface } = {}) {
+    this.thud(t, 110, 45, 0.16, 0.5);
+    this.hiss(t, 0.09, 0.18, { type: "lowpass", f: 900 });
+    if (surface === "wood") this.woodblock(t, 420, 0.3, this.sfxBus);
+  }
+  fx_step(t, { surface } = {}) {
+    if (surface === "wood") {
+      this.woodblock(t, 380 + Math.random() * 60, 0.14, this.sfxBus);
+      this.thud(t, 90, 50, 0.06, 0.12);
+    } else {
+      this.hiss(t, 0.05, 0.1, { type: "bandpass", f: 700 + Math.random() * 300, q: 0.9 });
+      this.thud(t, 80, 45, 0.05, 0.12);
+    }
+  }
+  fx_slide(t) {
+    this.hiss(t, 0.5, 0.3, { f: 1400, sweep: 350, q: 0.8, attack: 0.02 });
+    this.hiss(t, 0.35, 0.12, { type: "lowpass", f: 400 });
+  }
+  fx_coin(t) {
+    // Streaks climb in pitch so a coin line sounds like a run, not a beep.
+    const now = this.now;
+    this.coinStreak = now - this.lastCoin < 0.45 ? Math.min(8, this.coinStreak + 1) : 0;
+    this.lastCoin = now;
+    const base = midi(88 + [0, 2, 4, 5, 7, 9, 11, 12, 14][this.coinStreak]);
+    this.osc("triangle", base, t, 0.07, 0.16);
+    this.osc("triangle", base * 1.5, t + 0.055, 0.22, 0.13);
+    this.osc("sine", base * 4, t + 0.055, 0.12, 0.04);
+  }
+  fx_gem(t) {
+    [84, 88, 91, 96].forEach((n, k) => {
+      const f = midi(n),
+        at = t + k * 0.06;
+      this.osc("sine", f, at, 0.7, 0.12, { wet: 0.4 });
+      this.osc("sine", f * 2.76, at, 0.35, 0.04, { wet: 0.4 });
+    });
+  }
+  fx_power(t) {
+    [60, 64, 67, 72, 76].forEach((n, k) =>
+      this.osc("square", midi(n), t + k * 0.055, 0.12, 0.06, { lp: 2400, wet: 0.2 }),
+    );
+  }
+  fx_shield(t) {
+    this.osc("sine", 520, t, 0.6, 0.1, { to: 1040, glide: 0.4, wet: 0.5 });
+    this.osc("sine", 526, t, 0.6, 0.08, { to: 1050, glide: 0.4, wet: 0.5 });
+    this.hiss(t, 0.5, 0.05, { f: 5000, sweep: 9000, q: 2, wet: 0.4 });
+  }
+  fx_repair(t) {
+    [69, 73, 76].forEach((n) => this.osc("triangle", midi(n), t, 0.6, 0.08, { wet: 0.4, lp: 3000 }));
+  }
+  fx_fire(t, { weapon } = {}) {
+    if (weapon === "ion") {
+      this.osc("sawtooth", 1600, t, 0.18, 0.12, { to: 180, lp: 4000, wet: 0.2 });
+      this.hiss(t, 0.08, 0.15, { f: 3000, q: 3 });
+      return;
+    }
+    if (weapon === "rail") {
+      this.hiss(t, 0.06, 0.5, { type: "highpass", f: 1500, attack: 0.001 });
+      this.osc("sawtooth", 2400, t, 0.3, 0.07, { to: 600, lp: 5000, wet: 0.3 });
+      this.thud(t, 140, 50, 0.12, 0.4);
+      return;
+    }
+    const heavy = weapon === "storm",
+      light = weapon === "repeater" || weapon === "burst";
+    // Revolver crack: sharp noise transient, body thump and a canyon tail.
+    this.hiss(t, light ? 0.06 : 0.1, light ? 0.45 : 0.6, { type: "bandpass", f: heavy ? 1200 : 1900, q: 0.6, attack: 0.001, wet: 0.35 });
+    this.hiss(t, 0.03, 0.4, { type: "highpass", f: 3500, attack: 0.0005 });
+    this.thud(t, heavy ? 170 : 150, 55, heavy ? 0.14 : 0.08, heavy ? 0.5 : 0.35);
+  }
+  fx_reload(t) {
+    this.woodblock(t, 2400, 0.12, this.sfxBus);
+    this.woodblock(t + 0.12, 1800, 0.14, this.sfxBus);
+    this.woodblock(t + 0.32, 2600, 0.12, this.sfxBus);
+  }
+  fx_spark(t) {
+    this.osc("sine", 2200 + Math.random() * 600, t, 0.08, 0.06);
+    this.hiss(t, 0.03, 0.12, { type: "highpass", f: 4000 });
+  }
+  fx_explode(t) {
+    this.hiss(t, 1.1, 0.7, { type: "lowpass", f: 3200, sweep: 160, q: 0.8, attack: 0.002, wet: 0.5 });
+    this.thud(t, 90, 28, 0.6, 0.7);
+    this.woodblock(t + 0.02, 600, 0.15, this.sfxBus);
+  }
+  fx_damage(t) {
+    this.hiss(t, 0.22, 0.5, { type: "lowpass", f: 1400, sweep: 300, attack: 0.001 });
+    this.thud(t, 140, 40, 0.25, 0.6);
+    this.osc("square", 320, t + 0.02, 0.2, 0.06, { to: 110, lp: 1200 });
+  }
+  fx_blocked(t) {
+    [1, 2.4, 3.9].forEach((m, k) => this.osc("sine", 620 * m, t, 0.5 - k * 0.1, 0.1 - k * 0.025, { wet: 0.4 }));
+    this.hiss(t, 0.05, 0.2, { type: "highpass", f: 3000 });
+  }
+  fx_bump(t) {
+    this.woodblock(t, 300, 0.35, this.sfxBus);
+    this.thud(t, 100, 50, 0.12, 0.4);
+  }
+  fx_fall(t) {
+    this.osc("sine", 900, t, 0.42, 0.1, { to: 160, glide: 0.4 });
+    this.thud(t + 0.32, 90, 35, 0.3, 0.6);
+    this.hiss(t + 0.32, 0.3, 0.3, { type: "lowpass", f: 700 });
+  }
+  fx_warning(t) {
+    this.woodblock(t, 1500, 0.1, this.sfxBus);
+    this.woodblock(t + 0.1, 1500, 0.08, this.sfxBus);
+  }
+  fx_rumble(t) {
+    this.hiss(t, 0.9, 0.16, { type: "lowpass", f: 220, attack: 0.25 });
+    this.thud(t, 55, 40, 0.8, 0.15);
+  }
+  fx_route(t) {
+    this.hiss(t, 0.7, 0.22, { f: 300, sweep: 2400, q: 0.9, attack: 0.1, wet: 0.3 });
+  }
+  fx_ui(t) {
+    this.woodblock(t, 1700, 0.18, this.sfxBus);
+  }
+  fx_buy(t) {
+    [0, 0.07, 0.14].forEach((d, k) => this.osc("triangle", midi(84 + k * 4), t + d, 0.15, 0.12));
+    this.hiss(t + 0.14, 0.2, 0.08, { type: "highpass", f: 6000 });
+  }
+  fx_reward(t) {
+    [72, 76, 79, 84].forEach((n, k) => this.osc("triangle", midi(n), t + k * 0.08, 0.35, 0.1, { wet: 0.3 }));
+  }
+  fx_success(t) {
+    // Brass-ish fanfare: filtered saws on an A major arpeggio and final chord.
+    const brass = (n, at, dur, peak) =>
+      this.osc("sawtooth", midi(n), at, dur, peak, { attack: 0.03, lp: 2200, wet: 0.35 });
+    [57, 61, 64].forEach((n, k) => brass(n + 12, t + k * 0.13, 0.18, 0.09));
+    [57, 61, 64, 69].forEach((n) => brass(n + 12, t + 0.42, 1.1, 0.07));
+    this.hiss(t + 0.42, 1.2, 0.06, { type: "highpass", f: 7000, attack: 0.01, wet: 0.4 });
+    this.kick(t + 0.42, 0.4);
+  }
+  fx_fail(t) {
+    [64, 60, 57, 52].forEach((n, k) => this.pluck(t + k * 0.2, midi(n), 0.6, 0.12, 0.8, this.sfxBus, 0.3));
+  }
+  fx_record(t) {
+    this.fx_success(t);
+    [81, 85, 88, 93].forEach((n, k) => this.osc("triangle", midi(n), t + 0.7 + k * 0.07, 0.5, 0.07, { wet: 0.4 }));
   }
 }
 
@@ -79519,6 +80002,28 @@ const HAZARDS = new Set([
   "bolt",
 ]);
 const TARGETS = new Set(["drone", "barrel", "vent", "panel"]);
+// Rail cars are platforms: run up the ramp (or jump onto a low flatcar) and ride
+// on top. A tall boxcar without a ramp is a wall you must change lanes around.
+const RAILCAR = {
+  carLen: 15,
+  coupling: 1.2,
+  ramp: 13,
+  box: 2.5, // boxcar roof height
+  flat: 1.3, // flatcar deck height: reachable with a normal jump
+};
+const PIT_LEN = 5;
+const COLLECTIBLES = new Set(["coin", "gem", "power", "shield", "repair"]);
+// Height of the surface under lateral position x at distance d (0 = street).
+function supportAt(objects, x, d) {
+  let h = 0;
+  for (let o of objects) {
+    if (o.type !== "railcar" || o.dead || Math.abs(o.x - x) > 1.3) continue;
+    if (d >= o.at && d <= o.at + o.len) h = Math.max(h, o.h);
+    else if (o.ramp && d >= o.at - RAILCAR.ramp && d < o.at)
+      h = Math.max(h, (o.h * (d - (o.at - RAILCAR.ramp))) / RAILCAR.ramp);
+  }
+  return h;
+}
 function rng(seed) {
   let v = seed >>> 0;
   return () => {
@@ -79550,6 +80055,7 @@ class Run {
     this.x = 0;
     this.y = 0;
     this.vy = 0;
+    this.ground = 0;
     this.slide = 0;
     this.inv = 0;
     this.health = 3;
@@ -79596,13 +80102,21 @@ class Run {
   }
   action(type) {
     if (this.phase !== "play") return;
-    if (type === "left") this.lane = Math.max(-1, this.lane - 1);
-    if (type === "right") this.lane = Math.min(1, this.lane + 1);
-    if (type === "jump" && this.y < 0.05 && this.slide <= 0) {
+    if (type === "left" || type === "right") {
+      let lane = Math.max(-1, Math.min(1, this.lane + (type === "left" ? -1 : 1)));
+      // A rail car beside you is a wall unless you are already up at its height.
+      let side = Math.max(
+        supportAt(this.objects, lane * 3.2, this.distance),
+        supportAt(this.objects, lane * 3.2, this.distance + 2),
+      );
+      if (lane !== this.lane && side > this.y + 0.35) this.emit("bump", { side: lane - this.lane });
+      else this.lane = lane;
+    }
+    if (type === "jump" && this.y - this.ground < 0.05 && this.slide <= 0) {
       this.vy = CARGOS[this.mission.cargo].jump;
       this.emit("jump");
     }
-    if (type === "slide" && this.y < 0.1) {
+    if (type === "slide" && this.y - this.ground < 0.1) {
       this.slide = 0.85;
       this.emit("slide");
     }
@@ -79620,12 +80134,49 @@ class Run {
         "laser",
         "wall",
         "train",
+        "railcar",
         "gap",
         "drone",
         "bolt",
       ].includes(type)
     )
       return null;
+    if (type === "train") {
+      // Legacy "train" encounters become a single tall car to steer around.
+      type = "railcar";
+      extra = { cars: 1, kind: "box", ramp: false, ...extra };
+    }
+    if (type === "railcar") {
+      let cars = Math.max(1, Math.min(4, extra.cars || 2)),
+        kind = extra.kind === "flat" ? "flat" : "box";
+      extra = {
+        ...extra,
+        cars,
+        kind,
+        ramp: kind === "box" && !!extra.ramp,
+        h: RAILCAR[kind],
+        len: cars * RAILCAR.carLen + (cars - 1) * RAILCAR.coupling,
+      };
+      // Clear the lane under and around the train so nothing hides inside it.
+      let from = at - RAILCAR.ramp - 6,
+        to = at + extra.len + 14;
+      this.objects = this.objects.filter(
+        (o) => COLLECTIBLES.has(o.type) || o.lane !== lane || o.at < from || o.at > to,
+      );
+    } else {
+      let car = this.objects.find(
+        (o) =>
+          o.type === "railcar" &&
+          !o.dead &&
+          o.lane === lane &&
+          at >= o.at - RAILCAR.ramp - 6 &&
+          at <= o.at + o.len + 14,
+      );
+      if (car && !COLLECTIBLES.has(type)) return null;
+      // Pickups over a car sit on its roof.
+      if (car && at >= car.at && at <= car.at + car.len) extra = { h: car.h, ...extra };
+    }
+    if (type === "gap") extra = { len: PIT_LEN, ...extra };
     let o = {
       id: this.nextId++,
       type,
@@ -79712,6 +80263,20 @@ class Run {
       if (m.threat >= 5) types.push(["saw", free, 88]);
     }
     for (let [t, l, d] of types) this.add(t, l, at + d);
+    // Parked trains from the second mission on: ride the roof for coins, or steer around.
+    if (m.id >= 1 && this.route === "normal" && (m.train ? n % 3 === 1 : n % 5 === 3)) {
+      let carLane = free,
+        kind = n % 4 === 1 ? "flat" : "box",
+        ramp = kind === "box" && (m.id < 5 || n % 2 === 1),
+        cars = 2 + (n % 2),
+        start = at + 20 + RAILCAR.ramp;
+      let car = this.add("railcar", carLane, start, { cars, kind, ramp });
+      if (car && (ramp || kind === "flat"))
+        for (let k = 0; k < Math.floor(car.len / 5); k++)
+          this.add("coin", carLane, start + 3 + k * 5, { value: k % 6 === 5 ? 2 : 1 });
+      if (car && ramp && n % 2) this.add("gem", carLane, start + car.len - 4);
+      return types;
+    }
     if (m.environment && n % 5 === 2) {
       let kind = n % 3 === 0 ? "panel" : n % 3 === 1 ? "vent" : "barrel";
       this.add(kind, free, at - 18);
@@ -79880,6 +80445,12 @@ class Run {
         at + 14,
       );
       this.add("gem", choice === "safe" ? (lane === 1 ? -1 : lane + 1) : lane, at + 22);
+      // Western mine: open shafts between the carts. Jump them; never run in.
+      if (westernMine && k % 2 === 1) {
+        let pitLane = k === 5 ? null : lane === 1 ? -1 : lane + 1;
+        for (let l of pitLane === null ? [-1, 0, 1] : [pitLane])
+          this.add("gap", l, at + 32, { pit: true });
+      }
       if (choice === "risk" && variant % 2 === 1 && k === 2)
         for (let other of [-1, 0, 1].filter((x) => x !== lane))
           this.add("gap", other, at);
@@ -79932,11 +80503,7 @@ class Run {
       if (this.reload <= 0) this.ammo = this.ammoMax;
     }
     if (this.hold) this.fire();
-    if (this.y > 0 || this.vy > 0) {
-      this.vy -= 24 * dt;
-      this.y = Math.max(0, this.y + this.vy * dt);
-      if (this.y === 0) this.vy = 0;
-    }
+    this.updateSupport(dt);
     if (this.mission.pursuit) {
       this.hunter -=
         dt * (this.mission.boss ? 0.32 + this.mission.id * 0.008 : 0.14);
@@ -79962,6 +80529,7 @@ class Run {
             "laser",
             "wall",
             "train",
+            "railcar",
             "gap",
             "drone",
             "bolt",
@@ -80020,6 +80588,30 @@ class Run {
         o.rolled += travel + this.speed * dt;
       }
       let ahead = o.at - this.distance;
+      // Rolling hazards stop at a parked train in their lane.
+      if (o.rollSpeed && o.at !== previousAt) {
+        let car = this.objects.find(
+          (q) => q.type === "railcar" && !q.dead && q.lane === o.lane &&
+            o.at >= q.at && o.at <= q.at + q.len + 2,
+        );
+        if (car) {
+          o.dead = true;
+          continue;
+        }
+      }
+      if (o.type === "gap" && !o.hit) {
+        let into = this.distance - o.at;
+        if (
+          into > 0.7 &&
+          into < o.len - 0.7 &&
+          Math.abs(this.x - o.x) < 1.2 &&
+          this.y - this.ground < 0.05
+        ) {
+          o.hit = true;
+          this.emit("fall", { object: o.id });
+          this.damage(o);
+        } else if (into >= o.len) o.hit = true;
+      }
       if (o.type === "cart") o.arcY = o.drop ? Math.max(0, Math.min(9, (ahead - 45) * 0.16)) : 0;
       if (o.type === "saw") {
         let t = Math.max(0, Math.min(1, (90 - ahead) / 90)),
@@ -80032,14 +80624,15 @@ class Run {
           Math.sin(this.time * (1.25 + this.mission.threat * 0.08) + o.id) *
             (0.7 + this.mission.threat * 0.08);
       if (
-        (HAZARDS.has(o.type) || o.appearance === "wagon") &&
+        (HAZARDS.has(o.type) || o.appearance === "wagon" || o.type === "railcar") &&
         !o.warned &&
-        ahead < (["saw", "rock", "cart"].includes(o.type) || o.appearance === "wagon" ? 100 : 38) &&
-        ahead > 0
+        ahead < (["saw", "rock", "cart"].includes(o.type) || o.appearance === "wagon" ? 100
+          : o.type === "railcar" ? 75 : 38) &&
+        ahead > (o.type === "railcar" && o.ramp ? -RAILCAR.ramp : 0)
       ) {
         o.warned = true;
         this.emit("warning", { kind: o.appearance === "wagon" ? "wagon" : o.type,
-          lane: o.lane, side: o.sweepSide });
+          lane: o.lane, side: o.sweepSide, ramp: !!o.ramp, car: o.kind });
       }
       if (
         o.type === "drone" &&
@@ -80054,12 +80647,18 @@ class Run {
         this.add("bolt", this.lane, at, { x: this.x });
         this.emit("enemyFire", { object: o.id, targetAt: at, targetX: this.x });
       }
-      if (!o.hit && prev <= previousAt && this.distance >= o.at) {
+      if (
+        !o.hit &&
+        o.type !== "gap" &&
+        o.type !== "railcar" &&
+        prev <= previousAt &&
+        this.distance >= o.at
+      ) {
         o.hit = true;
         let same = Math.abs(this.x - o.x) <
           (o.type === "bolt" ? 0.62 : o.type === "rock" ? 1.5 : 1.2);
         if (same) {
-          if (o.type === "coin" && this.y < 1.5) {
+          if (o.type === "coin" && Math.abs(this.y - (o.h || 0)) < 1.5) {
             this.coins += o.value || 1;
             o.dead = true;
             this.emit("coin", { object: o.id });
@@ -80080,7 +80679,8 @@ class Run {
             o.dead = true;
             this.emit("repair");
           } else if (HAZARDS.has(o.type) || o.type === "drone") {
-            let safe =
+            // Up on a train roof, street-level hazards pass underneath.
+            let safe = this.y > 2 ||
               o.type === "barrier" || o.type === "saw"
                 ? this.y > 1.1
                 : o.type === "gap"
@@ -80094,12 +80694,52 @@ class Run {
           }
         }
       }
-      if (ahead < -22) o.dead = true;
+      if (ahead + (o.len || 0) < -22) o.dead = true;
     }
     this.objects = this.objects.filter((o) => !o.dead);
     if (!this.endless && this.distance >= this.goal)
       this.end(this.cargo > 0, "delivered");
     if (this.phase === "play" && this.cargo < 0) this.end(false, "cargo");
+  }
+  // Ground under the courier (street or a rail car), front collisions with cars,
+  // and gravity. Cars are entered by ramp, by jumping onto a flatcar, or not at all.
+  updateSupport(dt) {
+    let h = supportAt(this.objects, this.x, this.distance);
+    if (h > this.ground + 0.35 && this.y < h - 0.35) {
+      let car = this.objects.find(
+        (o) => o.type === "railcar" && !o.dead && Math.abs(o.x - this.x) <= 1.3 &&
+          this.distance >= o.at && this.distance <= o.at + o.len,
+      );
+      if (car && !car.hit) {
+        car.hit = true;
+        this.damage(car);
+        // Knocked aside to a free lane; with nowhere to go, scramble on top.
+        let free = [this.lane - 1, this.lane + 1].filter(
+          (l) => l >= -1 && l <= 1 && supportAt(this.objects, l * 3.2, this.distance) < 0.35,
+        );
+        if (free.length) {
+          this.lane = free[0];
+          h = Math.min(h, this.y);
+        } else this.y = h;
+      } else if (car) {
+        h = Math.min(h, this.y);
+      }
+    }
+    if (this.y > h || this.vy > 0) {
+      this.vy -= 24 * dt;
+      this.y += this.vy * dt;
+      if (this.y <= h) {
+        this.y = h;
+        if (this.vy < -2 && this.ground === h) this.emit("land");
+        this.vy = 0;
+      }
+    } else {
+      this.y = h;
+      this.vy = 0;
+    }
+    if (h > this.ground + 0.35 && this.y === h && this.vy === 0 && this.ground < h)
+      this.emit("land");
+    this.ground = h;
   }
   end(success, reason) {
     if (this.phase !== "play") return;
@@ -80155,7 +80795,7 @@ class Run {
   }
 }
 
-return {TITLE,DISTRICTS,storyText,missionName,MISSIONS,CARGOS,COURIER_WEAPONS,DEFAULT_SAVE,validateSave,rewardRun,objective,signature,rng,Run};
+return {TITLE,DISTRICTS,storyText,missionName,MISSIONS,CARGOS,COURIER_WEAPONS,DEFAULT_SAVE,validateSave,rewardRun,objective,signature,RAILCAR,PIT_LEN,supportAt,rng,Run};
 })();
 // game.js
 M[0]=(()=>{
@@ -80165,7 +80805,7 @@ const {loadGame,saveGame,COSTUMES,LOGIN_REWARDS,TASKS,dayKey,dailyState,claimLog
 const {GameAudio}=M[6];
 const V=M[7];
 const {L,LANG,setStaticText}=M[5];
-const {Run,MISSIONS,DISTRICTS,CARGOS,COURIER_WEAPONS,validateSave,rewardRun,TITLE,objective,missionName,storyText}=M[8];
+const {Run,RAILCAR,MISSIONS,DISTRICTS,CARGOS,COURIER_WEAPONS,validateSave,rewardRun,TITLE,objective,missionName,storyText}=M[8];
 const UPPER = LANG === "en" ? "en" : "tr",
   NUMBERS = LANG === "en" ? "en-US" : "tr-TR";
 const mapRecords = () =>
@@ -80195,7 +80835,8 @@ renderer.toneMappingExposure = 1.05;
 renderer.outputColorSpace = T.SRGBColorSpace;
 view.append(renderer.domElement);
 // FPS counter and graphics toggle in the HUD are developer aids: shown only with ?debug.
-if (/[?&]debug\b/.test(location.search)) document.body.classList.add("debug");
+const DEBUG = /[?&]debug\b/.test(location.search);
+if (DEBUG) document.body.classList.add("debug");
 // Observe readbacks without issuing one. Captures a bounded, local-only trace
 // when the canvas is read by game/library code or an external integration.
 const renderAudit = {
@@ -80453,15 +81094,34 @@ const { arms, legs, weapon, head, torso } = courier;
 // The flash rides on the revolver muzzle, which moves with the aiming arm.
 const muzzleFlash = glow("#ffce6c", 0, 0, 0, 1.7, courier.muzzle);
 muzzleFlash.visible = false;
-let shieldBubble = new T.Mesh(
-  new T.SphereGeometry(1.5, 20, 16),
-  new T.MeshBasicMaterial({
-    color: "#6ae5eb",
-    transparent: true,
-    opacity: 0.09,
-    wireframe: true,
-  }),
-);
+// Shield: a soft glowing shell with a slow ring, instead of a wireframe cage.
+let shieldBubble = new T.Group();
+{
+  const shell = new T.Mesh(
+    new T.SphereGeometry(1.45, 24, 18),
+    new T.MeshBasicMaterial({
+      color: "#6ae5eb",
+      transparent: true,
+      opacity: 0.1,
+      depthWrite: false,
+      blending: T.AdditiveBlending,
+      side: T.BackSide,
+    }),
+  );
+  const ring = new T.Mesh(
+    new T.TorusGeometry(1.4, 0.035, 6, 48),
+    new T.MeshBasicMaterial({
+      color: "#9ff6f2",
+      transparent: true,
+      opacity: 0.55,
+      depthWrite: false,
+      blending: T.AdditiveBlending,
+    }),
+  );
+  ring.rotation.x = Math.PI / 2;
+  shieldBubble.add(shell, ring);
+  shieldBubble.userData.ring = ring;
+}
 shieldBubble.position.y = 1.3;
 runner.add(shieldBubble);
 let rainCount = 450,
@@ -80601,6 +81261,9 @@ function save() {
 }
 function sound(f = 400, d = 0.1, type = "sine") {
   if (audioAllowed()) gameAudio.effect(f, d, type);
+}
+function sfx(name, opt) {
+  if (audioAllowed()) gameAudio.sfx(name, opt);
 }
 function initAmbient() {
   if (audioAllowed()) gameAudio.start(settings.landscape);
@@ -81315,6 +81978,7 @@ function positionOf(o) {
   return new T.Vector3(
     o.x + pathX(o.at - (run?.distance || 0)),
     groundAt(o.at) +
+      (o.h && o.type !== "railcar" ? o.h : 0) +
       (o.type === "drone" && o.appearance !== "wagon" ? 2.35 : o.arcY || 0),
     3 - (o.at - (run?.distance || 0)),
   );
@@ -81386,6 +82050,95 @@ function generateRegion(i) {
     }
   }
 }
+// Near edge black, far wall faintly lit: reads as depth from the chase camera.
+function pitTexture() {
+  return tex((c, w, h) => {
+    let grad = c.createLinearGradient(0, h, 0, 0);
+    grad.addColorStop(0, "#000000");
+    grad.addColorStop(0.55, "#07050a");
+    grad.addColorStop(0.85, "#2a1a10");
+    grad.addColorStop(1, "#5a3a20");
+    c.fillStyle = grad;
+    c.fillRect(0, 0, w, h);
+    c.fillStyle = "rgba(120,80,45,.35)";
+    for (let i = 0; i < 9; i++) c.fillRect(i * (w / 9), 0, 2, h * 0.18);
+  }, 64, 128);
+}
+// A parked train: boxcars (roof walkway, needs a ramp) or low flatcars (jump on).
+// Spans z = 0 … -len from the group origin; an optional ramp runs toward the player.
+function buildRailcar(o, g) {
+  const western = settings.landscape === "western",
+    flat = o.kind === "flat",
+    h = o.h,
+    body = mat(western ? (o.id % 2 ? "#8b3b2b" : "#6f4a2e") : "#56606a", 0.85, 0.05),
+    trim = mat("#3a2a1f", 0.8, 0.1),
+    deck = mat("#a07a4c", 0.9, 0.05),
+    iron = mat("#2c2a28", 0.55, 0.6),
+    brass = mat("#d6a24a", 0.4, 0.6);
+  // Track bed under the whole train and ramp.
+  const bedLen = o.len + (o.ramp ? RAILCAR.ramp : 0) + 10;
+  box(2.4, 0.06, bedLen, mat("#5d4a39", 0.95, 0.05), 0, 0.03, -o.len / 2 + (o.ramp ? RAILCAR.ramp / 2 : 0), g);
+  for (let x of [-0.72, 0.72])
+    box(0.1, 0.1, bedLen, mat("#8c8780", 0.55, 0.5), x, 0.1, -o.len / 2 + (o.ramp ? RAILCAR.ramp / 2 : 0), g);
+  for (let c = 0; c < o.cars; c++) {
+    const z0 = -(c * (RAILCAR.carLen + RAILCAR.coupling)),
+      mid = z0 - RAILCAR.carLen / 2;
+    // Chassis and wheel sets.
+    box(2.5, 0.28, RAILCAR.carLen - 0.4, iron, 0, 0.72, mid, g);
+    for (let dz of [-RAILCAR.carLen / 2 + 2.2, RAILCAR.carLen / 2 - 2.2])
+      for (let x of [-1.05, 1.05]) {
+        let wheel = new T.Mesh((geo.railWheel ??= new T.CylinderGeometry(0.42, 0.42, 0.18, 14)), iron);
+        wheel.rotation.z = Math.PI / 2;
+        wheel.position.set(x, 0.45, mid + dz);
+        g.add(wheel);
+      }
+    if (flat) {
+      box(2.8, 0.22, RAILCAR.carLen - 0.2, deck, 0, h - 0.11, mid, g);
+      for (let k = 0; k < 5; k++)
+        for (let x of [-1.38, 1.38]) box(0.14, 0.7, 0.14, trim, x, h + 0.3, z0 - 1.5 - k * 3, g);
+    } else {
+      box(2.8, h - 0.95, RAILCAR.carLen - 0.3, body, 0, 0.85 + (h - 0.95) / 2, mid, g);
+      // Vertical battens along both sides and the facing end.
+      for (let k = 1; k < 7; k++)
+        for (let x of [-1.42, 1.42]) box(0.06, h - 1.05, 0.14, trim, x, 0.9 + (h - 1.05) / 2, z0 - k * 2.1, g);
+      box(1.2, h - 1.3, 0.08, trim, 0, 0.95 + (h - 1.3) / 2, z0 + 0.12, g);
+      // Roof with a plank walkway on top: this is what the courier runs on.
+      box(3.0, 0.14, RAILCAR.carLen, mat(western ? "#5b3d2b" : "#4a525a", 0.85, 0.05), 0, h - 0.07, mid, g);
+      box(2.0, 0.06, RAILCAR.carLen - 0.2, deck, 0, h + 0.02, mid, g);
+      // End ladder and lamp on the facing end.
+      for (let x of [-1.15, -0.75]) box(0.06, h - 0.9, 0.06, iron, x, 0.85 + (h - 0.9) / 2, z0 + 0.2, g);
+      for (let k = 0; k < 4; k++) box(0.46, 0.05, 0.06, iron, -0.95, 1.1 + k * 0.38, z0 + 0.2, g);
+      if (c === 0) orb(0.13, mat("#ffe2a0", 0.2, 0.1, "#d99a3a"), 0.95, h - 0.45, z0 + 0.22, g);
+    }
+    box(0.5, 0.18, 0.3, brass, 0, 0.75, z0 + 0.1, g);
+    // Coupling plate so the roof path looks continuous between cars.
+    if (c < o.cars - 1)
+      box(flat ? 2.4 : 1.3, 0.06, RAILCAR.coupling + 0.4, flat ? deck : iron, 0, h - 0.02, z0 - RAILCAR.carLen - RAILCAR.coupling / 2, g);
+  }
+  if (o.ramp) {
+    const run = RAILCAR.ramp,
+      slope = Math.atan2(h, run),
+      length = Math.hypot(run, h),
+      ramp = box(2.6, 0.2, length, deck, 0, h / 2 - 0.08, run / 2, g);
+    ramp.rotation.x = slope;
+    for (let x of [-1.35, 1.35]) {
+      let rail = box(0.12, 0.12, length, trim, x, h / 2 + 0.45, run / 2, g);
+      rail.rotation.x = slope;
+    }
+    // Trestle legs under the ramp.
+    for (let k = 1; k < 4; k++) {
+      let z = run - (run * k) / 4,
+        legH = (h * k) / 4;
+      for (let x of [-1.1, 1.1]) box(0.18, legH, 0.18, trim, x, legH / 2, z, g);
+    }
+    // Cleats across the ramp for grip and readability.
+    for (let k = 1; k < 7; k++) {
+      let z = run - (run * k) / 7,
+        y = (h * k) / 7 + 0.05;
+      box(2.3, 0.06, 0.12, trim, 0, y, z, g).rotation.x = slope;
+    }
+  }
+}
 function createObject(o, tracked = true) {
   let g = new T.Group();
   const metal = mat("#607483", 0.45, 0.6);
@@ -81395,7 +82148,7 @@ function createObject(o, tracked = true) {
     stone.position.y = 1.15;
     let body = new T.Mesh(
       (geo.rollingBarrel ??= new T.CylinderGeometry(1.15, 1.15, 2.1, 16)),
-      mat("#8a5a32", 0.05, 0.85),
+      mat("#8a5a32", 0.85, 0.05),
     );
     body.rotation.z = Math.PI / 2;
     body.castShadow = body.receiveShadow = true;
@@ -81423,7 +82176,7 @@ function createObject(o, tracked = true) {
     stone.position.y = 1.3;
     let body = new T.Mesh(
       (geo.rollingRock ??= new T.IcosahedronGeometry(1.3, 2)),
-      mat("#8a8c8e", 0.05, 0.95),
+      mat("#8a8c8e", 0.95, 0.05),
     );
     body.castShadow = body.receiveShadow = true;
     stone.add(body);
@@ -81601,8 +82354,8 @@ function createObject(o, tracked = true) {
   }
   if (o.type === "laser" && settings.landscape === "western") {
     // Western: same slide-under hazard, drawn as a low wooden beam on posts.
-    const beam = mat("#8a5a32", 0.05, 0.9);
-    for (let s of [-1, 1]) box(0.3, 3.3, 0.3, mat("#5e4029", 0.05, 0.9), s * 1.4, 1.65, 0, g);
+    const beam = mat("#8a5a32", 0.9, 0.05);
+    for (let s of [-1, 1]) box(0.3, 3.3, 0.3, mat("#5e4029", 0.9, 0.05), s * 1.4, 1.65, 0, g);
     box(3.1, 0.45, 0.4, beam, 0, 1.85, 0, g);
     box(2.6, 0.12, 0.42, mat("#f0b871", 0.3, 0.4, "#91613a"), 0, 1.55, 0, g);
   } else if (o.type === "laser") {
@@ -81612,16 +82365,37 @@ function createObject(o, tracked = true) {
     glow("#ff8b7a", 0, 1.8, 0, 3.4, g);
   }
   if (o.type === "gap") {
-    let cover = box(2.9, 0.12, 7, mat("#05111f"), 0, 0.02, 0, g);
-    g.userData.gapCover = cover;
-    for (let z of [-3.4, 3.4])
-      box(3, 0.1, 0.12, mat("#f0b871", 0.4, 0.2, "#91613a"), 0, 0.04, z, g);
-    glow("#407b92", 0, -0.2, 0, 3, g);
+    // Open shaft spanning [at, at + len]. Drawn as a dark hole with a lit far
+    // wall, a timber collar and broken rail ends so it reads as "jump this".
+    const len = o.len || 5,
+      pit = new T.Group();
+    pit.position.z = -len / 2;
+    g.add(pit);
+    let hole = new T.Mesh(
+      (geo["pitHole" + len] ??= new T.PlaneGeometry(2.86, len)),
+      (mats.pitHole ??= new T.MeshBasicMaterial({ map: pitTexture(), color: "#ffffff" })),
+    );
+    hole.rotation.x = -Math.PI / 2;
+    // Sits above the mine rails (top ≈ 0.16) so no track appears to bridge it.
+    hole.position.y = 0.2;
+    pit.add(hole);
+    const timber = mat("#6b4a2c", 0.9, 0.05),
+      iron = mat("#6f6a63", 0.6, 0.45);
+    for (let z of [len / 2, -len / 2]) box(3.1, 0.26, 0.38, timber, 0, 0.16, z, pit);
+    for (let x of [-1.5, 1.5]) box(0.26, 0.24, len + 0.3, timber, x, 0.15, 0, pit);
+    // Broken rails: stubs reaching over the edge on both sides.
+    for (let x of [-0.62, 0.62])
+      for (let side of [1, -1]) {
+        let stub = box(0.1, 0.1, 0.7, iron, x, 0.27, side * (len / 2 - 0.25), pit);
+        stub.rotation.x = side * 0.18;
+      }
+    g.userData.gapCover = pit;
   }
+  if (o.type === "railcar") buildRailcar(o, g);
   if (o.appearance === "wagon") {
-    const wood = mat("#987044", 0.05, 0.95),
-      rim = mat("#493d30", 0.25, 0.85),
-      horseCoat = mat("#79523a", 0, 0.9);
+    const wood = mat("#987044", 0.95, 0.05),
+      rim = mat("#493d30", 0.85, 0.25),
+      horseCoat = mat("#79523a", 0.9, 0);
     box(2.1, 0.35, 2.8, wood, 0, 0.85, -3.5, g);
     for (let side of [-1, 1]) {
       for (let y of [1.15, 1.45, 1.75])
@@ -82271,7 +83045,7 @@ function showMenu() {
           }
           settings.weapon = id;
           save();
-          sound(720);
+          sfx("ui");
           showMenu();
         }),
     );
@@ -82294,7 +83068,7 @@ function showMenu() {
             settings.diamonds -= diamondCost;
             settings.weaponLevels[id]++;
             save();
-            sound(900);
+            sfx("buy");
             showMenu();
           }
         }),
@@ -82311,7 +83085,7 @@ function showMenu() {
             settings.coins -= cost;
             settings[key]++;
             save();
-            sound(600);
+            sfx("buy");
             showMenu();
           }
         }),
@@ -82462,7 +83236,7 @@ function showProfile(tab = "daily") {
     $("#claimLogin").onclick = () => {
       if (claimLogin(settings, profile)) {
         save();
-        sound(1050);
+        sfx("reward");
         showProfile(tab);
       }
     };
@@ -82471,7 +83245,7 @@ function showProfile(tab = "daily") {
         (b.onclick = () => {
           if (claimTask(settings, profile, +b.dataset.task)) {
             save();
-            sound(1100);
+            sfx("reward");
             showProfile(tab);
           }
         }),
@@ -82485,7 +83259,7 @@ function showProfile(tab = "daily") {
             const c = COSTUMES.find((x) => x.id === profile.costume);
             suit.color.set(c.suit);
             armor.color.set(c.armor);
-            sound(700);
+            sfx("buy");
             showProfile(tab);
           }
         }),
@@ -82514,7 +83288,7 @@ function finishTutorial() {
   start?.();
 }
 function advanceTutorial() {
-  sound(800, 0.08);
+  sfx("ui");
   if (++tutorialStep >= 3) finishTutorial();
   else drawTutorial();
 }
@@ -82567,7 +83341,7 @@ function drawTutorial() {
 }
 function showControls() {
   $("#menu").innerHTML =
-    L('<div class="card help-card"><div class="eyebrow">KURYE EL KİTABI</div><h1>Akıllı koş.<br><em>Sağ çık.</em></h1><div class="help-grid"><p><b>Hareket</b>Sağa/sola kaydır: şerit. Yukarı: zıpla. Aşağı: lazerin altından kay.</p><p><b>Çatışma</b>Drona veya çevre hedefine dokun. Basılı tutarak seri ateş et. Şarjör otomatik dolar.</p><p><b>Çevre</b>Turuncu varil: alan patlaması. Turkuaz ızgara: dronları devre dışı bırakır. KAPI paneli: ilerideki engeli açar.</p><p><b>Yollar</b>İlk görevde bile yol ayrımı var. Solda kal: kapalı metroya in, lazerlerin altından kay. Sağda kal: bahçeli çatılara yüksel, döşeme boşluklarından atla. Ortada kal: yeni sokaktan devam et. Her rotada elmas topla; turuncu güç çekirdekleri bu koşudaki silah hasarını artırır.</p><p><b>Yük</b>Ağır yükle zıplama alçalır. Cam yük darbede daha çok hasar alır. Hasarsız teslimat üç yıldız kazandırır.</p><p><b>Takipçi</b>Darbe aradaki mesafeyi kapatır. Dronları vurmak ve çevre hedefleri takipçiyi yavaşlatır.</p></div><button class="primary" id="backMenu">Anladım ↗</button></div>');
+    L('<div class="card help-card"><div class="eyebrow">KURYE EL KİTABI</div><h1>Akıllı koş.<br><em>Sağ çık.</em></h1><div class="help-grid"><p><b>Hareket</b>Sağa/sola kaydır: şerit. Yukarı: zıpla. Aşağı: lazerin altından kay.</p><p><b>Vagonlar</b>Rampalı yük vagonuna koşarak çık, çatısında altın topla. Alçak vagona zıplayarak bin. Rampasız yüksek vagondan şerit değiştirerek kaç.</p><p><b>Kuyular</b>Maden ocağındaki açık kuyuların üstünden zıpla; içine düşmek can götürür.</p><p><b>Çatışma</b>Drona veya çevre hedefine dokun. Basılı tutarak seri ateş et. Şarjör otomatik dolar.</p><p><b>Çevre</b>Turuncu varil: alan patlaması. Turkuaz ızgara: dronları devre dışı bırakır. KAPI paneli: ilerideki engeli açar.</p><p><b>Yollar</b>İlk görevde bile yol ayrımı var. Solda kal: kapalı metroya in, lazerlerin altından kay. Sağda kal: bahçeli çatılara yüksel, döşeme boşluklarından atla. Ortada kal: yeni sokaktan devam et. Her rotada elmas topla; turuncu güç çekirdekleri bu koşudaki silah hasarını artırır.</p><p><b>Yük</b>Ağır yükle zıplama alçalır. Cam yük darbede daha çok hasar alır. Hasarsız teslimat üç yıldız kazandırır.</p><p><b>Takipçi</b>Darbe aradaki mesafeyi kapatır. Dronları vurmak ve çevre hedefleri takipçiyi yavaşlatır.</p></div><button class="primary" id="backMenu">Anladım ↗</button></div>');
   $("#menu").innerHTML = westernText($("#menu").innerHTML);
   $("#menu .help-grid p:nth-child(4)").innerHTML =
     L("<b>Yollar</b>") +
@@ -82805,8 +83579,18 @@ function results(r) {
     selected = Math.min(39, settings.unlocked - 1);
     showMenu();
   });
-  sound(r.success ? 650 : 120, 0.25);
+  sfx(newRecord ? "record" : r.success ? "success" : "fail");
 }
+// ?debug only: lets automated browser checks read the live run.
+if (DEBUG)
+  globalThis.__kulhat = {
+    get run() {
+      return run;
+    },
+    get mode() {
+      return mode;
+    },
+  };
 let lastDamage = "";
 function events() {
   for (let e of run.takeEvents()) {
@@ -82814,32 +83598,59 @@ function events() {
       pos =
         visual?.position.clone() ||
         runner.position.clone().add(new T.Vector3(0, 1, 0));
-    if (e.type === "jump") sound(430);
-    if (e.type === "slide") sound(180);
+    if (e.type === "jump") sfx("jump");
+    if (e.type === "slide") sfx("slide");
+    if (e.type === "land") {
+      sfx("land", { surface: run.ground > 0.5 ? "wood" : "dirt" });
+      courier.squash = Math.max(courier.squash, 0.7);
+    }
+    if (e.type === "bump") {
+      sfx("bump");
+      shake = Math.max(shake, 0.18);
+      courier.bumpAt = time;
+      courier.bumpSide = e.side;
+    }
+    if (e.type === "fall") {
+      sfx("fall");
+      courier.fallAt = time;
+      burst(runner.position.clone().add(new T.Vector3(0, 0.3, 0)), "#7a5a3a", 10);
+      notice(L("KUYUYA DÜŞTÜN · ZIPLAMAYI UNUTMA"), 1.2);
+    }
     if (e.type === "fire") {
-      sound(900, 0.05, "triangle");
+      sfx("fire", { weapon: e.weapon });
       courier.fireAt = time;
       muzzleFlash.userData.until = time + 0.1;
     }
     if (e.type === "coin") {
-      sound(1200, 0.06, "triangle");
+      sfx("coin");
       burst(pos, "#ffda70", 4);
     }
     if (e.type === "power") {
       notice(L("SİLAH GÜCÜ ") + e.level + L("/5 · HASAR ARTTI"), 1.2);
-      sound(760, 0.08, "square");
+      sfx("power");
     }
     if (e.type === "gem") {
       burst(pos, "#a8f6ff", 5);
       notice(L("ELMAS ALINDI · ◆ ") + e.total, 1.2);
-      sound(1450, 0.08, "triangle");
+      sfx("gem");
     }
-    if (e.type === "shield") notice(L("KALKAN ALINDI"), 1);
-    if (e.type === "repair") notice(L("YÜK ONARILDI"), 1);
-    if (e.type === "supply") notice(L("ARA İKMAL · +1 CAN · YÜK ONARILDI"), 2);
+    if (e.type === "shield") {
+      notice(L("KALKAN ALINDI"), 1);
+      sfx("shield");
+    }
+    if (e.type === "repair") {
+      notice(L("YÜK ONARILDI"), 1);
+      sfx("repair");
+    }
+    if (e.type === "supply") {
+      notice(L("ARA İKMAL · +1 CAN · YÜK ONARILDI"), 2);
+      sfx("repair");
+    }
+    if (e.type === "warning")
+      sfx(["rock", "cart", "wagon", "railcar"].includes(e.kind) ? "rumble" : "warning");
     if (
       e.type === "warning" &&
-      (run.mission.id < 3 || ["saw", "rock", "wagon", "cart"].includes(e.kind))
+      (run.mission.id < 3 || ["saw", "rock", "wagon", "cart", "railcar", "gap"].includes(e.kind))
     ) {
       notice(
         {
@@ -82868,6 +83679,15 @@ function events() {
               ? L("ALÇAK KİRİŞ · KAY VEYA KAÇ")
               : L("LAZER · KAY VEYA KAÇ"),
           wall: L("KAPALI YOL · ŞERİT DEĞİŞTİR"),
+          railcar: e.ramp
+            ? L("RAMPA · VAGONUN ÜSTÜNE ÇIK")
+            : e.car === "flat"
+              ? L("ALÇAK VAGON · ZIPLA, ÜSTÜNDEN KOŞ")
+              : L("YÜK VAGONU → ") + [L("SOL"), L("ORTA"), L("SAĞ")][e.lane + 1] + L(" · ŞERİT DEĞİŞTİR"),
+          gap:
+            terrainAt(run.distance + 30)?.kind === "metro" && settings.landscape === "western"
+              ? L("MADEN KUYUSU · ZIPLA")
+              : L("BOŞLUK · ZIPLA"),
           bolt: L("DRON ATEŞİ · KAÇ"),
         }[e.kind] || "",
         0.8,
@@ -82895,7 +83715,8 @@ function events() {
             : L("Lazere yakalandın; aşağı kaydır."),
         wall: L("Kapalı şeritten zamanında çıkamadın."),
         train: L("Tren hattından kaçman gerekiyor."),
-        gap: L("Çatı boşluğunu zıplayarak geç."),
+        railcar: L("Yük vagonuna çarptın; rampadan çık ya da şerit değiştir."),
+        gap: L("Boşluğa düştün; kenara gelmeden zıpla."),
         drone:
           settings.landscape === "western"
             ? L("At arabasının yolundan çekil.")
@@ -82903,11 +83724,12 @@ function events() {
         bolt: L("Dron ateşinden kaçınmak için şerit değiştir."),
       }[e.kind];
       notice(lastDamage, 2);
-      sound(110, 0.15, "sawtooth");
+      sfx("damage");
     }
     if (e.type === "blocked") {
       burst(pos, "#a6f4ec");
       notice(L("KALKAN DARBESİ"), 0.8);
+      sfx("blocked");
     }
     if (e.type === "explode" || e.type === "environment") {
       burst(
@@ -82919,7 +83741,7 @@ function events() {
             : "#f4a484",
         20,
       );
-      sound(e.kind === "wagon" ? 190 : 130, 0.17, "sawtooth");
+      sfx("explode");
       if (e.kind === "wagon") notice(L("AT ARABASI DURDURULDU · ◈3"), 1);
       if (e.type === "environment")
         notice(
@@ -82931,8 +83753,12 @@ function events() {
           1.2,
         );
     }
-    if (e.type === "spark") burst(pos, "#b8e7e4", 4);
+    if (e.type === "spark") {
+      burst(pos, "#b8e7e4", 4);
+      sfx("spark");
+    }
     // The fork signs already name each route; a second banner only covered the road.
+    if (e.type === "route") sfx("route");
     if (e.type === "route")
       notice(
         e.choice === "safe"
@@ -83003,7 +83829,8 @@ function updateHud() {
     run.fork
       ? L("YOL AYRIMI ") + Math.ceil(run.fork.at - run.distance) + " m"
       : run.route === "safe"
-        ? routeLabels().left + L(" · ALÇAK KİRİŞLER")
+        ? routeLabels().left +
+          (settings.landscape === "western" ? L(" · KUYULARA DİKKAT") : L(" · ALÇAK KİRİŞLER"))
         : run.route === "risk"
           ? routeLabels().right + L(" · BOŞLUKLARA DİKKAT")
           : run.route === "street"
@@ -83020,7 +83847,6 @@ function syncObjects() {
     mesh.position.copy(p);
     if (mesh.userData.gapCover)
       mesh.userData.gapCover.visible = terrainAt(o.at)?.kind !== "roof";
-    if (o.type === "train") mesh.position.z -= 6;
     if (o.type === "rock")
       mesh.userData.rollingStone.rotation.x = o.rolled / 1.3;
     if (o.type === "cart") {
@@ -83444,7 +84270,7 @@ function update(dt, simulate = true) {
           o.type === "gap" &&
           !o.dead &&
           o.lane === tile.userData.lane &&
-          Math.abs(o.at - tileAt) < 2.6,
+          Math.abs(o.at + (o.len || 0) / 2 - tileAt) < (o.len || 0) / 2 + 0.6,
       );
     }
     s.position.x = pathX(Math.max(0, -s.position.z));
@@ -83461,7 +84287,7 @@ function update(dt, simulate = true) {
       mode,
       time,
       speed: run?.speed || 0,
-      y: run?.y || 0,
+      y: (run?.y || 0) - (run?.ground || 0),
       vy: run?.vy || 0,
       slide: run?.slide || 0,
       holding,
@@ -83469,10 +84295,30 @@ function update(dt, simulate = true) {
     },
     dt,
   );
+  // Pit fall: sink into the shaft and pop back out; bump: a short sideways recoil.
+  const fallT = time - (courier.fallAt ?? -9);
+  if (fallT >= 0 && fallT < 0.55) runner.position.y -= Math.sin((fallT / 0.55) * Math.PI) * 1.7;
+  const bumpT = time - (courier.bumpAt ?? -9);
+  if (bumpT >= 0 && bumpT < 0.25)
+    runner.position.x -= Math.sin((bumpT / 0.25) * Math.PI) * 0.45 * (courier.bumpSide || 0);
+  if (mode === "play" && run && !paused) {
+    // One footstep per foot plant, on the street or on a wooden car roof.
+    const plant = Math.floor(courier.phase / Math.PI);
+    if (plant !== courier.lastPlant) {
+      courier.lastPlant = plant;
+      if (run.y - run.ground < 0.05 && run.slide <= 0)
+        sfx("step", { surface: run.ground > 0.5 ? "wood" : "dirt" });
+    }
+    if (run.reload > 0 && !courier.reloading) sfx("reload");
+    courier.reloading = run.reload > 0;
+    gameAudio.setTension(run.mission.pursuit && run.hunter < 35);
+  }
   runner.visible =
     mode !== "play" || !run || run.inv <= 0 || Math.floor(time * 16) % 2 === 0;
   shieldBubble.visible = (run?.shield || 0) > 0;
   shieldBubble.rotation.y += dt * 0.4;
+  shieldBubble.userData.ring.position.y = Math.sin(time * 2.2) * 0.9;
+  shieldBubble.userData.ring.scale.setScalar(Math.cos(Math.asin(Math.sin(time * 2.2) * 0.64)));
   camera.position.x = T.MathUtils.damp(
     camera.position.x,
     offset + px * (camera.aspect < 1 ? 0.62 : 0.32),
@@ -83481,7 +84327,10 @@ function update(dt, simulate = true) {
   );
   camera.position.y = T.MathUtils.damp(
     camera.position.y,
-    5.2 + groundAt(run?.distance || 0) + (run?.y || 0) * 0.2,
+    5.2 +
+      groundAt(run?.distance || 0) +
+      (run?.ground || 0) * 0.75 +
+      ((run?.y || 0) - (run?.ground || 0)) * 0.2,
     5,
     dt,
   );

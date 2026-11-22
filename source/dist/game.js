@@ -22,6 +22,7 @@ import * as V from "./visuals.js";
 import { L, LANG, setStaticText } from "./i18n.js";
 import {
   Run,
+  RAILCAR,
   MISSIONS,
   DISTRICTS,
   CARGOS,
@@ -62,7 +63,8 @@ renderer.toneMappingExposure = 1.05;
 renderer.outputColorSpace = T.SRGBColorSpace;
 view.append(renderer.domElement);
 // FPS counter and graphics toggle in the HUD are developer aids: shown only with ?debug.
-if (/[?&]debug\b/.test(location.search)) document.body.classList.add("debug");
+const DEBUG = /[?&]debug\b/.test(location.search);
+if (DEBUG) document.body.classList.add("debug");
 // Observe readbacks without issuing one. Captures a bounded, local-only trace
 // when the canvas is read by game/library code or an external integration.
 const renderAudit = {
@@ -320,15 +322,34 @@ const { arms, legs, weapon, head, torso } = courier;
 // The flash rides on the revolver muzzle, which moves with the aiming arm.
 const muzzleFlash = glow("#ffce6c", 0, 0, 0, 1.7, courier.muzzle);
 muzzleFlash.visible = false;
-let shieldBubble = new T.Mesh(
-  new T.SphereGeometry(1.5, 20, 16),
-  new T.MeshBasicMaterial({
-    color: "#6ae5eb",
-    transparent: true,
-    opacity: 0.09,
-    wireframe: true,
-  }),
-);
+// Shield: a soft glowing shell with a slow ring, instead of a wireframe cage.
+let shieldBubble = new T.Group();
+{
+  const shell = new T.Mesh(
+    new T.SphereGeometry(1.45, 24, 18),
+    new T.MeshBasicMaterial({
+      color: "#6ae5eb",
+      transparent: true,
+      opacity: 0.1,
+      depthWrite: false,
+      blending: T.AdditiveBlending,
+      side: T.BackSide,
+    }),
+  );
+  const ring = new T.Mesh(
+    new T.TorusGeometry(1.4, 0.035, 6, 48),
+    new T.MeshBasicMaterial({
+      color: "#9ff6f2",
+      transparent: true,
+      opacity: 0.55,
+      depthWrite: false,
+      blending: T.AdditiveBlending,
+    }),
+  );
+  ring.rotation.x = Math.PI / 2;
+  shieldBubble.add(shell, ring);
+  shieldBubble.userData.ring = ring;
+}
 shieldBubble.position.y = 1.3;
 runner.add(shieldBubble);
 let rainCount = 450,
@@ -468,6 +489,9 @@ function save() {
 }
 function sound(f = 400, d = 0.1, type = "sine") {
   if (audioAllowed()) gameAudio.effect(f, d, type);
+}
+function sfx(name, opt) {
+  if (audioAllowed()) gameAudio.sfx(name, opt);
 }
 function initAmbient() {
   if (audioAllowed()) gameAudio.start(settings.landscape);
@@ -1182,6 +1206,7 @@ function positionOf(o) {
   return new T.Vector3(
     o.x + pathX(o.at - (run?.distance || 0)),
     groundAt(o.at) +
+      (o.h && o.type !== "railcar" ? o.h : 0) +
       (o.type === "drone" && o.appearance !== "wagon" ? 2.35 : o.arcY || 0),
     3 - (o.at - (run?.distance || 0)),
   );
@@ -1253,6 +1278,95 @@ function generateRegion(i) {
     }
   }
 }
+// Near edge black, far wall faintly lit: reads as depth from the chase camera.
+function pitTexture() {
+  return tex((c, w, h) => {
+    let grad = c.createLinearGradient(0, h, 0, 0);
+    grad.addColorStop(0, "#000000");
+    grad.addColorStop(0.55, "#07050a");
+    grad.addColorStop(0.85, "#2a1a10");
+    grad.addColorStop(1, "#5a3a20");
+    c.fillStyle = grad;
+    c.fillRect(0, 0, w, h);
+    c.fillStyle = "rgba(120,80,45,.35)";
+    for (let i = 0; i < 9; i++) c.fillRect(i * (w / 9), 0, 2, h * 0.18);
+  }, 64, 128);
+}
+// A parked train: boxcars (roof walkway, needs a ramp) or low flatcars (jump on).
+// Spans z = 0 … -len from the group origin; an optional ramp runs toward the player.
+function buildRailcar(o, g) {
+  const western = settings.landscape === "western",
+    flat = o.kind === "flat",
+    h = o.h,
+    body = mat(western ? (o.id % 2 ? "#8b3b2b" : "#6f4a2e") : "#56606a", 0.85, 0.05),
+    trim = mat("#3a2a1f", 0.8, 0.1),
+    deck = mat("#a07a4c", 0.9, 0.05),
+    iron = mat("#2c2a28", 0.55, 0.6),
+    brass = mat("#d6a24a", 0.4, 0.6);
+  // Track bed under the whole train and ramp.
+  const bedLen = o.len + (o.ramp ? RAILCAR.ramp : 0) + 10;
+  box(2.4, 0.06, bedLen, mat("#5d4a39", 0.95, 0.05), 0, 0.03, -o.len / 2 + (o.ramp ? RAILCAR.ramp / 2 : 0), g);
+  for (let x of [-0.72, 0.72])
+    box(0.1, 0.1, bedLen, mat("#8c8780", 0.55, 0.5), x, 0.1, -o.len / 2 + (o.ramp ? RAILCAR.ramp / 2 : 0), g);
+  for (let c = 0; c < o.cars; c++) {
+    const z0 = -(c * (RAILCAR.carLen + RAILCAR.coupling)),
+      mid = z0 - RAILCAR.carLen / 2;
+    // Chassis and wheel sets.
+    box(2.5, 0.28, RAILCAR.carLen - 0.4, iron, 0, 0.72, mid, g);
+    for (let dz of [-RAILCAR.carLen / 2 + 2.2, RAILCAR.carLen / 2 - 2.2])
+      for (let x of [-1.05, 1.05]) {
+        let wheel = new T.Mesh((geo.railWheel ??= new T.CylinderGeometry(0.42, 0.42, 0.18, 14)), iron);
+        wheel.rotation.z = Math.PI / 2;
+        wheel.position.set(x, 0.45, mid + dz);
+        g.add(wheel);
+      }
+    if (flat) {
+      box(2.8, 0.22, RAILCAR.carLen - 0.2, deck, 0, h - 0.11, mid, g);
+      for (let k = 0; k < 5; k++)
+        for (let x of [-1.38, 1.38]) box(0.14, 0.7, 0.14, trim, x, h + 0.3, z0 - 1.5 - k * 3, g);
+    } else {
+      box(2.8, h - 0.95, RAILCAR.carLen - 0.3, body, 0, 0.85 + (h - 0.95) / 2, mid, g);
+      // Vertical battens along both sides and the facing end.
+      for (let k = 1; k < 7; k++)
+        for (let x of [-1.42, 1.42]) box(0.06, h - 1.05, 0.14, trim, x, 0.9 + (h - 1.05) / 2, z0 - k * 2.1, g);
+      box(1.2, h - 1.3, 0.08, trim, 0, 0.95 + (h - 1.3) / 2, z0 + 0.12, g);
+      // Roof with a plank walkway on top: this is what the courier runs on.
+      box(3.0, 0.14, RAILCAR.carLen, mat(western ? "#5b3d2b" : "#4a525a", 0.85, 0.05), 0, h - 0.07, mid, g);
+      box(2.0, 0.06, RAILCAR.carLen - 0.2, deck, 0, h + 0.02, mid, g);
+      // End ladder and lamp on the facing end.
+      for (let x of [-1.15, -0.75]) box(0.06, h - 0.9, 0.06, iron, x, 0.85 + (h - 0.9) / 2, z0 + 0.2, g);
+      for (let k = 0; k < 4; k++) box(0.46, 0.05, 0.06, iron, -0.95, 1.1 + k * 0.38, z0 + 0.2, g);
+      if (c === 0) orb(0.13, mat("#ffe2a0", 0.2, 0.1, "#d99a3a"), 0.95, h - 0.45, z0 + 0.22, g);
+    }
+    box(0.5, 0.18, 0.3, brass, 0, 0.75, z0 + 0.1, g);
+    // Coupling plate so the roof path looks continuous between cars.
+    if (c < o.cars - 1)
+      box(flat ? 2.4 : 1.3, 0.06, RAILCAR.coupling + 0.4, flat ? deck : iron, 0, h - 0.02, z0 - RAILCAR.carLen - RAILCAR.coupling / 2, g);
+  }
+  if (o.ramp) {
+    const run = RAILCAR.ramp,
+      slope = Math.atan2(h, run),
+      length = Math.hypot(run, h),
+      ramp = box(2.6, 0.2, length, deck, 0, h / 2 - 0.08, run / 2, g);
+    ramp.rotation.x = slope;
+    for (let x of [-1.35, 1.35]) {
+      let rail = box(0.12, 0.12, length, trim, x, h / 2 + 0.45, run / 2, g);
+      rail.rotation.x = slope;
+    }
+    // Trestle legs under the ramp.
+    for (let k = 1; k < 4; k++) {
+      let z = run - (run * k) / 4,
+        legH = (h * k) / 4;
+      for (let x of [-1.1, 1.1]) box(0.18, legH, 0.18, trim, x, legH / 2, z, g);
+    }
+    // Cleats across the ramp for grip and readability.
+    for (let k = 1; k < 7; k++) {
+      let z = run - (run * k) / 7,
+        y = (h * k) / 7 + 0.05;
+      box(2.3, 0.06, 0.12, trim, 0, y, z, g).rotation.x = slope;
+    }
+  }
+}
 function createObject(o, tracked = true) {
   let g = new T.Group();
   const metal = mat("#607483", 0.45, 0.6);
@@ -1262,7 +1376,7 @@ function createObject(o, tracked = true) {
     stone.position.y = 1.15;
     let body = new T.Mesh(
       (geo.rollingBarrel ??= new T.CylinderGeometry(1.15, 1.15, 2.1, 16)),
-      mat("#8a5a32", 0.05, 0.85),
+      mat("#8a5a32", 0.85, 0.05),
     );
     body.rotation.z = Math.PI / 2;
     body.castShadow = body.receiveShadow = true;
@@ -1290,7 +1404,7 @@ function createObject(o, tracked = true) {
     stone.position.y = 1.3;
     let body = new T.Mesh(
       (geo.rollingRock ??= new T.IcosahedronGeometry(1.3, 2)),
-      mat("#8a8c8e", 0.05, 0.95),
+      mat("#8a8c8e", 0.95, 0.05),
     );
     body.castShadow = body.receiveShadow = true;
     stone.add(body);
@@ -1468,8 +1582,8 @@ function createObject(o, tracked = true) {
   }
   if (o.type === "laser" && settings.landscape === "western") {
     // Western: same slide-under hazard, drawn as a low wooden beam on posts.
-    const beam = mat("#8a5a32", 0.05, 0.9);
-    for (let s of [-1, 1]) box(0.3, 3.3, 0.3, mat("#5e4029", 0.05, 0.9), s * 1.4, 1.65, 0, g);
+    const beam = mat("#8a5a32", 0.9, 0.05);
+    for (let s of [-1, 1]) box(0.3, 3.3, 0.3, mat("#5e4029", 0.9, 0.05), s * 1.4, 1.65, 0, g);
     box(3.1, 0.45, 0.4, beam, 0, 1.85, 0, g);
     box(2.6, 0.12, 0.42, mat("#f0b871", 0.3, 0.4, "#91613a"), 0, 1.55, 0, g);
   } else if (o.type === "laser") {
@@ -1479,16 +1593,37 @@ function createObject(o, tracked = true) {
     glow("#ff8b7a", 0, 1.8, 0, 3.4, g);
   }
   if (o.type === "gap") {
-    let cover = box(2.9, 0.12, 7, mat("#05111f"), 0, 0.02, 0, g);
-    g.userData.gapCover = cover;
-    for (let z of [-3.4, 3.4])
-      box(3, 0.1, 0.12, mat("#f0b871", 0.4, 0.2, "#91613a"), 0, 0.04, z, g);
-    glow("#407b92", 0, -0.2, 0, 3, g);
+    // Open shaft spanning [at, at + len]. Drawn as a dark hole with a lit far
+    // wall, a timber collar and broken rail ends so it reads as "jump this".
+    const len = o.len || 5,
+      pit = new T.Group();
+    pit.position.z = -len / 2;
+    g.add(pit);
+    let hole = new T.Mesh(
+      (geo["pitHole" + len] ??= new T.PlaneGeometry(2.86, len)),
+      (mats.pitHole ??= new T.MeshBasicMaterial({ map: pitTexture(), color: "#ffffff" })),
+    );
+    hole.rotation.x = -Math.PI / 2;
+    // Sits above the mine rails (top ≈ 0.16) so no track appears to bridge it.
+    hole.position.y = 0.2;
+    pit.add(hole);
+    const timber = mat("#6b4a2c", 0.9, 0.05),
+      iron = mat("#6f6a63", 0.6, 0.45);
+    for (let z of [len / 2, -len / 2]) box(3.1, 0.26, 0.38, timber, 0, 0.16, z, pit);
+    for (let x of [-1.5, 1.5]) box(0.26, 0.24, len + 0.3, timber, x, 0.15, 0, pit);
+    // Broken rails: stubs reaching over the edge on both sides.
+    for (let x of [-0.62, 0.62])
+      for (let side of [1, -1]) {
+        let stub = box(0.1, 0.1, 0.7, iron, x, 0.27, side * (len / 2 - 0.25), pit);
+        stub.rotation.x = side * 0.18;
+      }
+    g.userData.gapCover = pit;
   }
+  if (o.type === "railcar") buildRailcar(o, g);
   if (o.appearance === "wagon") {
-    const wood = mat("#987044", 0.05, 0.95),
-      rim = mat("#493d30", 0.25, 0.85),
-      horseCoat = mat("#79523a", 0, 0.9);
+    const wood = mat("#987044", 0.95, 0.05),
+      rim = mat("#493d30", 0.85, 0.25),
+      horseCoat = mat("#79523a", 0.9, 0);
     box(2.1, 0.35, 2.8, wood, 0, 0.85, -3.5, g);
     for (let side of [-1, 1]) {
       for (let y of [1.15, 1.45, 1.75])
@@ -2138,7 +2273,7 @@ function showMenu() {
           }
           settings.weapon = id;
           save();
-          sound(720);
+          sfx("ui");
           showMenu();
         }),
     );
@@ -2161,7 +2296,7 @@ function showMenu() {
             settings.diamonds -= diamondCost;
             settings.weaponLevels[id]++;
             save();
-            sound(900);
+            sfx("buy");
             showMenu();
           }
         }),
@@ -2178,7 +2313,7 @@ function showMenu() {
             settings.coins -= cost;
             settings[key]++;
             save();
-            sound(600);
+            sfx("buy");
             showMenu();
           }
         }),
@@ -2329,7 +2464,7 @@ function showProfile(tab = "daily") {
     $("#claimLogin").onclick = () => {
       if (claimLogin(settings, profile)) {
         save();
-        sound(1050);
+        sfx("reward");
         showProfile(tab);
       }
     };
@@ -2338,7 +2473,7 @@ function showProfile(tab = "daily") {
         (b.onclick = () => {
           if (claimTask(settings, profile, +b.dataset.task)) {
             save();
-            sound(1100);
+            sfx("reward");
             showProfile(tab);
           }
         }),
@@ -2352,7 +2487,7 @@ function showProfile(tab = "daily") {
             const c = COSTUMES.find((x) => x.id === profile.costume);
             suit.color.set(c.suit);
             armor.color.set(c.armor);
-            sound(700);
+            sfx("buy");
             showProfile(tab);
           }
         }),
@@ -2381,7 +2516,7 @@ function finishTutorial() {
   start?.();
 }
 function advanceTutorial() {
-  sound(800, 0.08);
+  sfx("ui");
   if (++tutorialStep >= 3) finishTutorial();
   else drawTutorial();
 }
@@ -2434,7 +2569,7 @@ function drawTutorial() {
 }
 function showControls() {
   $("#menu").innerHTML =
-    L('<div class="card help-card"><div class="eyebrow">KURYE EL KİTABI</div><h1>Akıllı koş.<br><em>Sağ çık.</em></h1><div class="help-grid"><p><b>Hareket</b>Sağa/sola kaydır: şerit. Yukarı: zıpla. Aşağı: lazerin altından kay.</p><p><b>Çatışma</b>Drona veya çevre hedefine dokun. Basılı tutarak seri ateş et. Şarjör otomatik dolar.</p><p><b>Çevre</b>Turuncu varil: alan patlaması. Turkuaz ızgara: dronları devre dışı bırakır. KAPI paneli: ilerideki engeli açar.</p><p><b>Yollar</b>İlk görevde bile yol ayrımı var. Solda kal: kapalı metroya in, lazerlerin altından kay. Sağda kal: bahçeli çatılara yüksel, döşeme boşluklarından atla. Ortada kal: yeni sokaktan devam et. Her rotada elmas topla; turuncu güç çekirdekleri bu koşudaki silah hasarını artırır.</p><p><b>Yük</b>Ağır yükle zıplama alçalır. Cam yük darbede daha çok hasar alır. Hasarsız teslimat üç yıldız kazandırır.</p><p><b>Takipçi</b>Darbe aradaki mesafeyi kapatır. Dronları vurmak ve çevre hedefleri takipçiyi yavaşlatır.</p></div><button class="primary" id="backMenu">Anladım ↗</button></div>');
+    L('<div class="card help-card"><div class="eyebrow">KURYE EL KİTABI</div><h1>Akıllı koş.<br><em>Sağ çık.</em></h1><div class="help-grid"><p><b>Hareket</b>Sağa/sola kaydır: şerit. Yukarı: zıpla. Aşağı: lazerin altından kay.</p><p><b>Vagonlar</b>Rampalı yük vagonuna koşarak çık, çatısında altın topla. Alçak vagona zıplayarak bin. Rampasız yüksek vagondan şerit değiştirerek kaç.</p><p><b>Kuyular</b>Maden ocağındaki açık kuyuların üstünden zıpla; içine düşmek can götürür.</p><p><b>Çatışma</b>Drona veya çevre hedefine dokun. Basılı tutarak seri ateş et. Şarjör otomatik dolar.</p><p><b>Çevre</b>Turuncu varil: alan patlaması. Turkuaz ızgara: dronları devre dışı bırakır. KAPI paneli: ilerideki engeli açar.</p><p><b>Yollar</b>İlk görevde bile yol ayrımı var. Solda kal: kapalı metroya in, lazerlerin altından kay. Sağda kal: bahçeli çatılara yüksel, döşeme boşluklarından atla. Ortada kal: yeni sokaktan devam et. Her rotada elmas topla; turuncu güç çekirdekleri bu koşudaki silah hasarını artırır.</p><p><b>Yük</b>Ağır yükle zıplama alçalır. Cam yük darbede daha çok hasar alır. Hasarsız teslimat üç yıldız kazandırır.</p><p><b>Takipçi</b>Darbe aradaki mesafeyi kapatır. Dronları vurmak ve çevre hedefleri takipçiyi yavaşlatır.</p></div><button class="primary" id="backMenu">Anladım ↗</button></div>');
   $("#menu").innerHTML = westernText($("#menu").innerHTML);
   $("#menu .help-grid p:nth-child(4)").innerHTML =
     L("<b>Yollar</b>") +
@@ -2672,8 +2807,18 @@ function results(r) {
     selected = Math.min(39, settings.unlocked - 1);
     showMenu();
   });
-  sound(r.success ? 650 : 120, 0.25);
+  sfx(newRecord ? "record" : r.success ? "success" : "fail");
 }
+// ?debug only: lets automated browser checks read the live run.
+if (DEBUG)
+  globalThis.__kulhat = {
+    get run() {
+      return run;
+    },
+    get mode() {
+      return mode;
+    },
+  };
 let lastDamage = "";
 function events() {
   for (let e of run.takeEvents()) {
@@ -2681,32 +2826,59 @@ function events() {
       pos =
         visual?.position.clone() ||
         runner.position.clone().add(new T.Vector3(0, 1, 0));
-    if (e.type === "jump") sound(430);
-    if (e.type === "slide") sound(180);
+    if (e.type === "jump") sfx("jump");
+    if (e.type === "slide") sfx("slide");
+    if (e.type === "land") {
+      sfx("land", { surface: run.ground > 0.5 ? "wood" : "dirt" });
+      courier.squash = Math.max(courier.squash, 0.7);
+    }
+    if (e.type === "bump") {
+      sfx("bump");
+      shake = Math.max(shake, 0.18);
+      courier.bumpAt = time;
+      courier.bumpSide = e.side;
+    }
+    if (e.type === "fall") {
+      sfx("fall");
+      courier.fallAt = time;
+      burst(runner.position.clone().add(new T.Vector3(0, 0.3, 0)), "#7a5a3a", 10);
+      notice(L("KUYUYA DÜŞTÜN · ZIPLAMAYI UNUTMA"), 1.2);
+    }
     if (e.type === "fire") {
-      sound(900, 0.05, "triangle");
+      sfx("fire", { weapon: e.weapon });
       courier.fireAt = time;
       muzzleFlash.userData.until = time + 0.1;
     }
     if (e.type === "coin") {
-      sound(1200, 0.06, "triangle");
+      sfx("coin");
       burst(pos, "#ffda70", 4);
     }
     if (e.type === "power") {
       notice(L("SİLAH GÜCÜ ") + e.level + L("/5 · HASAR ARTTI"), 1.2);
-      sound(760, 0.08, "square");
+      sfx("power");
     }
     if (e.type === "gem") {
       burst(pos, "#a8f6ff", 5);
       notice(L("ELMAS ALINDI · ◆ ") + e.total, 1.2);
-      sound(1450, 0.08, "triangle");
+      sfx("gem");
     }
-    if (e.type === "shield") notice(L("KALKAN ALINDI"), 1);
-    if (e.type === "repair") notice(L("YÜK ONARILDI"), 1);
-    if (e.type === "supply") notice(L("ARA İKMAL · +1 CAN · YÜK ONARILDI"), 2);
+    if (e.type === "shield") {
+      notice(L("KALKAN ALINDI"), 1);
+      sfx("shield");
+    }
+    if (e.type === "repair") {
+      notice(L("YÜK ONARILDI"), 1);
+      sfx("repair");
+    }
+    if (e.type === "supply") {
+      notice(L("ARA İKMAL · +1 CAN · YÜK ONARILDI"), 2);
+      sfx("repair");
+    }
+    if (e.type === "warning")
+      sfx(["rock", "cart", "wagon", "railcar"].includes(e.kind) ? "rumble" : "warning");
     if (
       e.type === "warning" &&
-      (run.mission.id < 3 || ["saw", "rock", "wagon", "cart"].includes(e.kind))
+      (run.mission.id < 3 || ["saw", "rock", "wagon", "cart", "railcar", "gap"].includes(e.kind))
     ) {
       notice(
         {
@@ -2735,6 +2907,15 @@ function events() {
               ? L("ALÇAK KİRİŞ · KAY VEYA KAÇ")
               : L("LAZER · KAY VEYA KAÇ"),
           wall: L("KAPALI YOL · ŞERİT DEĞİŞTİR"),
+          railcar: e.ramp
+            ? L("RAMPA · VAGONUN ÜSTÜNE ÇIK")
+            : e.car === "flat"
+              ? L("ALÇAK VAGON · ZIPLA, ÜSTÜNDEN KOŞ")
+              : L("YÜK VAGONU → ") + [L("SOL"), L("ORTA"), L("SAĞ")][e.lane + 1] + L(" · ŞERİT DEĞİŞTİR"),
+          gap:
+            terrainAt(run.distance + 30)?.kind === "metro" && settings.landscape === "western"
+              ? L("MADEN KUYUSU · ZIPLA")
+              : L("BOŞLUK · ZIPLA"),
           bolt: L("DRON ATEŞİ · KAÇ"),
         }[e.kind] || "",
         0.8,
@@ -2762,7 +2943,8 @@ function events() {
             : L("Lazere yakalandın; aşağı kaydır."),
         wall: L("Kapalı şeritten zamanında çıkamadın."),
         train: L("Tren hattından kaçman gerekiyor."),
-        gap: L("Çatı boşluğunu zıplayarak geç."),
+        railcar: L("Yük vagonuna çarptın; rampadan çık ya da şerit değiştir."),
+        gap: L("Boşluğa düştün; kenara gelmeden zıpla."),
         drone:
           settings.landscape === "western"
             ? L("At arabasının yolundan çekil.")
@@ -2770,11 +2952,12 @@ function events() {
         bolt: L("Dron ateşinden kaçınmak için şerit değiştir."),
       }[e.kind];
       notice(lastDamage, 2);
-      sound(110, 0.15, "sawtooth");
+      sfx("damage");
     }
     if (e.type === "blocked") {
       burst(pos, "#a6f4ec");
       notice(L("KALKAN DARBESİ"), 0.8);
+      sfx("blocked");
     }
     if (e.type === "explode" || e.type === "environment") {
       burst(
@@ -2786,7 +2969,7 @@ function events() {
             : "#f4a484",
         20,
       );
-      sound(e.kind === "wagon" ? 190 : 130, 0.17, "sawtooth");
+      sfx("explode");
       if (e.kind === "wagon") notice(L("AT ARABASI DURDURULDU · ◈3"), 1);
       if (e.type === "environment")
         notice(
@@ -2798,8 +2981,12 @@ function events() {
           1.2,
         );
     }
-    if (e.type === "spark") burst(pos, "#b8e7e4", 4);
+    if (e.type === "spark") {
+      burst(pos, "#b8e7e4", 4);
+      sfx("spark");
+    }
     // The fork signs already name each route; a second banner only covered the road.
+    if (e.type === "route") sfx("route");
     if (e.type === "route")
       notice(
         e.choice === "safe"
@@ -2870,7 +3057,8 @@ function updateHud() {
     run.fork
       ? L("YOL AYRIMI ") + Math.ceil(run.fork.at - run.distance) + " m"
       : run.route === "safe"
-        ? routeLabels().left + L(" · ALÇAK KİRİŞLER")
+        ? routeLabels().left +
+          (settings.landscape === "western" ? L(" · KUYULARA DİKKAT") : L(" · ALÇAK KİRİŞLER"))
         : run.route === "risk"
           ? routeLabels().right + L(" · BOŞLUKLARA DİKKAT")
           : run.route === "street"
@@ -2887,7 +3075,6 @@ function syncObjects() {
     mesh.position.copy(p);
     if (mesh.userData.gapCover)
       mesh.userData.gapCover.visible = terrainAt(o.at)?.kind !== "roof";
-    if (o.type === "train") mesh.position.z -= 6;
     if (o.type === "rock")
       mesh.userData.rollingStone.rotation.x = o.rolled / 1.3;
     if (o.type === "cart") {
@@ -3311,7 +3498,7 @@ function update(dt, simulate = true) {
           o.type === "gap" &&
           !o.dead &&
           o.lane === tile.userData.lane &&
-          Math.abs(o.at - tileAt) < 2.6,
+          Math.abs(o.at + (o.len || 0) / 2 - tileAt) < (o.len || 0) / 2 + 0.6,
       );
     }
     s.position.x = pathX(Math.max(0, -s.position.z));
@@ -3328,7 +3515,7 @@ function update(dt, simulate = true) {
       mode,
       time,
       speed: run?.speed || 0,
-      y: run?.y || 0,
+      y: (run?.y || 0) - (run?.ground || 0),
       vy: run?.vy || 0,
       slide: run?.slide || 0,
       holding,
@@ -3336,10 +3523,30 @@ function update(dt, simulate = true) {
     },
     dt,
   );
+  // Pit fall: sink into the shaft and pop back out; bump: a short sideways recoil.
+  const fallT = time - (courier.fallAt ?? -9);
+  if (fallT >= 0 && fallT < 0.55) runner.position.y -= Math.sin((fallT / 0.55) * Math.PI) * 1.7;
+  const bumpT = time - (courier.bumpAt ?? -9);
+  if (bumpT >= 0 && bumpT < 0.25)
+    runner.position.x -= Math.sin((bumpT / 0.25) * Math.PI) * 0.45 * (courier.bumpSide || 0);
+  if (mode === "play" && run && !paused) {
+    // One footstep per foot plant, on the street or on a wooden car roof.
+    const plant = Math.floor(courier.phase / Math.PI);
+    if (plant !== courier.lastPlant) {
+      courier.lastPlant = plant;
+      if (run.y - run.ground < 0.05 && run.slide <= 0)
+        sfx("step", { surface: run.ground > 0.5 ? "wood" : "dirt" });
+    }
+    if (run.reload > 0 && !courier.reloading) sfx("reload");
+    courier.reloading = run.reload > 0;
+    gameAudio.setTension(run.mission.pursuit && run.hunter < 35);
+  }
   runner.visible =
     mode !== "play" || !run || run.inv <= 0 || Math.floor(time * 16) % 2 === 0;
   shieldBubble.visible = (run?.shield || 0) > 0;
   shieldBubble.rotation.y += dt * 0.4;
+  shieldBubble.userData.ring.position.y = Math.sin(time * 2.2) * 0.9;
+  shieldBubble.userData.ring.scale.setScalar(Math.cos(Math.asin(Math.sin(time * 2.2) * 0.64)));
   camera.position.x = T.MathUtils.damp(
     camera.position.x,
     offset + px * (camera.aspect < 1 ? 0.62 : 0.32),
@@ -3348,7 +3555,10 @@ function update(dt, simulate = true) {
   );
   camera.position.y = T.MathUtils.damp(
     camera.position.y,
-    5.2 + groundAt(run?.distance || 0) + (run?.y || 0) * 0.2,
+    5.2 +
+      groundAt(run?.distance || 0) +
+      (run?.ground || 0) * 0.75 +
+      ((run?.y || 0) - (run?.ground || 0)) * 0.2,
     5,
     dt,
   );

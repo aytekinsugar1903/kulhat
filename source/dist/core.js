@@ -588,6 +588,28 @@ const HAZARDS = new Set([
   "bolt",
 ]);
 const TARGETS = new Set(["drone", "barrel", "vent", "panel"]);
+// Rail cars are platforms: run up the ramp (or jump onto a low flatcar) and ride
+// on top. A tall boxcar without a ramp is a wall you must change lanes around.
+export const RAILCAR = {
+  carLen: 15,
+  coupling: 1.2,
+  ramp: 13,
+  box: 2.5, // boxcar roof height
+  flat: 1.3, // flatcar deck height: reachable with a normal jump
+};
+export const PIT_LEN = 5;
+const COLLECTIBLES = new Set(["coin", "gem", "power", "shield", "repair"]);
+// Height of the surface under lateral position x at distance d (0 = street).
+export function supportAt(objects, x, d) {
+  let h = 0;
+  for (let o of objects) {
+    if (o.type !== "railcar" || o.dead || Math.abs(o.x - x) > 1.3) continue;
+    if (d >= o.at && d <= o.at + o.len) h = Math.max(h, o.h);
+    else if (o.ramp && d >= o.at - RAILCAR.ramp && d < o.at)
+      h = Math.max(h, (o.h * (d - (o.at - RAILCAR.ramp))) / RAILCAR.ramp);
+  }
+  return h;
+}
 export function rng(seed) {
   let v = seed >>> 0;
   return () => {
@@ -619,6 +641,7 @@ export class Run {
     this.x = 0;
     this.y = 0;
     this.vy = 0;
+    this.ground = 0;
     this.slide = 0;
     this.inv = 0;
     this.health = 3;
@@ -665,13 +688,21 @@ export class Run {
   }
   action(type) {
     if (this.phase !== "play") return;
-    if (type === "left") this.lane = Math.max(-1, this.lane - 1);
-    if (type === "right") this.lane = Math.min(1, this.lane + 1);
-    if (type === "jump" && this.y < 0.05 && this.slide <= 0) {
+    if (type === "left" || type === "right") {
+      let lane = Math.max(-1, Math.min(1, this.lane + (type === "left" ? -1 : 1)));
+      // A rail car beside you is a wall unless you are already up at its height.
+      let side = Math.max(
+        supportAt(this.objects, lane * 3.2, this.distance),
+        supportAt(this.objects, lane * 3.2, this.distance + 2),
+      );
+      if (lane !== this.lane && side > this.y + 0.35) this.emit("bump", { side: lane - this.lane });
+      else this.lane = lane;
+    }
+    if (type === "jump" && this.y - this.ground < 0.05 && this.slide <= 0) {
       this.vy = CARGOS[this.mission.cargo].jump;
       this.emit("jump");
     }
-    if (type === "slide" && this.y < 0.1) {
+    if (type === "slide" && this.y - this.ground < 0.1) {
       this.slide = 0.85;
       this.emit("slide");
     }
@@ -689,12 +720,49 @@ export class Run {
         "laser",
         "wall",
         "train",
+        "railcar",
         "gap",
         "drone",
         "bolt",
       ].includes(type)
     )
       return null;
+    if (type === "train") {
+      // Legacy "train" encounters become a single tall car to steer around.
+      type = "railcar";
+      extra = { cars: 1, kind: "box", ramp: false, ...extra };
+    }
+    if (type === "railcar") {
+      let cars = Math.max(1, Math.min(4, extra.cars || 2)),
+        kind = extra.kind === "flat" ? "flat" : "box";
+      extra = {
+        ...extra,
+        cars,
+        kind,
+        ramp: kind === "box" && !!extra.ramp,
+        h: RAILCAR[kind],
+        len: cars * RAILCAR.carLen + (cars - 1) * RAILCAR.coupling,
+      };
+      // Clear the lane under and around the train so nothing hides inside it.
+      let from = at - RAILCAR.ramp - 6,
+        to = at + extra.len + 14;
+      this.objects = this.objects.filter(
+        (o) => COLLECTIBLES.has(o.type) || o.lane !== lane || o.at < from || o.at > to,
+      );
+    } else {
+      let car = this.objects.find(
+        (o) =>
+          o.type === "railcar" &&
+          !o.dead &&
+          o.lane === lane &&
+          at >= o.at - RAILCAR.ramp - 6 &&
+          at <= o.at + o.len + 14,
+      );
+      if (car && !COLLECTIBLES.has(type)) return null;
+      // Pickups over a car sit on its roof.
+      if (car && at >= car.at && at <= car.at + car.len) extra = { h: car.h, ...extra };
+    }
+    if (type === "gap") extra = { len: PIT_LEN, ...extra };
     let o = {
       id: this.nextId++,
       type,
@@ -781,6 +849,20 @@ export class Run {
       if (m.threat >= 5) types.push(["saw", free, 88]);
     }
     for (let [t, l, d] of types) this.add(t, l, at + d);
+    // Parked trains from the second mission on: ride the roof for coins, or steer around.
+    if (m.id >= 1 && this.route === "normal" && (m.train ? n % 3 === 1 : n % 5 === 3)) {
+      let carLane = free,
+        kind = n % 4 === 1 ? "flat" : "box",
+        ramp = kind === "box" && (m.id < 5 || n % 2 === 1),
+        cars = 2 + (n % 2),
+        start = at + 20 + RAILCAR.ramp;
+      let car = this.add("railcar", carLane, start, { cars, kind, ramp });
+      if (car && (ramp || kind === "flat"))
+        for (let k = 0; k < Math.floor(car.len / 5); k++)
+          this.add("coin", carLane, start + 3 + k * 5, { value: k % 6 === 5 ? 2 : 1 });
+      if (car && ramp && n % 2) this.add("gem", carLane, start + car.len - 4);
+      return types;
+    }
     if (m.environment && n % 5 === 2) {
       let kind = n % 3 === 0 ? "panel" : n % 3 === 1 ? "vent" : "barrel";
       this.add(kind, free, at - 18);
@@ -949,6 +1031,12 @@ export class Run {
         at + 14,
       );
       this.add("gem", choice === "safe" ? (lane === 1 ? -1 : lane + 1) : lane, at + 22);
+      // Western mine: open shafts between the carts. Jump them; never run in.
+      if (westernMine && k % 2 === 1) {
+        let pitLane = k === 5 ? null : lane === 1 ? -1 : lane + 1;
+        for (let l of pitLane === null ? [-1, 0, 1] : [pitLane])
+          this.add("gap", l, at + 32, { pit: true });
+      }
       if (choice === "risk" && variant % 2 === 1 && k === 2)
         for (let other of [-1, 0, 1].filter((x) => x !== lane))
           this.add("gap", other, at);
@@ -1001,11 +1089,7 @@ export class Run {
       if (this.reload <= 0) this.ammo = this.ammoMax;
     }
     if (this.hold) this.fire();
-    if (this.y > 0 || this.vy > 0) {
-      this.vy -= 24 * dt;
-      this.y = Math.max(0, this.y + this.vy * dt);
-      if (this.y === 0) this.vy = 0;
-    }
+    this.updateSupport(dt);
     if (this.mission.pursuit) {
       this.hunter -=
         dt * (this.mission.boss ? 0.32 + this.mission.id * 0.008 : 0.14);
@@ -1031,6 +1115,7 @@ export class Run {
             "laser",
             "wall",
             "train",
+            "railcar",
             "gap",
             "drone",
             "bolt",
@@ -1089,6 +1174,30 @@ export class Run {
         o.rolled += travel + this.speed * dt;
       }
       let ahead = o.at - this.distance;
+      // Rolling hazards stop at a parked train in their lane.
+      if (o.rollSpeed && o.at !== previousAt) {
+        let car = this.objects.find(
+          (q) => q.type === "railcar" && !q.dead && q.lane === o.lane &&
+            o.at >= q.at && o.at <= q.at + q.len + 2,
+        );
+        if (car) {
+          o.dead = true;
+          continue;
+        }
+      }
+      if (o.type === "gap" && !o.hit) {
+        let into = this.distance - o.at;
+        if (
+          into > 0.7 &&
+          into < o.len - 0.7 &&
+          Math.abs(this.x - o.x) < 1.2 &&
+          this.y - this.ground < 0.05
+        ) {
+          o.hit = true;
+          this.emit("fall", { object: o.id });
+          this.damage(o);
+        } else if (into >= o.len) o.hit = true;
+      }
       if (o.type === "cart") o.arcY = o.drop ? Math.max(0, Math.min(9, (ahead - 45) * 0.16)) : 0;
       if (o.type === "saw") {
         let t = Math.max(0, Math.min(1, (90 - ahead) / 90)),
@@ -1101,14 +1210,15 @@ export class Run {
           Math.sin(this.time * (1.25 + this.mission.threat * 0.08) + o.id) *
             (0.7 + this.mission.threat * 0.08);
       if (
-        (HAZARDS.has(o.type) || o.appearance === "wagon") &&
+        (HAZARDS.has(o.type) || o.appearance === "wagon" || o.type === "railcar") &&
         !o.warned &&
-        ahead < (["saw", "rock", "cart"].includes(o.type) || o.appearance === "wagon" ? 100 : 38) &&
-        ahead > 0
+        ahead < (["saw", "rock", "cart"].includes(o.type) || o.appearance === "wagon" ? 100
+          : o.type === "railcar" ? 75 : 38) &&
+        ahead > (o.type === "railcar" && o.ramp ? -RAILCAR.ramp : 0)
       ) {
         o.warned = true;
         this.emit("warning", { kind: o.appearance === "wagon" ? "wagon" : o.type,
-          lane: o.lane, side: o.sweepSide });
+          lane: o.lane, side: o.sweepSide, ramp: !!o.ramp, car: o.kind });
       }
       if (
         o.type === "drone" &&
@@ -1123,12 +1233,18 @@ export class Run {
         this.add("bolt", this.lane, at, { x: this.x });
         this.emit("enemyFire", { object: o.id, targetAt: at, targetX: this.x });
       }
-      if (!o.hit && prev <= previousAt && this.distance >= o.at) {
+      if (
+        !o.hit &&
+        o.type !== "gap" &&
+        o.type !== "railcar" &&
+        prev <= previousAt &&
+        this.distance >= o.at
+      ) {
         o.hit = true;
         let same = Math.abs(this.x - o.x) <
           (o.type === "bolt" ? 0.62 : o.type === "rock" ? 1.5 : 1.2);
         if (same) {
-          if (o.type === "coin" && this.y < 1.5) {
+          if (o.type === "coin" && Math.abs(this.y - (o.h || 0)) < 1.5) {
             this.coins += o.value || 1;
             o.dead = true;
             this.emit("coin", { object: o.id });
@@ -1149,7 +1265,8 @@ export class Run {
             o.dead = true;
             this.emit("repair");
           } else if (HAZARDS.has(o.type) || o.type === "drone") {
-            let safe =
+            // Up on a train roof, street-level hazards pass underneath.
+            let safe = this.y > 2 ||
               o.type === "barrier" || o.type === "saw"
                 ? this.y > 1.1
                 : o.type === "gap"
@@ -1163,12 +1280,52 @@ export class Run {
           }
         }
       }
-      if (ahead < -22) o.dead = true;
+      if (ahead + (o.len || 0) < -22) o.dead = true;
     }
     this.objects = this.objects.filter((o) => !o.dead);
     if (!this.endless && this.distance >= this.goal)
       this.end(this.cargo > 0, "delivered");
     if (this.phase === "play" && this.cargo < 0) this.end(false, "cargo");
+  }
+  // Ground under the courier (street or a rail car), front collisions with cars,
+  // and gravity. Cars are entered by ramp, by jumping onto a flatcar, or not at all.
+  updateSupport(dt) {
+    let h = supportAt(this.objects, this.x, this.distance);
+    if (h > this.ground + 0.35 && this.y < h - 0.35) {
+      let car = this.objects.find(
+        (o) => o.type === "railcar" && !o.dead && Math.abs(o.x - this.x) <= 1.3 &&
+          this.distance >= o.at && this.distance <= o.at + o.len,
+      );
+      if (car && !car.hit) {
+        car.hit = true;
+        this.damage(car);
+        // Knocked aside to a free lane; with nowhere to go, scramble on top.
+        let free = [this.lane - 1, this.lane + 1].filter(
+          (l) => l >= -1 && l <= 1 && supportAt(this.objects, l * 3.2, this.distance) < 0.35,
+        );
+        if (free.length) {
+          this.lane = free[0];
+          h = Math.min(h, this.y);
+        } else this.y = h;
+      } else if (car) {
+        h = Math.min(h, this.y);
+      }
+    }
+    if (this.y > h || this.vy > 0) {
+      this.vy -= 24 * dt;
+      this.y += this.vy * dt;
+      if (this.y <= h) {
+        this.y = h;
+        if (this.vy < -2 && this.ground === h) this.emit("land");
+        this.vy = 0;
+      }
+    } else {
+      this.y = h;
+      this.vy = 0;
+    }
+    if (h > this.ground + 0.35 && this.y === h && this.vy === 0 && this.ground < h)
+      this.emit("land");
+    this.ground = h;
   }
   end(success, reason) {
     if (this.phase !== "play") return;

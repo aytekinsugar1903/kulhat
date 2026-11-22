@@ -1,6 +1,6 @@
 # KÜLHAT · Son Teslimat
 
-Three.js ile yazılmış, tarayıcıda çalışan bir raylı koşu oyunu. İki harita (Western Kasabası, Dağ Patikası), 40 etap, yol ayrımları, silah deposu, günlük ödüller ve kostümler içerir. Sunucu, giriş ya da dış servis gerektirmez.
+Three.js ile yazılmış, tarayıcıda çalışan bir raylı koşu oyunu. İki harita (Western Kasabası, Dağ Patikası), 40 etap, yol ayrımları, üstünde koşulabilen tren vagonları (rampalı yük vagonu, zıplanarak binilen alçak vagon), maden ocağında üstünden atlanan kuyular, silah deposu, günlük ödüller ve kostümler içerir. Sunucu, giriş ya da dış servis gerektirmez.
 
 ## Çalıştırma
 

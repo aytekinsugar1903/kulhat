@@ -1,5 +1,5 @@
 {
-  "initialBytes": 2324167,
+  "initialBytes": 2358896,
   "files": [
     {
       "file": "README.md",
@@ -23,7 +23,7 @@
     },
     {
       "file": "js/kulhat.bundle.js",
-      "bytes": 2256153
+      "bytes": 2290882
     },
     {
       "file": "js/platform.js",
@@ -39,19 +39,19 @@
     },
     {
       "file": "source/dist/audio.js",
-      "bytes": 3032
+      "bytes": 21373
     },
     {
       "file": "source/dist/core.js",
-      "bytes": 40140
+      "bytes": 46319
     },
     {
       "file": "source/dist/game.js",
-      "bytes": 109275
+      "bytes": 118352
     },
     {
       "file": "source/dist/i18n.js",
-      "bytes": 30007
+      "bytes": 31137
     },
     {
       "file": "source/dist/icon-192.png",
@@ -99,11 +99,11 @@
     },
     {
       "file": "source/tests/audio.test.js",
-      "bytes": 2507
+      "bytes": 5799
     },
     {
       "file": "source/tests/campaign.test.js",
-      "bytes": 12306
+      "bytes": 12538
     },
     {
       "file": "source/tests/maps.test.js",
@@ -111,7 +111,7 @@
     },
     {
       "file": "source/tests/pilot.js",
-      "bytes": 2311
+      "bytes": 2720
     },
     {
       "file": "source/tests/profile.test.js",

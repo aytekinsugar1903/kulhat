@@ -11,6 +11,7 @@ export function pilot(run, route = "safe") {
           "rock",
           "cart",
           "train",
+          "railcar",
           "barrier",
           "saw",
           "laser",
@@ -28,7 +29,11 @@ export function pilot(run, route = "safe") {
             (s, o) =>
               s +
               (Math.abs((o.type === "saw" ? o.baseX : o.x) - l * 3.2) < 1.3
-                ? (["wall", "train", "drone", "rock", "cart"].includes(o.type)
+                ? (o.type === "railcar"
+                    ? o.ramp || o.kind === "flat" || run.y >= o.h - 0.3
+                      ? 0
+                      : 5
+                    : ["wall", "train", "drone", "rock", "cart"].includes(o.type)
                     ? 5
                     : o.type === "bolt"
                       ? 3
@@ -56,6 +61,10 @@ export function pilot(run, route = "safe") {
         eta < 0.38 &&
         eta > 0.12
       )
+        run.action("jump");
+      // Hop onto a low flatcar so the deck is under you on arrival.
+      if (hazard.type === "railcar" && hazard.kind === "flat" &&
+        run.y < hazard.h - 0.3 && eta < 0.45 && eta > 0.2)
         run.action("jump");
       if (hazard.type === "laser" && eta < 0.6) run.action("slide");
     }

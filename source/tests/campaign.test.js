@@ -317,14 +317,17 @@ test("first mission exposes metro and roof branches with distinct encounters", (
       (o) => o.at > r.distance + 65 && o.at < r.routeEnds &&
         !["coin", "gem", "power"].includes(o.type),
     );
-    assert.equal(hazards.length, choice === "safe" ? 8 : 4);
+    // Western mine: 8 carts/barrels plus open shafts (one lane, or all three on the 6th).
+    assert.equal(hazards.length, choice === "safe" ? 8 + 1 + 1 + 3 + 1 : 4);
     assert.ok(
       hazards.every((o) =>
         choice === "safe"
-          ? ["cart", "rock"].includes(o.type)
+          ? ["cart", "rock", "gap"].includes(o.type)
           : o.type === "gap",
       ),
     );
+    if (choice === "safe")
+      assert.ok(hazards.filter((o) => o.type === "gap").every((o) => o.pit && o.len > 0));
     assert.ok(hazards.every((o) => o.at < r.goal));
   }
 });
