@@ -79217,7 +79217,8 @@ function createDesertFloor(scene) {
 function buildCourier(body, suit, armor, accent) {
   const skin = m("#c98d63", { rough: 0.7 }),
     leather = m("#5a3a26", { rough: 0.75 }),
-    hatM = m("#6b4428", { rough: 0.85 }),
+    // Own material (not the shared cache): costumes recolour the hat.
+    hatM = m("#6b4428", { rough: 0.85 }).clone(),
     hair = m("#3b2516", { rough: 0.9 }),
     denim = m("#3d4d63", { rough: 0.9 }),
     bootM = m("#3a2619", { rough: 0.6 }),
@@ -79298,6 +79299,55 @@ function buildCourier(body, suit, armor, accent) {
     scarf.push(seg);
     link = seg;
   }
+  // Costume accessories, each readable from the chase camera (see setCostumeStyle).
+  const extras = {};
+  {
+    // Ember: bandolier slung across the back over the satchel.
+    const b = group(upper, 0, 1.56, 0.62);
+    b.rotation.z = -0.72;
+    add(new T.BoxGeometry(0.14, 1.3, 0.05), leather, 0, 0, 0, b);
+    for (let k = 0; k < 7; k++)
+      add(new T.CylinderGeometry(0.035, 0.035, 0.16, 6), brass, 0, -0.48 + k * 0.16, 0.04, b).rotation.z = Math.PI / 2;
+    extras.bandolier = b;
+    // Sage: striped wool poncho over the shoulders.
+    const p = group(upper, 0, 1.74, 0.02);
+    const wool = m("#7d6442", { rough: 1 }),
+      stripe = m("#c9a46a", { rough: 1 });
+    const cone = add(new T.CylinderGeometry(0.42, 0.8, 0.78, 14, 1, true), wool, 0, 0, 0, p);
+    cone.material.side = T.DoubleSide;
+    cone.scale.z = 0.88;
+    for (const y of [-0.22, -0.3])
+      add(new T.CylinderGeometry(0.74 + (y + 0.22) * -0.4, 0.75 + (y + 0.22) * -0.4, 0.04, 14, 1, true), stripe, 0, y, 0, p).scale.z = 0.88;
+    extras.poncho = p;
+    // Violet: a tall feather in the hat band.
+    const f = group(hat, 0.26, 0.12, 0.16);
+    f.rotation.set(0.5, 0, -0.35);
+    add(new T.CapsuleGeometry(0.05, 0.5, 3, 6), accent, 0, 0.3, 0, f).scale.set(0.6, 1, 1.6);
+    extras.feather = f;
+    // Ivory: a brass star on the back of the shoulder cape.
+    const shape = new T.Shape();
+    for (let i = 0; i < 10; i++) {
+      const r = i % 2 ? 0.09 : 0.21,
+        a = (i / 10) * Math.PI * 2 + Math.PI / 2;
+      i ? shape.lineTo(Math.cos(a) * r, Math.sin(a) * r) : shape.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+    }
+    const star = new T.Mesh(new T.ShapeGeometry(shape), brass);
+    star.position.set(0, 1.9, 0.5);
+    star.rotation.x = -0.35;
+    upper.add(star);
+    extras.star = star;
+    // Crimson: a sash at the waist with long tails that trail behind.
+    const sash = group(upper, 0, 0, 0);
+    add(new T.CylinderGeometry(0.455, 0.455, 0.16, 14), accent, 0, 1.24, 0, sash).scale.z = 0.82;
+    extras.sashTails = [];
+    for (const side of [-1, 1]) {
+      const hinge = group(sash, side * 0.12, 1.22, 0.38);
+      add(new T.BoxGeometry(0.14, 0.85, 0.03), accent, 0, -0.42, 0, hinge);
+      hinge.userData.side = side * 2;
+      extras.sashTails.push(hinge);
+    }
+    extras.sash = sash;
+  }
   const arms = [],
     legs = [],
     knees = [],
@@ -79331,9 +79381,26 @@ function buildCourier(body, suit, armor, accent) {
   const muzzle = group(gun, 0, -0.7, 0);
   return {
     arms, legs, knees, elbows, weapon, head, torso,
-    hips, chest, headPivot, hat, tails, scarf, pony, muzzle,
+    hips, chest, headPivot, hat, tails: [...tails, ...extras.sashTails], scarf, pony, muzzle,
+    extras, hatMat: hatM,
     phase: 0, squash: 0, wasAir: false, fireAt: -9,
   };
+}
+
+// Costume look: hat colour plus one signature accessory per costume.
+const COSTUME_STYLE = {
+  courier: { hat: "#6b4428" },
+  ember: { hat: "#4f2a1a", extra: "bandolier" },
+  sage: { hat: "#5e5a3c", extra: "poncho" },
+  violet: { hat: "#1f1a26", extra: "feather" },
+  ivory: { hat: "#e6dbc0", extra: "star" },
+  crimson: { hat: "#3a1d1d", extra: "sash" },
+};
+function setCostumeStyle(c, id) {
+  const style = COSTUME_STYLE[id] || COSTUME_STYLE.courier;
+  c.hatMat.color.set(style.hat);
+  for (const [name, node] of Object.entries(c.extras))
+    if (!Array.isArray(node)) node.visible = name === style.extra;
 }
 
 // Pose the courier for this frame. Presentation only: the simulation never reads
@@ -79584,7 +79651,7 @@ function westernRoofParts(variant, quality) {
   return parts;
 }
 
-return {westernStreetParts,setSignNames,trailParts,partsToGroup,createSky,fillHorizon,createDesertFloor,buildCourier,animateCourier,createAmbient,westernRoofParts};
+return {westernStreetParts,setSignNames,trailParts,partsToGroup,createSky,fillHorizon,createDesertFloor,buildCourier,setCostumeStyle,animateCourier,createAmbient,westernRoofParts};
 })();
 // core.js
 M[8]=(()=>{
@@ -81079,7 +81146,7 @@ renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = T.PCFSoftShadowMap;
 renderer.toneMapping = T.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+renderer.toneMappingExposure = 1.1;
 renderer.outputColorSpace = T.SRGBColorSpace;
 view.append(renderer.domElement);
 // FPS counter and graphics toggle in the HUD are developer aids: shown only with ?debug.
@@ -81138,8 +81205,12 @@ Object.assign(sun.shadow.camera, {
 sun.shadow.bias = -0.0005;
 scene.add(sun);
 scene.add(sun.target);
-const fill = new T.PointLight("#55e5ec", 25, 24);
-fill.position.set(0, 5, 5);
+// The chase camera sees the courier's back while the sun is ahead, so the
+// courier read as a dark silhouette. The existing fill light now sits behind
+// and above the courier, warm, lighting what the player actually looks at
+// (no extra light: every light costs on every pixel on phones).
+const fill = new T.PointLight("#ffd7ae", 34, 26, 1.4);
+fill.position.set(0, 6.5, 9.5);
 scene.add(fill);
 const mats = {};
 function mat(color, rough = 0.6, metal = 0.1, emissive = null) {
@@ -81225,44 +81296,119 @@ const buildingTex = tex(
   256,
 );
 buildingTex.wrapS = buildingTex.wrapT = T.RepeatWrapping;
+// Packed-dirt street: colour blotches, wagon ruts, hoof prints, pebbles with a
+// lit top and shadowed bottom, and fine dry-mud cracks. Seeded so it never shimmers
+// between sessions; it tiles 2×5 across each road segment.
 const roadTex = tex(
   (c, w, h) => {
+    let seed = 20261122;
+    const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
     c.fillStyle = "#b6966d";
     c.fillRect(0, 0, w, h);
-    for (let i = 0; i < 9000; i++) {
-      let v = Math.random() * 50 + 70;
-      c.fillStyle = "rgba(" + v + "," + v + "," + v + ",.1)";
-      c.fillRect(Math.random() * w, Math.random() * h, 1, 2);
+    // Large soft colour variation (drawn three times for seamless tiling).
+    for (let i = 0; i < 26; i++) {
+      const x = rnd() * w,
+        y = rnd() * h,
+        r = 30 + rnd() * 70,
+        light = rnd() > 0.5;
+      for (const dx of [-w, 0, w])
+        for (const dy of [-h, 0, h]) {
+          const g = c.createRadialGradient(x + dx, y + dy, 0, x + dx, y + dy, r);
+          g.addColorStop(0, light ? "rgba(214,184,140,.22)" : "rgba(130,100,68,.18)");
+          g.addColorStop(1, "rgba(0,0,0,0)");
+          c.fillStyle = g;
+          c.fillRect(x + dx - r, y + dy - r, r * 2, r * 2);
+        }
     }
-    c.strokeStyle = "rgba(120,92,62,.35)";
-    c.lineWidth = 1.5;
-    for (let i = 0; i < 40; i++) {
-      let x = Math.random() * w,
-        y = Math.random() * h;
+    // Wagon ruts: two pairs of darker, slightly wavy bands running the length.
+    for (const u of [0.22, 0.34, 0.66, 0.78]) {
+      c.strokeStyle = "rgba(92,68,44,.22)";
+      c.lineWidth = 7;
       c.beginPath();
-      c.moveTo(x, y);
-      c.lineTo(x + (Math.random() - 0.5) * 6, y + 14 + Math.random() * 20);
+      for (let y = 0; y <= h; y += 8) {
+        const x = u * w + Math.sin((y / h) * Math.PI * 2) * 3;
+        y ? c.lineTo(x, y) : c.moveTo(x, y);
+      }
+      c.stroke();
+      c.strokeStyle = "rgba(228,200,160,.18)";
+      c.lineWidth = 2;
+      c.beginPath();
+      for (let y = 0; y <= h; y += 8) {
+        const x = u * w + 4 + Math.sin((y / h) * Math.PI * 2) * 3;
+        y ? c.lineTo(x, y) : c.moveTo(x, y);
+      }
       c.stroke();
     }
-    for (let i = 0; i < 18; i++) {
-      c.fillStyle = "rgba(95,72,48,.28)";
+    // Fine grit.
+    for (let i = 0; i < 16000; i++) {
+      const v = 60 + rnd() * 90;
+      c.fillStyle = `rgba(${v | 0},${(v * 0.84) | 0},${(v * 0.66) | 0},.13)`;
+      c.fillRect(rnd() * w, rnd() * h, 1 + rnd(), 1 + rnd() * 2);
+    }
+    // Dry-mud cracks: short branching polylines.
+    c.strokeStyle = "rgba(96,70,46,.3)";
+    c.lineWidth = 1.2;
+    for (let i = 0; i < 70; i++) {
+      let x = rnd() * w,
+        y = rnd() * h,
+        a = rnd() * Math.PI * 2;
       c.beginPath();
-      c.ellipse(Math.random() * w, Math.random() * h, 2 + Math.random() * 3, 1.5, 0, 0, 7);
+      c.moveTo(x, y);
+      for (let k = 0; k < 4; k++) {
+        a += (rnd() - 0.5) * 1.4;
+        x += Math.cos(a) * (5 + rnd() * 9);
+        y += Math.sin(a) * (5 + rnd() * 9);
+        c.lineTo(x, y);
+      }
+      c.stroke();
+    }
+    // Hoof prints: little horseshoe arcs in loose trails.
+    for (let t = 0; t < 6; t++) {
+      let x = rnd() * w,
+        y = rnd() * h;
+      for (let k = 0; k < 6; k++) {
+        const px = x + (k % 2 ? 7 : -7),
+          py = (y + k * 22) % h;
+        c.strokeStyle = "rgba(84,60,40,.4)";
+        c.lineWidth = 2.2;
+        c.beginPath();
+        c.arc(px, py, 4.5, Math.PI * 0.15, Math.PI * 0.85, true);
+        c.stroke();
+      }
+    }
+    // Pebbles: lit from above, shadow below.
+    for (let i = 0; i < 160; i++) {
+      const x = rnd() * w,
+        y = rnd() * h,
+        r = 1.2 + rnd() * 2.6;
+      c.fillStyle = "rgba(70,52,36,.35)";
+      c.beginPath();
+      c.ellipse(x + 0.8, y + 1.2, r, r * 0.7, 0, 0, 7);
+      c.fill();
+      const v = 150 + rnd() * 60;
+      c.fillStyle = `rgb(${v | 0},${(v * 0.86) | 0},${(v * 0.7) | 0})`;
+      c.beginPath();
+      c.ellipse(x, y, r, r * 0.7, 0, 0, 7);
+      c.fill();
+      c.fillStyle = "rgba(255,240,210,.35)";
+      c.beginPath();
+      c.ellipse(x - r * 0.3, y - r * 0.25, r * 0.45, r * 0.3, 0, 0, 7);
       c.fill();
     }
   },
-  256,
-  256,
+  512,
+  512,
 );
 roadTex.wrapS = roadTex.wrapT = T.RepeatWrapping;
 roadTex.repeat.set(2, 5);
+
 const roadMat = new T.MeshStandardMaterial({
   map: roadTex,
-  color: "#e7c798",
-  roughness: 0.98,
+  color: "#efcf9f",
+  roughness: 0.97,
   metalness: 0,
   bumpMap: roadTex,
-  bumpScale: 0.12,
+  bumpScale: 0.6,
 });
 const skyline = new T.Group();
 const horizons = { western: new T.Group(), trail: new T.Group() };
@@ -81484,7 +81630,6 @@ let selected = Math.min(MISSIONS.length - 1, settings.unlocked - 1),
   flashTimer = 0,
   visuals = new Map(),
   bulletMeshes = new Map(),
-  particles = [],
   effects = [],
   regionMeshes = [],
   currentDistrict = -1,
@@ -81525,6 +81670,8 @@ function setQuality(q) {
   camera.updateProjectionMatrix();
   sun.castShadow = !low;
   fill.visible = !low;
+  // Without the fill light, lift the cheap ambient light so the courier stays readable.
+  hemi.intensity = low ? 2.3 : 1.7;
   skyline.visible = !low;
   dust.children.forEach((cloud, i) => (cloud.visible = !low || i < 2));
   rain.material.opacity = low ? 0 : 0.5;
@@ -81581,33 +81728,127 @@ function batchStaticDecor(group) {
   }
   group.userData.batched = true;
 }
-function burst(position, color, count = 16) {
-  if (quality === "low") count = Math.min(2, Math.ceil(count / 6));
-  for (
-    let i = 0;
-    i < count && particles.length < (quality === "low" ? 12 : 120);
-    i++
-  ) {
-    let mesh = box(
-      0.08,
-      0.08,
-      0.08,
-      mat(color, 0.3, 0.3, color),
-      position.x,
-      position.y,
-      position.z,
+// Pooled soft particles. Additive sprites for sparks and glints, alpha-blended
+// sprites for dust and smoke. Nothing is allocated after start-up.
+const FX = { add: [], dust: [], next: { add: 0, dust: 0 } };
+for (const [kind, n] of [["add", 90], ["dust", 80]]) {
+  for (let i = 0; i < n; i++) {
+    const sprite = new T.Sprite(
+      new T.SpriteMaterial({
+        map: glowTex,
+        transparent: true,
+        depthWrite: false,
+        blending: kind === "add" ? T.AdditiveBlending : T.NormalBlending,
+      }),
     );
-    mesh.castShadow = false;
-    particles.push({
-      mesh,
-      v: new T.Vector3(
-        (Math.random() - 0.5) * 7,
-        Math.random() * 5,
-        (Math.random() - 0.5) * 7,
-      ),
-      life: 0.6,
+    sprite.visible = false;
+    scene.add(sprite);
+    FX[kind].push({ sprite, life: 0, max: 1, v: new T.Vector3(), g: 0, size: 1, grow: 0, drag: 0, alpha: 1 });
+  }
+}
+function spawnFx(kind, pos, o) {
+  const pool = FX[kind],
+    p = pool[(FX.next[kind] = (FX.next[kind] + 1) % pool.length)];
+  p.sprite.position.copy(pos);
+  if (o.jitter) p.sprite.position.add(new T.Vector3((Math.random() - 0.5) * o.jitter, Math.random() * o.jitter * 0.3, (Math.random() - 0.5) * o.jitter));
+  p.v.set(o.vx ?? 0, o.vy ?? 0, o.vz ?? 0);
+  p.life = p.max = o.life;
+  p.g = o.g ?? 0;
+  p.size = o.size;
+  p.grow = o.grow ?? 0;
+  p.drag = o.drag ?? 0;
+  p.alpha = o.alpha ?? 1;
+  p.sprite.material.color.set(o.color);
+  p.sprite.material.opacity = p.alpha;
+  p.sprite.scale.setScalar(o.size);
+  p.sprite.visible = true;
+}
+// Sparks: bright, quick, fall with gravity. Keeps the old burst() signature.
+function burst(position, color, count = 16) {
+  if (quality === "low") count = Math.min(4, Math.ceil(count / 4));
+  for (let i = 0; i < count; i++) {
+    const a = Math.random() * Math.PI * 2,
+      up = Math.random(),
+      speed = 3 + Math.random() * 5;
+    spawnFx("add", position, {
+      color,
+      vx: Math.cos(a) * speed * (1 - up * 0.5),
+      vy: 1.5 + up * 6,
+      vz: Math.sin(a) * speed * (1 - up * 0.5),
+      g: 13,
+      drag: 1.5,
+      life: 0.35 + Math.random() * 0.35,
+      size: 0.28 + Math.random() * 0.22,
+      jitter: 0.3,
     });
   }
+}
+// Dust: soft clouds that swell and fade (landing, sliding, impacts, pits).
+function dustPuff(position, { count = 6, color = settings.landscape === "trail" ? "#c9b89a" : "#d3b083", spread = 2.2, up = 1.2, size = 0.9, life = 0.75, alpha = 0.5 } = {}) {
+  if (quality === "low") count = Math.min(2, count);
+  for (let i = 0; i < count; i++) {
+    const a = Math.random() * Math.PI * 2,
+      r = spread * (0.5 + Math.random() * 0.5);
+    spawnFx("dust", position, {
+      color,
+      vx: Math.cos(a) * r,
+      vy: up * (0.4 + Math.random() * 0.8),
+      vz: Math.sin(a) * r + 2,
+      g: -0.6,
+      drag: 2.4,
+      life: life * (0.7 + Math.random() * 0.6),
+      size: size * (0.7 + Math.random() * 0.5),
+      grow: 1.6,
+      alpha,
+      jitter: 0.4,
+    });
+  }
+}
+// Smoke: darker, slower, rises (explosions).
+function smoke(position, count = 8) {
+  if (quality === "low") count = 2;
+  for (let i = 0; i < count; i++)
+    spawnFx("dust", position, {
+      color: i % 3 ? "#5b4a3d" : "#7c6a58",
+      vx: (Math.random() - 0.5) * 2.5,
+      vy: 1.5 + Math.random() * 2.5,
+      vz: (Math.random() - 0.5) * 2.5 + 4,
+      g: -0.8,
+      drag: 1.2,
+      life: 1 + Math.random() * 0.8,
+      size: 1.1 + Math.random() * 0.9,
+      grow: 2.2,
+      alpha: 0.55,
+      jitter: 0.8,
+    });
+}
+
+function updateFx(dt, motion) {
+  for (const kind of ["add", "dust"])
+    for (const p of FX[kind]) {
+      if (p.life <= 0) continue;
+      p.life -= dt;
+      if (p.life <= 0) {
+        p.sprite.visible = false;
+        continue;
+      }
+      const t = p.life / p.max;
+      p.v.y -= p.g * dt;
+      p.v.multiplyScalar(Math.max(0, 1 - p.drag * dt));
+      p.sprite.position.addScaledVector(p.v, dt);
+      // The world scrolls toward the camera; particles left behind travel with it.
+      p.sprite.position.z += motion * dt;
+      p.sprite.scale.setScalar(p.size * (p.grow ? 1 + (1 - t) * p.grow : 0.35 + t * 0.65));
+      p.sprite.material.opacity = p.alpha * (kind === "dust" ? t * Math.min(1, (1 - t) * 6 + 0.3) : Math.min(1, t * 1.6));
+    }
+
+}
+function clearFx() {
+  for (const kind of ["add", "dust"])
+    for (const p of FX[kind]) {
+      p.life = 0;
+      p.sprite.visible = false;
+    }
 }
 function westernText(text) {
   if (settings.landscape !== "western" || typeof text !== "string") return text;
@@ -82933,8 +83174,7 @@ function clearVisuals() {
   visuals.clear();
   bulletMeshes.forEach(cleanup);
   bulletMeshes.clear();
-  particles.forEach((p) => cleanup(p.mesh));
-  particles = [];
+  clearFx();
   effects.forEach((e) => cleanup(e.mesh));
   effects = [];
   forkVisual.visible = false;
@@ -83018,6 +83258,7 @@ function showMenu() {
   const costume = COSTUMES.find((c) => c.id === profile.costume) || COSTUMES[0];
   suit.color.set(costume.suit);
   armor.color.set(costume.armor);
+  V.setCostumeStyle(courier, costume.id);
   $("#menu").hidden = false;
   generateRegion(page);
   clearVisuals();
@@ -83551,6 +83792,7 @@ function showProfile(tab = "daily") {
             const c = COSTUMES.find((x) => x.id === profile.costume);
             suit.color.set(c.suit);
             armor.color.set(c.armor);
+            V.setCostumeStyle(courier, c.id);
             sfx("buy");
             showProfile(tab);
           }
@@ -83925,17 +84167,45 @@ if (DEBUG)
     },
   };
 let lastDamage = "";
+let lastWind = "",
+  fovKick = 0,
+  camDip = 0,
+  camRoll = 0,
+  hitStop = 0,
+  slideDustUntil = 0,
+  slideDustAt = 0;
+// Restart a small CSS "pop" on a HUD element (coin counter on pickup).
+function bump(sel) {
+  const el = $(sel);
+  if (!el) return;
+  el.classList.remove("bump");
+  void el.offsetWidth;
+  el.classList.add("bump");
+}
 function events() {
   for (let e of run.takeEvents()) {
     let visual = e.object ? visuals.get(e.object) : null,
       pos =
         visual?.position.clone() ||
         runner.position.clone().add(new T.Vector3(0, 1, 0));
-    if (e.type === "jump") sfx("jump");
-    if (e.type === "slide") sfx("slide");
+    if (e.type === "jump") {
+      sfx("jump");
+      dustPuff(runner.position.clone().add(new T.Vector3(0, 0.15, 0.3)), { count: 4, spread: 1.4, up: 0.6, size: 0.7 });
+      fovKick += 2;
+    }
+    if (e.type === "slide") {
+      sfx("slide");
+      slideDustUntil = time + 0.75;
+    }
     if (e.type === "land") {
       sfx("land", { surface: run.ground > 0.5 ? "wood" : "dirt" });
       courier.squash = Math.max(courier.squash, 0.7);
+      // A ring of dust (wood splinters on a car roof) and a small camera dip.
+      dustPuff(runner.position.clone().add(new T.Vector3(0, 0.15, 0.3)), run.ground > 0.5
+        ? { count: 5, color: "#a5835a", spread: 2.6, up: 0.5, size: 0.6 }
+        : { count: 9, spread: 3.2, up: 0.7, size: 1 });
+      camDip = Math.max(camDip, 0.28);
+      fovKick -= 1.5;
     }
     if (e.type === "bump") {
       sfx("bump");
@@ -83946,24 +84216,32 @@ function events() {
     if (e.type === "fall") {
       sfx("fall");
       courier.fallAt = time;
-      burst(runner.position.clone().add(new T.Vector3(0, 0.3, 0)), "#7a5a3a", 10);
+      dustPuff(runner.position.clone().add(new T.Vector3(0, 0.2, 0)), { count: 10, color: "#6e5440", spread: 2, up: 2.4, size: 1.1, life: 1 });
       notice(L("KUYUYA DÜŞTÜN · ZIPLAMAYI UNUTMA"), 1.2);
     }
     if (e.type === "fire") {
       sfx("fire", { weapon: e.weapon });
       courier.fireAt = time;
       muzzleFlash.userData.until = time + 0.1;
+      const mp = new T.Vector3();
+      courier.muzzle.getWorldPosition(mp);
+      spawnFx("add", mp, { color: "#ffd58a", life: 0.07, size: 1.3 });
+      spawnFx("dust", mp, { color: "#bfb2a0", life: 0.5, size: 0.35, grow: 2.5, vy: 0.8, vz: 1, alpha: 0.35 });
     }
     if (e.type === "coin") {
       sfx("coin");
-      burst(pos, "#ffda70", 4);
+      burst(pos, "#ffd36a", 5);
+      spawnFx("add", pos, { color: "#fff1b8", life: 0.22, size: 1.6, vz: 2 });
+      bump("#coins");
     }
     if (e.type === "power") {
       notice(L("SİLAH GÜCÜ ") + e.level + L("/5 · HASAR ARTTI"), 1.2);
       sfx("power");
     }
     if (e.type === "gem") {
-      burst(pos, "#a8f6ff", 5);
+      burst(pos, "#a8f6ff", 12);
+      spawnFx("add", pos, { color: "#d9fbff", life: 0.35, size: 2.6, vz: 2 });
+      bump("#coins");
       notice(L("ELMAS ALINDI · ◆ ") + e.total, 1.2);
       sfx("gem");
     }
@@ -84033,6 +84311,11 @@ function events() {
       } catch {}
       shake = 0.35;
       flashTimer = 0.2;
+      // Freeze-frame for impact, sparks and dust where the courier got hit.
+      hitStop = 0.09;
+      fovKick += 3;
+      burst(runner.position.clone().add(new T.Vector3(0, 1.4, -0.4)), "#ffb08a", 10);
+      dustPuff(runner.position.clone().add(new T.Vector3(0, 0.4, -0.5)), { count: 5, spread: 2.5, up: 1.6 });
       $("#flash").classList.add("hit");
       lastDamage = {
         barrier: L("Bariyere çarptın; yukarı kaydırarak zıpla."),
@@ -84068,12 +84351,17 @@ function events() {
       burst(
         pos,
         e.kind === "wagon"
-          ? "#b79a72"
+          ? "#ffc078"
           : e.type === "environment"
             ? "#ffd09a"
-            : "#f4a484",
-        20,
+            : "#ffad7a",
+        22,
       );
+      smoke(pos, e.kind === "wagon" ? 10 : 7);
+      dustPuff(pos.clone().setY(runner.position.y + 0.3), { count: 5, spread: 3.5, up: 1, size: 1.3 });
+      // Fireball flash: one large additive glow instead of a real light.
+      spawnFx("add", pos.clone().add(new T.Vector3(0, 1, 0.5)), { color: "#ffb46a", life: 0.3, size: 7, vz: 3 });
+      shake = Math.max(shake, 0.16);
       sfx("explode");
       if (e.kind === "wagon") notice(L("AT ARABASI DURDURULDU · ◈3"), 1);
       if (e.type === "environment")
@@ -84095,7 +84383,7 @@ function events() {
     if (e.type === "checkpoint") {
       notice(L("⚑ KAYIT NOKTASI · YARI YOL"), 2);
       sfx("reward");
-      burst(runner.position.clone().add(new T.Vector3(0, 3, -4)), "#ffd27a", 18);
+      for (const x of [-5.4, 5.4]) burst(runner.position.clone().add(new T.Vector3(x - runner.position.x, 6.4, -6)), "#ffd27a", 14);
     }
     if (e.type === "route")
       notice(
@@ -84716,38 +85004,41 @@ function update(dt, simulate = true) {
     5,
     dt,
   );
+  // Landing dip and a light step bob while running on the ground.
+  camDip = T.MathUtils.damp(camDip, 0, 7, dt);
+  const grounded = mode === "play" && run && run.y - run.ground < 0.05 && run.slide <= 0;
+  camera.position.y -= camDip - (grounded && !paused ? Math.abs(Math.sin(courier.phase)) * 0.045 : 0);
   camera.position.z = innerWidth < innerHeight ? 14.4 : 12;
   const speedFeel =
     mode === "play" ? clamp((run.speed - run.mission.speed) / 12, 0, 1) : 0;
-  const nextFov = T.MathUtils.damp(camera.fov, 57 + speedFeel * 3, 3, dt);
+  // Wider view as speed builds over a run, plus short kicks from jumps, landings and hits.
+  const pace = mode === "play" ? clamp((run.speed - 18) / 20, 0, 1) : 0;
+  fovKick = T.MathUtils.damp(fovKick, 0, 4, dt);
+  const nextFov = T.MathUtils.damp(camera.fov, 56 + pace * 4 + speedFeel * 3 + fovKick, 6, dt);
   if (Math.abs(nextFov - camera.fov) > 0.005) {
     camera.fov = nextFov;
     camera.updateProjectionMatrix();
   }
-  $("#wind").style.opacity =
-    mode === "play" ? String(0.08 + speedFeel * 0.28) : "0";
+  const windOpacity = mode === "play" && quality !== "low" ? (0.06 + pace * 0.22 + speedFeel * 0.3).toFixed(2) : "0";
+  if (windOpacity !== lastWind) $("#wind").style.opacity = lastWind = windOpacity;
   camera.lookAt(
     pathX(20) + px * (camera.aspect < 1 ? 0.5 : 0.2),
     1.8 + groundAt((run?.distance || 0) + 20) + (run?.y || 0) * 0.1,
     -17,
   );
+  // Lean the camera slightly into lane changes.
+  camRoll = T.MathUtils.damp(camRoll, mode === "play" && run ? clamp((run.lane * 3.2 - run.x) * 0.018, -0.05, 0.05) : 0, 8, dt);
+  if (camRoll) camera.rotateZ(camRoll);
   if (shake > 0) {
     camera.position.x += (Math.random() - 0.5) * shake;
     camera.position.y += (Math.random() - 0.5) * shake;
   }
-  for (let p of particles) {
-    p.mesh.position.addScaledVector(p.v, dt);
-    p.v.y -= 12 * dt;
-    p.life -= dt;
-    p.mesh.scale.setScalar(Math.max(0.05, p.life * 1.5));
+  // Slide: a dust trail behind the boots.
+  if (mode === "play" && run && run.slide > 0 && time < slideDustUntil && time - slideDustAt > 0.06) {
+    slideDustAt = time;
+    dustPuff(runner.position.clone().add(new T.Vector3(0, 0.15, 0.6)), { count: 2, spread: 0.8, up: 0.5, size: 0.8, life: 0.6 });
   }
-  particles = particles.filter((p) => {
-    if (p.life <= 0) {
-      cleanup(p.mesh);
-      return false;
-    }
-    return true;
-  });
+  updateFx(dt, motion);
   for (let i = 0; rain.visible && i < rainCount; i++) {
     rainPos[i * 3 + 1] -= dt * 13;
     rainPos[i * 3 + 2] += dt * motion * 0.4;
@@ -84776,12 +85067,15 @@ function update(dt, simulate = true) {
   sun.position.x = -12 + offset;
   sun.target.position.x = offset;
   fill.position.x = offset;
+
 }
 let accumulator = 0;
 function frame(now) {
   let real = Math.min(0.1, Math.max(0, (now - last) / 1000));
   last = now;
-  if (mode === "play") accumulator += real;
+  // Impact freeze-frame: the simulation crawls for a few hundredths of a second.
+  if (hitStop > 0) hitStop -= real;
+  if (mode === "play") accumulator += hitStop > 0 ? real * 0.12 : real;
   else accumulator = 0;
   let steps = 0;
   while (accumulator >= 1 / 60 && steps++ < 6) {

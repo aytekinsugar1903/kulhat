@@ -584,7 +584,8 @@ export function createDesertFloor(scene) {
 export function buildCourier(body, suit, armor, accent) {
   const skin = m("#c98d63", { rough: 0.7 }),
     leather = m("#5a3a26", { rough: 0.75 }),
-    hatM = m("#6b4428", { rough: 0.85 }),
+    // Own material (not the shared cache): costumes recolour the hat.
+    hatM = m("#6b4428", { rough: 0.85 }).clone(),
     hair = m("#3b2516", { rough: 0.9 }),
     denim = m("#3d4d63", { rough: 0.9 }),
     bootM = m("#3a2619", { rough: 0.6 }),
@@ -665,6 +666,55 @@ export function buildCourier(body, suit, armor, accent) {
     scarf.push(seg);
     link = seg;
   }
+  // Costume accessories, each readable from the chase camera (see setCostumeStyle).
+  const extras = {};
+  {
+    // Ember: bandolier slung across the back over the satchel.
+    const b = group(upper, 0, 1.56, 0.62);
+    b.rotation.z = -0.72;
+    add(new T.BoxGeometry(0.14, 1.3, 0.05), leather, 0, 0, 0, b);
+    for (let k = 0; k < 7; k++)
+      add(new T.CylinderGeometry(0.035, 0.035, 0.16, 6), brass, 0, -0.48 + k * 0.16, 0.04, b).rotation.z = Math.PI / 2;
+    extras.bandolier = b;
+    // Sage: striped wool poncho over the shoulders.
+    const p = group(upper, 0, 1.74, 0.02);
+    const wool = m("#7d6442", { rough: 1 }),
+      stripe = m("#c9a46a", { rough: 1 });
+    const cone = add(new T.CylinderGeometry(0.42, 0.8, 0.78, 14, 1, true), wool, 0, 0, 0, p);
+    cone.material.side = T.DoubleSide;
+    cone.scale.z = 0.88;
+    for (const y of [-0.22, -0.3])
+      add(new T.CylinderGeometry(0.74 + (y + 0.22) * -0.4, 0.75 + (y + 0.22) * -0.4, 0.04, 14, 1, true), stripe, 0, y, 0, p).scale.z = 0.88;
+    extras.poncho = p;
+    // Violet: a tall feather in the hat band.
+    const f = group(hat, 0.26, 0.12, 0.16);
+    f.rotation.set(0.5, 0, -0.35);
+    add(new T.CapsuleGeometry(0.05, 0.5, 3, 6), accent, 0, 0.3, 0, f).scale.set(0.6, 1, 1.6);
+    extras.feather = f;
+    // Ivory: a brass star on the back of the shoulder cape.
+    const shape = new T.Shape();
+    for (let i = 0; i < 10; i++) {
+      const r = i % 2 ? 0.09 : 0.21,
+        a = (i / 10) * Math.PI * 2 + Math.PI / 2;
+      i ? shape.lineTo(Math.cos(a) * r, Math.sin(a) * r) : shape.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+    }
+    const star = new T.Mesh(new T.ShapeGeometry(shape), brass);
+    star.position.set(0, 1.9, 0.5);
+    star.rotation.x = -0.35;
+    upper.add(star);
+    extras.star = star;
+    // Crimson: a sash at the waist with long tails that trail behind.
+    const sash = group(upper, 0, 0, 0);
+    add(new T.CylinderGeometry(0.455, 0.455, 0.16, 14), accent, 0, 1.24, 0, sash).scale.z = 0.82;
+    extras.sashTails = [];
+    for (const side of [-1, 1]) {
+      const hinge = group(sash, side * 0.12, 1.22, 0.38);
+      add(new T.BoxGeometry(0.14, 0.85, 0.03), accent, 0, -0.42, 0, hinge);
+      hinge.userData.side = side * 2;
+      extras.sashTails.push(hinge);
+    }
+    extras.sash = sash;
+  }
   const arms = [],
     legs = [],
     knees = [],
@@ -698,9 +748,26 @@ export function buildCourier(body, suit, armor, accent) {
   const muzzle = group(gun, 0, -0.7, 0);
   return {
     arms, legs, knees, elbows, weapon, head, torso,
-    hips, chest, headPivot, hat, tails, scarf, pony, muzzle,
+    hips, chest, headPivot, hat, tails: [...tails, ...extras.sashTails], scarf, pony, muzzle,
+    extras, hatMat: hatM,
     phase: 0, squash: 0, wasAir: false, fireAt: -9,
   };
+}
+
+// Costume look: hat colour plus one signature accessory per costume.
+const COSTUME_STYLE = {
+  courier: { hat: "#6b4428" },
+  ember: { hat: "#4f2a1a", extra: "bandolier" },
+  sage: { hat: "#5e5a3c", extra: "poncho" },
+  violet: { hat: "#1f1a26", extra: "feather" },
+  ivory: { hat: "#e6dbc0", extra: "star" },
+  crimson: { hat: "#3a1d1d", extra: "sash" },
+};
+export function setCostumeStyle(c, id) {
+  const style = COSTUME_STYLE[id] || COSTUME_STYLE.courier;
+  c.hatMat.color.set(style.hat);
+  for (const [name, node] of Object.entries(c.extras))
+    if (!Array.isArray(node)) node.visible = name === style.extra;
 }
 
 // Pose the courier for this frame. Presentation only: the simulation never reads

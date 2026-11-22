@@ -2004,10 +2004,49 @@
         flex: 1 1 auto;
         min-height: 52px;
       }
+
+      /* --- Speed lines: ten streaks along the edges, varied length and pace --- */
+      #wind i {
+        width: 2px;
+        height: 18vh;
+        opacity: 0.9;
+      }
+      #wind i:nth-child(1) { left: 4%; animation-duration: 0.55s; animation-delay: -0.1s; }
+      #wind i:nth-child(2) { left: 95%; animation-duration: 0.6s; animation-delay: -0.35s; transform: rotate(-9deg); }
+      #wind i:nth-child(3) { left: 11%; animation-duration: 0.7s; animation-delay: -0.5s; height: 12vh; }
+      #wind i:nth-child(4) { left: 88%; animation-duration: 0.5s; animation-delay: -0.2s; transform: rotate(-7deg); }
+      #wind i:nth-child(5) { left: 1.5%; animation-duration: 0.45s; animation-delay: -0.4s; height: 24vh; }
+      #wind i:nth-child(6) { left: 98%; animation-duration: 0.48s; animation-delay: -0.05s; height: 22vh; transform: rotate(-10deg); }
+      #wind i:nth-child(7) { left: 16%; animation-duration: 0.8s; animation-delay: -0.65s; height: 9vh; opacity: 0.6; }
+      #wind i:nth-child(8) { left: 83%; animation-duration: 0.75s; animation-delay: -0.3s; height: 10vh; opacity: 0.6; transform: rotate(-6deg); }
+      #wind i:nth-child(9) { left: 7%; animation-duration: 0.62s; animation-delay: -0.15s; }
+      #wind i:nth-child(10) { left: 92%; animation-duration: 0.66s; animation-delay: -0.55s; transform: rotate(-8deg); }
+      /* --- Cinematic grade: warm vignette over the 3D view, under the HUD --- */
+      #grade {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(120% 85% at 50% 42%, #0000 55%, #2a14062e 78%, #1a0b0399 100%);
+      }
+      body.menu-open #grade {
+        opacity: 0.6;
+      }
+      /* --- Coin counter pop on pickup --- */
+      #coins.bump {
+        animation: hud-bump 0.25s ease-out;
+      }
+      @keyframes hud-bump {
+        40% { transform: scale(1.12); color: #ffd36a; }
+      }
+      #coins {
+        display: inline-block;
+        transform-origin: left center;
+      }
 </style>
   </head>
   <body class="menu-open">
     <div id="view"></div>
+    <div id="grade" aria-hidden="true"></div>
     <div class="hud">
       <div class="top">
         <div>
@@ -2067,7 +2106,7 @@
       "
     ></div>
     <div class="flash" id="flash"></div>
-    <div id="wind" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div id="wind" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="veil" id="menu"></div>
     <div id="extras" hidden></div>
     <div id="tutorial" hidden></div>
