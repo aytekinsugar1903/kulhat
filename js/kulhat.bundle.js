@@ -77586,8 +77586,11 @@ const EN = {
  "</button><button id=\"back\">Üs ve yükseltmeler</button></div></div>": "</button><button id=\"back\">Base and upgrades</button></div></div>",
  "✦ YENİ REKOR! ✦ · ": "✦ NEW RECORD! ✦ · ",
  "EN İYİ SKOR · ": "BEST SCORE · ",
- "<div class=\"ad-placements\"><button id=\"adContinue\" disabled>Devam et (reklam)</button><button id=\"adDouble\" disabled>Altını 2 katına çıkar (reklam)</button><small>Reklamlar bu sürümde kapalı.</small></div>": "<div class=\"ad-placements\"><button id=\"adContinue\" disabled>Continue (ad)</button><button id=\"adDouble\" disabled>Double your gold (ad)</button><small>Ads are off in this version.</small></div>",
- "Reklam yerleri için platform entegrasyonu gerekli.": "Ad slots need platform integration.",
+ "▶ Reklam izle · altını 2 katına çıkar": "▶ Watch an ad · double your gold",
+ "İsteğe bağlı. İstemezsen hemen devam edebilirsin.": "Optional. You can keep playing without it.",
+ "Reklam yükleniyor…": "Loading ad…",
+ " altın eklendi": " gold added",
+ "Reklam tamamlanmadı, ödül verilmedi.": "Ad not finished, no reward given.",
  "SİLAH GÜCÜ ": "WEAPON POWER ",
  "/5 · HASAR ARTTI": "/5 · MORE DAMAGE",
  "ELMAS ALINDI · ◆ ": "GEM COLLECTED · ◆ ",
@@ -77826,13 +77829,34 @@ function selectCostume(settings, profile, id) {
   profile.costume = id;
   return true;
 }
-// No ad SDK/network calls. Placements remain disabled in this build.
-const REWARDED_ADS_ENABLED = false;
-async function showRewardedAd() {
-  return { success: true, mock: true };
+// Ads come only from the YouTube Playables ads API (via platform.js). Outside
+// YouTube there is no ad SDK and no network call: every placement stays hidden.
+const REWARD_IDS = { doubleGold: "kulhat-double-gold-1" };
+function rewardedAdsAvailable(platform = globalThis.KULHAT_PLATFORM) {
+  return !!platform?.ads?.available;
+}
+// Resolves {success:true} only when YouTube reports the reward as earned.
+async function showRewardedAd(id, platform = globalThis.KULHAT_PLATFORM) {
+  if (!rewardedAdsAvailable(platform)) return { success: false, unavailable: true };
+  try {
+    return { success: (await platform.ads.rewarded(id)) === true };
+  } catch {
+    return { success: false };
+  }
+}
+// Interstitial pacing: never during a player's first runs of the session, then at
+// most one ad per 3 finished runs and per 3 minutes. Shown only on the result →
+// next screen transition (never during play).
+const INTERSTITIAL_RULES = { firstAfterRuns: 3, everyRuns: 3, minGapMs: 180000 };
+function interstitialDue(p, now, rules = INTERSTITIAL_RULES) {
+  return (
+    p.sessionRuns >= rules.firstAfterRuns &&
+    p.runsSinceAd >= rules.everyRuns &&
+    now - p.lastAdAt >= rules.minGapMs
+  );
 }
 
-return {SAVE_KEY,loadGame,saveGame,COSTUMES,normalizeProfile,dayKey,LOGIN_REWARDS,TASKS,dailyState,claimLogin,recordDaily,claimTask,selectCostume,REWARDED_ADS_ENABLED,showRewardedAd};
+return {SAVE_KEY,loadGame,saveGame,COSTUMES,normalizeProfile,dayKey,LOGIN_REWARDS,TASKS,dailyState,claimLogin,recordDaily,claimTask,selectCostume,REWARD_IDS,rewardedAdsAvailable,showRewardedAd,INTERSTITIAL_RULES,interstitialDue};
 })();
 // audio.js
 M[6]=(()=>{
@@ -80137,7 +80161,7 @@ return {TITLE,DISTRICTS,storyText,missionName,MISSIONS,CARGOS,COURIER_WEAPONS,DE
 M[0]=(()=>{
 const T=M[1];
 const {RoundedBoxGeometry}=M[3];
-const {loadGame,saveGame,COSTUMES,LOGIN_REWARDS,TASKS,dayKey,dailyState,claimLogin,recordDaily,claimTask,selectCostume,REWARDED_ADS_ENABLED,showRewardedAd}=M[4];
+const {loadGame,saveGame,COSTUMES,LOGIN_REWARDS,TASKS,dayKey,dailyState,claimLogin,recordDaily,claimTask,selectCostume,REWARD_IDS,rewardedAdsAvailable,showRewardedAd,interstitialDue}=M[4];
 const {GameAudio}=M[6];
 const V=M[7];
 const {L,LANG,setStaticText}=M[5];
@@ -82603,6 +82627,25 @@ function resultBreakdown(r) {
     "</p>"
   );
 }
+// Ad state lives only in memory for this session; nothing about ads is saved.
+const adPacing = { sessionRuns: 0, runsSinceAd: 0, lastAdAt: -Infinity };
+let adBusy = false;
+// Wraps a result-screen button: when pacing allows, YouTube shows an interstitial
+// on this screen change first; the game continues whether or not one was shown.
+function afterInterstitial(next) {
+  return async () => {
+    if (adBusy) return;
+    if (inPlayables && platform?.ads && interstitialDue(adPacing, Date.now())) {
+      adBusy = true;
+      gameAudio.stop();
+      adPacing.lastAdAt = Date.now();
+      adPacing.runsSinceAd = 0;
+      await platform.ads.interstitial();
+      adBusy = false;
+    }
+    next();
+  };
+}
 function results(r) {
   mode = "end";
   holding = false;
@@ -82631,6 +82674,8 @@ function results(r) {
     // YouTube shows the best score; it matches the saved leaderboard best.
     platform?.sendScore(Math.max(0, ...settings.leaderboard.map((x) => x.score)));
     sessionRewarded = true;
+    adPacing.sessionRuns++;
+    adPacing.runsSinceAd++;
   }
   gameAudio.stop();
   $("#menu").hidden = false;
@@ -82708,12 +82753,36 @@ function results(r) {
         (newRecord ? L("✦ YENİ REKOR! ✦ · ") : L("EN İYİ SKOR · ")) +
         Math.max(previousBest, r.score).toLocaleString(NUMBERS) +
         "</p>" +
-        L('<div class="ad-placements"><button id="adContinue" disabled>Devam et (reklam)</button><button id="adDouble" disabled>Altını 2 katına çıkar (reklam)</button><small>Reklamlar bu sürümde kapalı.</small></div>'),
+        // Opt-in rewarded ad: YouTube only, and only when the run earned gold.
+        (rewardedAdsAvailable() && r.coins > 0
+          ? '<div class="ad-placements"><button id="adDouble">' +
+            L("▶ Reklam izle · altını 2 katına çıkar") +
+            " (+◈ " +
+            r.coins +
+            ")</button><small>" +
+            L("İsteğe bağlı. İstemezsen hemen devam edebilirsin.") +
+            "</small></div>"
+          : ""),
     );
-  // No placements are enabled until a real SDK and platform review are complete.
-  // One mock entry point is exported by profile.js for later SDK integration.
-  if (REWARDED_ADS_ENABLED)
-    console.warn(L("Reklam yerleri için platform entegrasyonu gerekli."));
+  const adDouble = $("#adDouble");
+  if (adDouble)
+    adDouble.onclick = async () => {
+      if (r.adDoubled || adBusy) return;
+      adBusy = true;
+      adDouble.disabled = true;
+      adDouble.textContent = L("Reklam yükleniyor…");
+      gameAudio.stop();
+      const res = await showRewardedAd(REWARD_IDS.doubleGold);
+      adBusy = false;
+      if (res.success && !r.adDoubled) {
+        r.adDoubled = true;
+        settings.coins += r.coins;
+        save();
+        adDouble.textContent = "◈ +" + r.coins + L(" altın eklendi");
+      } else {
+        adDouble.textContent = L("Reklam tamamlanmadı, ödül verilmedi.");
+      }
+    };
   const retryRow = $("#retry").parentNode;
   const resultHeading = $("#menu .result-card h1");
   if (retryRow && resultHeading?.parentNode)
@@ -82721,16 +82790,21 @@ function results(r) {
   const bestScore = $("#menu .best-score");
   if (bestScore && retryRow?.parentNode)
     retryRow.parentNode.insertBefore(bestScore, retryRow);
-  $("#retry").onclick = () =>
+  // The optional ad sits right under the main buttons, never in front of them.
+  const adRow = $("#menu .ad-placements");
+  if (adRow && retryRow?.parentNode)
+    retryRow.parentNode.insertBefore(adRow, retryRow.nextSibling);
+  $("#retry").onclick = afterInterstitial(() =>
     openMission(
       r.success && r.mission < 39 ? r.mission + 1 : r.mission,
       r.endless,
-    );
-  $("#back").onclick = () => {
+    ),
+  );
+  $("#back").onclick = afterInterstitial(() => {
     page = Math.floor(Math.min(39, settings.unlocked - 1) / 5);
     selected = Math.min(39, settings.unlocked - 1);
     showMenu();
-  };
+  });
   sound(r.success ? 650 : 120, 0.25);
 }
 let lastDamage = "";

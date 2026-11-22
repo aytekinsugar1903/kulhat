@@ -47,8 +47,37 @@
         getItem: (key) => localStorage.getItem(key),
         setItem: (key, value) => localStorage.setItem(key, value),
       };
+  // Resolves to `fallback` if the SDK promise never settles, so the game cannot hang on an ad.
+  const settle = (promise, ms, fallback) =>
+    Promise.race([
+      promise.catch(() => fallback),
+      new Promise((r) => setTimeout(() => r(fallback), ms)),
+    ]);
+  const ytAds = yt && yt.ads ? yt.ads : null;
+  // Only YouTube's own ads API is used; Playables forbids off-platform ads and purchases.
+  const ads = {
+    available: !!(ytAds && typeof ytAds.requestRewardedAd === "function"),
+    interstitial() {
+      if (!ytAds || typeof ytAds.requestInterstitialAd !== "function")
+        return Promise.resolve(false);
+      return settle(
+        Promise.resolve().then(() => ytAds.requestInterstitialAd()).then(() => true),
+        60000,
+        false,
+      );
+    },
+    rewarded(id) {
+      if (!ads.available) return Promise.resolve(false);
+      return settle(
+        Promise.resolve().then(() => ytAds.requestRewardedAd(id)).then((r) => r === true),
+        120000,
+        false,
+      );
+    },
+  };
   const platform = {
     inPlayables: !!yt,
+    ads,
     storage,
     gameReady() {
       if (!yt || readyCalled) return;

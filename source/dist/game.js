@@ -12,8 +12,10 @@ import {
   recordDaily,
   claimTask,
   selectCostume,
-  REWARDED_ADS_ENABLED,
+  REWARD_IDS,
+  rewardedAdsAvailable,
   showRewardedAd,
+  interstitialDue,
 } from "./profile.js";
 import { GameAudio } from "./audio.js";
 import * as V from "./visuals.js";
@@ -2492,6 +2494,25 @@ function resultBreakdown(r) {
     "</p>"
   );
 }
+// Ad state lives only in memory for this session; nothing about ads is saved.
+const adPacing = { sessionRuns: 0, runsSinceAd: 0, lastAdAt: -Infinity };
+let adBusy = false;
+// Wraps a result-screen button: when pacing allows, YouTube shows an interstitial
+// on this screen change first; the game continues whether or not one was shown.
+function afterInterstitial(next) {
+  return async () => {
+    if (adBusy) return;
+    if (inPlayables && platform?.ads && interstitialDue(adPacing, Date.now())) {
+      adBusy = true;
+      gameAudio.stop();
+      adPacing.lastAdAt = Date.now();
+      adPacing.runsSinceAd = 0;
+      await platform.ads.interstitial();
+      adBusy = false;
+    }
+    next();
+  };
+}
 function results(r) {
   mode = "end";
   holding = false;
@@ -2520,6 +2541,8 @@ function results(r) {
     // YouTube shows the best score; it matches the saved leaderboard best.
     platform?.sendScore(Math.max(0, ...settings.leaderboard.map((x) => x.score)));
     sessionRewarded = true;
+    adPacing.sessionRuns++;
+    adPacing.runsSinceAd++;
   }
   gameAudio.stop();
   $("#menu").hidden = false;
@@ -2597,12 +2620,36 @@ function results(r) {
         (newRecord ? L("✦ YENİ REKOR! ✦ · ") : L("EN İYİ SKOR · ")) +
         Math.max(previousBest, r.score).toLocaleString(NUMBERS) +
         "</p>" +
-        L('<div class="ad-placements"><button id="adContinue" disabled>Devam et (reklam)</button><button id="adDouble" disabled>Altını 2 katına çıkar (reklam)</button><small>Reklamlar bu sürümde kapalı.</small></div>'),
+        // Opt-in rewarded ad: YouTube only, and only when the run earned gold.
+        (rewardedAdsAvailable() && r.coins > 0
+          ? '<div class="ad-placements"><button id="adDouble">' +
+            L("▶ Reklam izle · altını 2 katına çıkar") +
+            " (+◈ " +
+            r.coins +
+            ")</button><small>" +
+            L("İsteğe bağlı. İstemezsen hemen devam edebilirsin.") +
+            "</small></div>"
+          : ""),
     );
-  // No placements are enabled until a real SDK and platform review are complete.
-  // One mock entry point is exported by profile.js for later SDK integration.
-  if (REWARDED_ADS_ENABLED)
-    console.warn(L("Reklam yerleri için platform entegrasyonu gerekli."));
+  const adDouble = $("#adDouble");
+  if (adDouble)
+    adDouble.onclick = async () => {
+      if (r.adDoubled || adBusy) return;
+      adBusy = true;
+      adDouble.disabled = true;
+      adDouble.textContent = L("Reklam yükleniyor…");
+      gameAudio.stop();
+      const res = await showRewardedAd(REWARD_IDS.doubleGold);
+      adBusy = false;
+      if (res.success && !r.adDoubled) {
+        r.adDoubled = true;
+        settings.coins += r.coins;
+        save();
+        adDouble.textContent = "◈ +" + r.coins + L(" altın eklendi");
+      } else {
+        adDouble.textContent = L("Reklam tamamlanmadı, ödül verilmedi.");
+      }
+    };
   const retryRow = $("#retry").parentNode;
   const resultHeading = $("#menu .result-card h1");
   if (retryRow && resultHeading?.parentNode)
@@ -2610,16 +2657,21 @@ function results(r) {
   const bestScore = $("#menu .best-score");
   if (bestScore && retryRow?.parentNode)
     retryRow.parentNode.insertBefore(bestScore, retryRow);
-  $("#retry").onclick = () =>
+  // The optional ad sits right under the main buttons, never in front of them.
+  const adRow = $("#menu .ad-placements");
+  if (adRow && retryRow?.parentNode)
+    retryRow.parentNode.insertBefore(adRow, retryRow.nextSibling);
+  $("#retry").onclick = afterInterstitial(() =>
     openMission(
       r.success && r.mission < 39 ? r.mission + 1 : r.mission,
       r.endless,
-    );
-  $("#back").onclick = () => {
+    ),
+  );
+  $("#back").onclick = afterInterstitial(() => {
     page = Math.floor(Math.min(39, settings.unlocked - 1) / 5);
     selected = Math.min(39, settings.unlocked - 1);
     showMenu();
-  };
+  });
   sound(r.success ? 650 : 120, 0.25);
 }
 let lastDamage = "";

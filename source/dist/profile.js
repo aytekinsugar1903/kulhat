@@ -137,8 +137,29 @@ export function selectCostume(settings, profile, id) {
   profile.costume = id;
   return true;
 }
-// No ad SDK/network calls. Placements remain disabled in this build.
-export const REWARDED_ADS_ENABLED = false;
-export async function showRewardedAd() {
-  return { success: true, mock: true };
+// Ads come only from the YouTube Playables ads API (via platform.js). Outside
+// YouTube there is no ad SDK and no network call: every placement stays hidden.
+export const REWARD_IDS = { doubleGold: "kulhat-double-gold-1" };
+export function rewardedAdsAvailable(platform = globalThis.KULHAT_PLATFORM) {
+  return !!platform?.ads?.available;
+}
+// Resolves {success:true} only when YouTube reports the reward as earned.
+export async function showRewardedAd(id, platform = globalThis.KULHAT_PLATFORM) {
+  if (!rewardedAdsAvailable(platform)) return { success: false, unavailable: true };
+  try {
+    return { success: (await platform.ads.rewarded(id)) === true };
+  } catch {
+    return { success: false };
+  }
+}
+// Interstitial pacing: never during a player's first runs of the session, then at
+// most one ad per 3 finished runs and per 3 minutes. Shown only on the result →
+// next screen transition (never during play).
+export const INTERSTITIAL_RULES = { firstAfterRuns: 3, everyRuns: 3, minGapMs: 180000 };
+export function interstitialDue(p, now, rules = INTERSTITIAL_RULES) {
+  return (
+    p.sessionRuns >= rules.firstAfterRuns &&
+    p.runsSinceAd >= rules.everyRuns &&
+    now - p.lastAdAt >= rules.minGapMs
+  );
 }
