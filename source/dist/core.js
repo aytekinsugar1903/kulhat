@@ -677,6 +677,67 @@ export class Run {
     this.nextSupply = 1200;
     this.script = signature(this.mission);
     this.scriptIndex = 0;
+    // Halfway checkpoint (campaign only): a snapshot to resume from after a failed run.
+    this.checkpointAt = endless ? Infinity : Math.round(this.goal * 0.5);
+    this.checkpoint = null;
+    this.flagPlaced = false;
+    this.resumed = null;
+  }
+  // State needed to continue a run from here. Coins and gems are banked when the
+  // failed run ends, so a resumed run starts its own tally at zero.
+  snapshot() {
+    return {
+      distance: this.distance,
+      goal: this.goal,
+      cargo: this.cargo,
+      shield: this.shield,
+      hunter: this.hunter,
+      power: this.power,
+      kills: this.kills,
+      environment: this.environment,
+      routes: [...this.routes],
+      damageCount: this.damageCount,
+      time: this.time,
+      checkpoint: this.checkpoint,
+    };
+  }
+  // Start this run from a snapshot (a checkpoint, or the point of failure after a
+  // rewarded ad). `health` and `minCargo` set how forgiving the restart is.
+  resumeFrom(snap, { health = 3, minCargo = 50, hunterBonus = 25, kind = "checkpoint" } = {}) {
+    let d = snap.distance;
+    Object.assign(this, {
+      distance: d,
+      goal: snap.goal,
+      cargo: Math.max(minCargo, snap.cargo),
+      shield: snap.shield,
+      power: snap.power,
+      kills: snap.kills,
+      environment: snap.environment,
+      routes: [...snap.routes],
+      damageCount: snap.damageCount,
+      time: snap.time,
+      health,
+      inv: 2,
+      // Resuming from the checkpoint keeps it available for the next attempt.
+      checkpoint: snap.checkpoint || (kind === "checkpoint" ? snap : null),
+      flagPlaced: true,
+      resumed: kind,
+    });
+    this.hunter = this.mission.pursuit ? Math.min(100, Math.max(snap.hunter, 0) + hunterBonus) : Infinity;
+    this.objects = [];
+    this.shots = [];
+    this.fork = null;
+    this.route = "normal";
+    this.routeSections = [];
+    this.offset = this.targetOffset = 0;
+    this.nextWave = d + 30;
+    this.nextFork = d + 260;
+    this.nextSupply = 1200 + Math.max(0, Math.ceil((d - 1200) / 1500)) * 1500;
+    if (this.nextSupply <= d) this.nextSupply += 1500;
+    while (this.scriptIndex < this.script.length && this.script[this.scriptIndex].at < d + 40)
+      this.scriptIndex++;
+    this.emit("resume", { kind });
+    return this;
   }
   emit(type, data = {}) {
     this.events.push({ type, ...data });
@@ -758,7 +819,7 @@ export class Run {
           at >= o.at - RAILCAR.ramp - 6 &&
           at <= o.at + o.len + 14,
       );
-      if (car && !COLLECTIBLES.has(type)) return null;
+      if (car && !COLLECTIBLES.has(type) && type !== "flag") return null;
       // Pickups over a car sit on its roof.
       if (car && at >= car.at && at <= car.at + car.len) extra = { h: car.h, ...extra };
     }
@@ -1072,6 +1133,14 @@ export class Run {
       this.riskFactor *
       (this.route === "safe" ? 0.96 : this.route === "risk" ? 1.06 : 1);
     this.distance += this.speed * dt;
+    if (!this.flagPlaced && this.distance >= this.checkpointAt - 150) {
+      this.flagPlaced = true;
+      this.add("flag", 0, this.checkpointAt);
+    }
+    if (!this.checkpoint && this.distance >= this.checkpointAt) {
+      this.checkpoint = this.snapshot();
+      this.emit("checkpoint");
+    }
     if (this.distance >= this.nextSupply) {
       this.nextSupply += 1500;
       this.health = Math.min(3, this.health + 1);
@@ -1376,6 +1445,9 @@ export class Run {
       objective: met,
       objectiveText: obj.text,
       time: this.time,
+      checkpoint: this.checkpoint || null,
+      resumed: this.resumed,
+      failSnapshot: success ? null : this.snapshot(),
     };
     this.emit("end", { result: this.result });
   }

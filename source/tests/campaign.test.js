@@ -343,3 +343,62 @@ test("middle fork selects a reward-bearing street route and all routes contain g
   let r = new Run(0); r.fork = { at: 0 }; r.step(0);
   assert.equal(r.route, "street");
 });
+
+test("halfway checkpoint: placed once, snapshot taken, a failed run resumes from it", async () => {
+  const { pilot } = await import("./pilot.js");
+  let r = new Run(6, {}, 11);
+  assert.equal(r.checkpointAt, Math.round(r.goal * 0.5));
+  let flags = 0,
+    seen = 0;
+  while (r.phase === "play" && r.distance < r.checkpointAt + 5) {
+    r.health = 3;
+    r.cargo = 100;
+    r.hunter = 100;
+    r.step(0.04);
+    for (const e of r.takeEvents()) if (e.type === "checkpoint") seen++;
+    flags = Math.max(flags, r.objects.filter((o) => o.type === "flag").length);
+  }
+  assert.equal(seen, 1);
+  assert.equal(flags, 1);
+  assert.ok(r.checkpoint && Math.abs(r.checkpoint.distance - r.checkpointAt) < 2);
+  // Fail the run, then resume from the checkpoint.
+  r.health = 1;
+  r.inv = 0;
+  r.shield = 0;
+  r.damage({ type: "barrier", id: -1 });
+  assert.equal(r.phase, "end");
+  assert.ok(r.result.checkpoint && r.result.failSnapshot);
+  let c = new Run(6, {}, 12).resumeFrom(r.result.checkpoint, { kind: "checkpoint" });
+  assert.equal(Math.round(c.distance), Math.round(r.checkpoint.distance));
+  assert.equal(c.health, 3);
+  assert.equal(c.coins, 0, "coins were banked by the failed run");
+  assert.ok(c.checkpoint, "checkpoint stays for another attempt");
+  assert.ok(c.objects.length === 0 && c.inv > 0);
+  assert.ok(c.script.slice(c.scriptIndex).every((o) => o.at >= c.distance + 40));
+  const res = pilot(c);
+  assert.ok(res.success, "a resumed run can still be delivered");
+  assert.equal(res.resumed, "checkpoint");
+});
+test("rewarded continue resumes at the point of failure with two lives, once", () => {
+  let r = new Run(8, {}, 5);
+  r.distance = 900;
+  r.health = 1;
+  r.inv = 0;
+  r.shield = 0;
+  r.damage({ type: "barrier", id: -1 });
+  const snap = r.result.failSnapshot;
+  assert.equal(Math.round(snap.distance), 900);
+  let c = new Run(8, {}, 6).resumeFrom(snap, { kind: "ad", health: 2, minCargo: 40, hunterBonus: 35 });
+  assert.equal(c.health, 2);
+  assert.ok(c.cargo >= 40);
+  assert.equal(c.resumed, "ad");
+  c.health = 1;
+  c.inv = 0;
+  c.shield = 0;
+  c.damage({ type: "barrier", id: -2 });
+  assert.equal(c.result.resumed, "ad", "the result tells the UI an ad continue was already used");
+});
+test("endless runs have no checkpoint", () => {
+  let e = new Run(29, {}, 3, true);
+  assert.equal(e.checkpointAt, Infinity);
+});

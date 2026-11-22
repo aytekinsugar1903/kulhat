@@ -704,6 +704,11 @@ export class GameAudio {
     this.thud(t + 0.32, 90, 35, 0.3, 0.6);
     this.hiss(t + 0.32, 0.3, 0.3, { type: "lowpass", f: 700 });
   }
+  // Low double thump while on the last heart.
+  fx_heartbeat(t) {
+    this.thud(t, 70, 40, 0.12, 0.22);
+    this.thud(t + 0.18, 62, 38, 0.14, 0.16);
+  }
   fx_warning(t) {
     this.woodblock(t, 1500, 0.1, this.sfxBus);
     this.woodblock(t + 0.1, 1500, 0.08, this.sfxBus);

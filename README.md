@@ -62,6 +62,14 @@ Web sürümünü güncellemek için `rebuilt/` içindeki `index.html`, `js/` ve 
 
 Oyun Türkçe ve İngilizce'dir. Dil açılışta bir kez seçilir: YouTube içinde `ytgame.system.getLanguage()` kullanılır (`tr` ile başlayan dil kodları Türkçe, diğerleri İngilizce). YouTube dışında menüdeki ENGLISH / TÜRKÇE düğmesiyle seçilen dil, seçim yoksa tarayıcı dili geçerlidir. YouTube içinde dil düğmesi gizlidir; çünkü dil YouTube ayarına uymalı ve dil tercihi bulut kaydına yazılmamalıdır. Çeviriler `source/dist/i18n.js` dosyasındadır: Türkçe metin anahtar, İngilizce karşılığı değerdir. Kaynakta görünen her Türkçe metin `L("...")` ile sarılıdır.
 
+## Canlar ve kayıt noktası
+
+- Her koşu 3 canla başlar (sol üstte kalpler). Çoğu darbe 1 can, ağır maden vagonu 2 can götürür; darbeden sonra yaklaşık 1 saniye dokunulmazlık vardır. Son can kalınca ekran kenarı kırmızı atar ve kalp sesi duyulur.
+- Kalkan bir darbeyi tamamen yutar (en fazla 4). Her 1500 m'de ara ikmal +1 can ve +%20 yük verir.
+- Koşu biter: canlar biterse, yük %0'a inerse veya (5. etaptan sonra) takipçi yakalarsa.
+- Etabın yarısında **kayıt noktası** kemeri vardır. Koşu orada geçildikten sonra biterse sonuç ekranında "Kayıt noktasından devam" çıkar (3 can, yük en az %50). Toplanan altın başarısız koşuda kasaya eklenir, devam koşusu sıfırdan sayar.
+- YouTube içinde ayrıca isteğe bağlı "Reklam izle · kaldığın yerden devam" vardır: düşülen noktadan 2 canla devam; aynı zincirde bir kez (ödül kimliği `kulhat-continue-1`).
+
 ## Kontroller
 
 Telefonda sağa/sola kaydırarak şerit değiştirilir, yukarı kaydırarak zıplanır, aşağı kaydırarak kayılır; hedefe dokunarak ateş edilir. Klavyede oklar/WASD, ateş için Space, duraklatmak ve panelleri kapatmak için Esc kullanılır.

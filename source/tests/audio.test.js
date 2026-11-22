@@ -140,7 +140,7 @@ test("every named effect plays, unknown names are ignored, effects wake a suspen
   const names = [
     "jump", "land", "step", "slide", "coin", "gem", "power", "shield", "repair", "fire", "reload",
     "spark", "explode", "damage", "blocked", "bump", "fall", "warning", "rumble", "route", "ui",
-    "buy", "reward", "success", "fail", "record",
+    "buy", "reward", "success", "fail", "record", "heartbeat",
   ];
   const host = mockHost(),
     audio = new GameAudio(host);

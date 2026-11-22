@@ -1367,6 +1367,42 @@ function buildRailcar(o, g) {
     }
   }
 }
+// Halfway checkpoint: a wooden arch across all three lanes with a banner and flags.
+function buildCheckpointArch(o, g) {
+  const wood = mat("#7a5233", 0.9, 0.05),
+    cloth = mat("#c2452f", 0.85, 0);
+  for (const x of [-5.4, 5.4]) {
+    box(0.5, 6.2, 0.5, wood, x, 3.1, 0, g);
+    let flag = box(0.06, 0.9, 1.3, cloth, x, 6.4, 0.65, g);
+    flag.userData.flag = true;
+  }
+  box(11.6, 0.45, 0.5, wood, 0, 5.9, 0, g);
+  const banner = new T.Mesh(
+    (geo.checkpointBanner ??= new T.PlaneGeometry(6, 1.1)),
+    (mats.checkpointBanner ??= new T.MeshStandardMaterial({
+      map: tex(
+        (c, w, h) => {
+          c.fillStyle = "#3b2416";
+          c.fillRect(0, 0, w, h);
+          c.strokeStyle = "#e7c58a";
+          c.lineWidth = 6;
+          c.strokeRect(6, 6, w - 12, h - 12);
+          c.fillStyle = "#ffe2a8";
+          c.font = "bold 44px Georgia, serif";
+          c.textAlign = "center";
+          c.textBaseline = "middle";
+          c.fillText(L("⚑ KAYIT NOKTASI"), w / 2, h / 2 + 2, w - 30);
+        },
+        512,
+        96,
+      ),
+      roughness: 0.9,
+    })),
+  );
+  banner.position.set(0, 5.15, 0.27);
+  g.add(banner);
+  glow("#ffd27a", 0, 5.2, 0.6, 5, g);
+}
 function createObject(o, tracked = true) {
   let g = new T.Group();
   const metal = mat("#607483", 0.45, 0.6);
@@ -1620,6 +1656,7 @@ function createObject(o, tracked = true) {
     g.userData.gapCover = pit;
   }
   if (o.type === "railcar") buildRailcar(o, g);
+  if (o.type === "flag") buildCheckpointArch(o, g);
   if (o.appearance === "wagon") {
     const wood = mat("#987044", 0.95, 0.05),
       rim = mat("#493d30", 0.85, 0.25),
@@ -1882,12 +1919,13 @@ function clearVisuals() {
   effects = [];
   forkVisual.visible = false;
 }
-function openMission(id, endless = false) {
+function openMission(id, endless = false, resume = null) {
   document.body.classList.remove("menu-open");
   armoryOpen = false;
   clearVisuals();
   selected = id;
   run = new Run(id, settings, Date.now() % 100000, endless);
+  if (resume) run.resumeFrom(resume.snap, resume.opts);
   let weaponScale = {
     sidearm: 1,
     burst: 1.18,
@@ -1908,6 +1946,7 @@ function openMission(id, endless = false) {
     }[run.weapon],
   );
   lastDamage = "";
+  shownHealth = shownShield = null;
   camera.position.set(0, 5.2, innerWidth < innerHeight ? 14.4 : 12);
   camera.lookAt(0, 1.8, -17);
   mode = "play";
@@ -1929,7 +1968,11 @@ function openMission(id, endless = false) {
   });
   initAmbient();
   notice(
-    id === 0
+    resume
+      ? resume.opts?.kind === "ad"
+        ? L("KALDIĞIN YERDEN DEVAM · 2 CAN")
+        : L("KAYIT NOKTASINDAN DEVAM")
+      : id === 0
       ? L("YUKARI KAYDIR: ZIPLA · SAĞ/SOL: KAÇ")
       : stageName(run.mission).toLocaleUpperCase(UPPER) +
           " · " +
@@ -1944,6 +1987,7 @@ function openMission(id, endless = false) {
 }
 function showMenu() {
   document.body.classList.add("menu-open");
+  document.body.classList.remove("last-life");
   mode = "menu";
   run = null;
   $("#fork-signs").hidden = true;
@@ -2796,6 +2840,47 @@ function results(r) {
   const adRow = $("#menu .ad-placements");
   if (adRow && retryRow?.parentNode)
     retryRow.parentNode.insertBefore(adRow, retryRow.nextSibling);
+  // Failed run: continue from the halfway checkpoint, or (YouTube only) watch an
+  // optional ad to continue from where you fell. Retrying from the start stays.
+  if (!r.success && !r.endless && retryRow?.parentNode) {
+    const canAd = rewardedAdsAvailable() && r.resumed !== "ad" && r.failSnapshot;
+    if (r.checkpoint || canAd) {
+      const row = document.createElement("div");
+      row.className = "row continue-row";
+      row.innerHTML =
+        (r.checkpoint
+          ? '<button id="fromCheckpoint" class="primary">' + L("⚑ Kayıt noktasından devam") + "</button>"
+          : "") +
+        (canAd
+          ? '<button id="adContinue">' + L("▶ Reklam izle · kaldığın yerden devam") + "</button>"
+          : "");
+      retryRow.parentNode.insertBefore(row, retryRow);
+      $("#retry").classList.remove("primary", "retry-large");
+      $("#retry").textContent = L("Baştan başla");
+      const cp = $("#fromCheckpoint");
+      if (cp)
+        cp.onclick = afterInterstitial(() =>
+          openMission(r.mission, false, { snap: r.checkpoint, opts: { kind: "checkpoint" } }),
+        );
+      const ad = $("#adContinue");
+      if (ad)
+        ad.onclick = async () => {
+          if (adBusy) return;
+          adBusy = true;
+          ad.disabled = true;
+          ad.textContent = L("Reklam yükleniyor…");
+          gameAudio.stop();
+          const res = await showRewardedAd(REWARD_IDS.continueRun);
+          adBusy = false;
+          if (res.success)
+            openMission(r.mission, false, {
+              snap: r.failSnapshot,
+              opts: { kind: "ad", health: 2, minCargo: 40, hunterBonus: 35 },
+            });
+          else ad.textContent = L("Reklam tamamlanmadı, ödül verilmedi.");
+        };
+    }
+  }
   $("#retry").onclick = afterInterstitial(() =>
     openMission(
       r.success && r.mission < 39 ? r.mission + 1 : r.mission,
@@ -2987,6 +3072,11 @@ function events() {
     }
     // The fork signs already name each route; a second banner only covered the road.
     if (e.type === "route") sfx("route");
+    if (e.type === "checkpoint") {
+      notice(L("⚑ KAYIT NOKTASI · YARI YOL"), 2);
+      sfx("reward");
+      burst(runner.position.clone().add(new T.Vector3(0, 3, -4)), "#ffd27a", 18);
+    }
     if (e.type === "route")
       notice(
         e.choice === "safe"
@@ -3022,8 +3112,7 @@ function updateHud() {
   $("#progress").style.width = run.endless
     ? "100%"
     : Math.min(100, (run.distance / run.goal) * 100) + "%";
-  $("#hp").textContent = "▰ ".repeat(Math.max(0, run.health));
-  $("#shield").textContent = L("KALKAN ") + run.shield;
+  renderVitals();
   $("#coins").textContent =
     "◈ " +
     run.coins +
@@ -3065,6 +3154,46 @@ function updateHud() {
             ? routeLabels().middle + L(" · ALTIN VE ELMAS TOPLA")
             : "",
   );
+}
+// Hearts for lives (with a break / refill animation) and a shield badge.
+const HEART =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.6-4.7-9.6-9.2C1 8.6 3.2 5 6.7 5c2 0 3.4 1.1 4.3 2.6C12 6.1 13.4 5 15.4 5c3.5 0 5.6 3.6 4.2 6.8C19.6 16.3 12 21 12 21z"/></svg>';
+const SHIELD_ICON =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.3-8 11-4.6-1.7-8-6-8-11V5z"/></svg>';
+let shownHealth = null,
+  shownShield = null,
+  heartbeatAt = 0;
+function renderVitals() {
+  const hp = Math.max(0, run.health),
+    max = 3;
+  if (hp !== shownHealth) {
+    const lost = shownHealth !== null && hp < shownHealth,
+      gained = shownHealth !== null && hp > shownHealth;
+    let html = "";
+    for (let i = 0; i < max; i++) {
+      const full = i < hp,
+        breaking = lost && i >= hp && i < shownHealth,
+        popping = gained && i >= shownHealth && i < hp;
+      html +=
+        '<i class="heart ' +
+        (full ? "full" : "empty") +
+        (breaking ? " breaking" : "") +
+        (popping ? " popping" : "") +
+        '">' +
+        HEART +
+        "</i>";
+    }
+    $("#hp").innerHTML = html;
+    $("#hp").setAttribute("aria-label", L("Can: ") + hp + "/" + max);
+    shownHealth = hp;
+  }
+  if (run.shield !== shownShield) {
+    $("#shield").innerHTML =
+      '<i class="shield-badge ' + (run.shield ? "on" : "off") + '">' + SHIELD_ICON + "</i>" + run.shield;
+    $("#shield").setAttribute("aria-label", L("Kalkan: ") + run.shield);
+    shownShield = run.shield;
+  }
+  document.body.classList.toggle("last-life", mode === "play" && hp === 1);
 }
 function syncObjects() {
   let ids = new Set();
@@ -3540,6 +3669,10 @@ function update(dt, simulate = true) {
     if (run.reload > 0 && !courier.reloading) sfx("reload");
     courier.reloading = run.reload > 0;
     gameAudio.setTension(run.mission.pursuit && run.hunter < 35);
+    if (run.health === 1 && time - heartbeatAt > 0.95) {
+      heartbeatAt = time;
+      sfx("heartbeat");
+    }
     gameAudio.setPlace(terrainAt(run.distance)?.kind === "metro" ? "mine" : "open");
   }
   runner.visible =

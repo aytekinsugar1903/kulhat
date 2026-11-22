@@ -1,5 +1,5 @@
 {
-  "initialBytes": 2365677,
+  "initialBytes": 2376773,
   "files": [
     {
       "file": "README.md",
@@ -19,11 +19,11 @@
     },
     {
       "file": "index.html",
-      "bytes": 46388
+      "bytes": 49039
     },
     {
       "file": "js/kulhat.bundle.js",
-      "bytes": 2297261
+      "bytes": 2305706
     },
     {
       "file": "js/platform.js",
@@ -39,19 +39,19 @@
     },
     {
       "file": "source/dist/audio.js",
-      "bytes": 27667
+      "bytes": 27821
     },
     {
       "file": "source/dist/core.js",
-      "bytes": 46319
+      "bytes": 49020
     },
     {
       "file": "source/dist/game.js",
-      "bytes": 118437
+      "bytes": 123517
     },
     {
       "file": "source/dist/i18n.js",
-      "bytes": 31137
+      "bytes": 31613
     },
     {
       "file": "source/dist/icon-192.png",
@@ -63,7 +63,7 @@
     },
     {
       "file": "source/dist/kulhat.html",
-      "bytes": 46458
+      "bytes": 49109
     },
     {
       "file": "source/dist/platform.js",
@@ -71,7 +71,7 @@
     },
     {
       "file": "source/dist/profile.js",
-      "bytes": 5531
+      "bytes": 5565
     },
     {
       "file": "source/dist/vendor/LICENSE-THREE.txt",
@@ -99,11 +99,11 @@
     },
     {
       "file": "source/tests/audio.test.js",
-      "bytes": 5967
+      "bytes": 5980
     },
     {
       "file": "source/tests/campaign.test.js",
-      "bytes": 12538
+      "bytes": 14881
     },
     {
       "file": "source/tests/maps.test.js",

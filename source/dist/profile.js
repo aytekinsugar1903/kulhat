@@ -139,7 +139,7 @@ export function selectCostume(settings, profile, id) {
 }
 // Ads come only from the YouTube Playables ads API (via platform.js). Outside
 // YouTube there is no ad SDK and no network call: every placement stays hidden.
-export const REWARD_IDS = { doubleGold: "kulhat-double-gold-1" };
+export const REWARD_IDS = { doubleGold: "kulhat-double-gold-1", continueRun: "kulhat-continue-1" };
 export function rewardedAdsAvailable(platform = globalThis.KULHAT_PLATFORM) {
   return !!platform?.ads?.available;
 }
