@@ -116,8 +116,10 @@ test("a full song loop schedules bass, accompaniment, lead and percussion", () =
     for (let i = 0; i < 16 * 8; i++) audio.scheduleStep(i, i * 0.15);
     const f = host.state.frequencies;
     assert(f.some((x) => x < 120), map + ": bass register");
-    assert(f.some((x) => x > 500 && x < 1500), map + ": lead register");
-    assert(host.state.starts > 250, map + ": dense enough to be music");
+    assert(f.some((x) => x > 180 && x < 1500), map + ": lead register");
+    assert(host.state.starts > 150, map + ": dense enough to be music");
+    // Strings come from cached Karplus-Strong buffers, not one buffer per note.
+    assert(audio.samples.size > 3 && audio.samples.size < 40, map + ": string cache");
     audio.stop();
   }
 });

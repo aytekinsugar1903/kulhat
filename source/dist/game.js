@@ -3540,6 +3540,7 @@ function update(dt, simulate = true) {
     if (run.reload > 0 && !courier.reloading) sfx("reload");
     courier.reloading = run.reload > 0;
     gameAudio.setTension(run.mission.pursuit && run.hunter < 35);
+    gameAudio.setPlace(terrainAt(run.distance)?.kind === "metro" ? "mine" : "open");
   }
   runner.visible =
     mode !== "play" || !run || run.inv <= 0 || Math.floor(time * 16) % 2 === 0;

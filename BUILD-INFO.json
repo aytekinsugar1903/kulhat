@@ -1,5 +1,5 @@
 {
-  "initialBytes": 2359298,
+  "initialBytes": 2365677,
   "files": [
     {
       "file": "README.md",
@@ -23,7 +23,7 @@
     },
     {
       "file": "js/kulhat.bundle.js",
-      "bytes": 2290882
+      "bytes": 2297261
     },
     {
       "file": "js/platform.js",
@@ -39,7 +39,7 @@
     },
     {
       "file": "source/dist/audio.js",
-      "bytes": 21373
+      "bytes": 27667
     },
     {
       "file": "source/dist/core.js",
@@ -47,7 +47,7 @@
     },
     {
       "file": "source/dist/game.js",
-      "bytes": 118352
+      "bytes": 118437
     },
     {
       "file": "source/dist/i18n.js",
@@ -99,7 +99,7 @@
     },
     {
       "file": "source/tests/audio.test.js",
-      "bytes": 5799
+      "bytes": 5967
     },
     {
       "file": "source/tests/campaign.test.js",

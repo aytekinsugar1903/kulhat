@@ -77940,6 +77940,9 @@ class GameAudio {
     this.voices = new Set();
     this.coinStreak = 0;
     this.lastCoin = -1;
+    this.samples = new Map();
+    this.place = "open";
+    this.stepSide = 1;
   }
 
   // ------------------------------------------------------------------ setup
@@ -77968,6 +77971,9 @@ class GameAudio {
         this.sfxBus = ctx.createGain();
         this.sfxBus.gain.value = 0.8;
         this.sfxBus.connect(this.out);
+        this.ambBus = ctx.createGain();
+        this.ambBus.gain.value = 0.22;
+        this.ambBus.connect(this.out);
         this.noise = this.makeNoise();
         this.reverb = this.makeReverb();
       }
@@ -78084,7 +78090,7 @@ class GameAudio {
     return o;
   }
   // Filtered noise burst; `sweep` moves the filter from f to sweep.
-  hiss(t, dur, peak, { type = "bandpass", f = 1000, q = 1, sweep, attack = 0.003, bus = this.sfxBus, wet = 0 } = {}) {
+  hiss(t, dur, peak, { type = "bandpass", f = 1000, q = 1, sweep, attack = 0.003, bus = this.sfxBus, wet = 0, pan = 0 } = {}) {
     if (!this.noise) return;
     const ctx = this.context,
       src = ctx.createBufferSource(),
@@ -78095,7 +78101,7 @@ class GameAudio {
     this.env(g, t, attack, peak, dur);
     src.connect(flt);
     flt.connect(g);
-    this.send(g, bus, wet);
+    this.send(this.pan(g, pan), bus, wet);
     const offset = ((this.step * 0.137) % 1) * 0.5;
     this.voices.add(src);
     src.onended = () => {
@@ -78113,29 +78119,121 @@ class GameAudio {
     this.osc("sine", from, t, dur, peak, { attack: 0.002, to, glide: dur * 0.7, bus });
   }
 
-  // ------------------------------------------------------------ instruments
-  pluck(t, f, dur, peak, bright = 1, bus = this.musicBus, wet = 0.12) {
-    const ctx = this.context,
-      o = ctx.createOscillator(),
-      o2 = ctx.createOscillator(),
-      flt = this.filter("lowpass", Math.min(12000, f * 9 * bright), 1.2),
-      g = ctx.createGain();
-    o.type = "sawtooth";
-    o2.type = "triangle";
-    o.frequency.setValueAtTime(f, t);
-    o2.frequency.setValueAtTime(f * 1.003, t);
-    flt.frequency.exponentialRampToValueAtTime(Math.max(f * 1.2, 200), t + dur * 0.5);
-    this.env(g, t, 0.003, peak, dur);
-    o.connect(flt);
-    o2.connect(flt);
-    flt.connect(g);
-    this.send(g, bus, wet);
-    this.track(o, [t, t + dur + 0.05], flt, g);
-    this.track(o2, [t, t + dur + 0.05]);
+  // Optional stereo placement (-1 left … 1 right).
+  pan(node, value) {
+    if (!value || !this.context.createStereoPanner) return node;
+    const p = this.context.createStereoPanner();
+    p.pan.value = Math.max(-1, Math.min(1, value));
+    node.connect(p);
+    return p;
   }
+  // Play a pre-rendered mono buffer through a gain envelope.
+  play(buf, t, peak, { bus = this.sfxBus, wet = 0, pan = 0, rate = 1, dur, lp } = {}) {
+    if (!buf) return;
+    const ctx = this.context,
+      src = ctx.createBufferSource(),
+      g = ctx.createGain();
+    src.buffer = buf;
+    if (src.playbackRate) src.playbackRate.value = rate;
+    const len = dur ?? (buf.duration || 1) / rate;
+    g.gain.setValueAtTime(peak, t);
+    g.gain.setValueAtTime(peak, t + Math.max(0.01, len - 0.04));
+    g.gain.linearRampToValueAtTime(0.0001, t + len);
+    let head = src;
+    if (lp) {
+      const f = this.filter("lowpass", lp);
+      src.connect(f);
+      head = f;
+    }
+    head.connect(g);
+    this.send(this.pan(g, pan), bus, wet);
+    this.track(src, [t, t + len + 0.02], g);
+  }
+  // Karplus-Strong plucked string, rendered once per pitch/timbre and cached.
+  // bright 0…1 = pick brightness, t60 = seconds to fade by 60 dB.
+  string(freq, { bright = 0.6, t60 = 1.2, len = 1.4 } = {}) {
+    const key = [Math.round(freq * 10), bright, t60, len].join();
+    if (this.samples.has(key)) return this.samples.get(key);
+    const ctx = this.context;
+    if (!ctx.createBuffer) return null;
+    const sr = ctx.sampleRate || 44100,
+      n = Math.floor(sr * len),
+      buf = ctx.createBuffer(1, n, sr),
+      out = buf.getChannelData?.(0);
+    if (!out) return null;
+    const period = Math.max(2, Math.round(sr / freq)),
+      line = new Float32Array(period),
+      decay = Math.pow(0.001, 1 / (t60 * freq));
+    let seed = Math.round(freq * 977) >>> 0,
+      prev = 0;
+    for (let i = 0; i < period; i++) {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      const noise = seed / 2147483648 - 1;
+      prev += (0.15 + bright * 0.85) * (noise - prev);
+      line[i] = prev;
+    }
+    let idx = 0,
+      peak = 0;
+    for (let i = 0; i < n; i++) {
+      const cur = line[idx],
+        next = line[(idx + 1) % period];
+      line[idx] = decay * 0.5 * (cur + next);
+      out[i] = cur;
+      peak = Math.max(peak, Math.abs(cur));
+      idx = (idx + 1) % period;
+    }
+    const norm = peak > 0 ? 0.8 / peak : 1;
+    for (let i = 0; i < n; i++) out[i] *= norm;
+    this.samples.set(key, buf);
+    return buf;
+  }
+  // Layered gunshot: sharp crack, chesty body, low thump, dusty tail.
+  gunBuffer(kind) {
+    const key = "gun:" + kind;
+    if (this.samples.has(key)) return this.samples.get(key);
+    const ctx = this.context;
+    if (!ctx.createBuffer) return null;
+    const sr = ctx.sampleRate || 44100,
+      n = Math.floor(sr * 0.7),
+      buf = ctx.createBuffer(1, n, sr),
+      out = buf.getChannelData?.(0);
+    if (!out) return null;
+    const heavy = kind === "heavy",
+      light = kind === "light";
+    let seed = heavy ? 71 : light ? 37 : 53,
+      body = 0,
+      tail = 0,
+      peak = 0;
+    for (let i = 0; i < n; i++) {
+      const t = i / sr;
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      const noise = seed / 2147483648 - 1;
+      body += 0.08 * (noise - body);
+      tail += 0.025 * (noise - tail);
+      const crack = noise * Math.exp(-t / (light ? 0.004 : 0.007)),
+        chest = body * 3 * Math.exp(-t / (heavy ? 0.09 : light ? 0.035 : 0.06)),
+        thump = Math.sin(2 * Math.PI * (heavy ? 70 : 95) * t * (1 - t * 2)) * Math.exp(-t / (heavy ? 0.08 : 0.05)),
+        dust = tail * 2.2 * Math.exp(-t / (light ? 0.12 : 0.22));
+      out[i] = crack * 0.9 + chest + thump * (heavy ? 0.9 : 0.6) + dust;
+      peak = Math.max(peak, Math.abs(out[i]));
+    }
+    const norm = peak > 0 ? 0.95 / peak : 1;
+    for (let i = 0; i < n; i++) out[i] *= norm;
+    this.samples.set(key, buf);
+    return buf;
+  }
+
+  // ------------------------------------------------------------ instruments
+  // Plucked string (guitar / banjo) from the Karplus-Strong cache.
+  pluck(t, f, dur, peak, bright = 1, bus = this.musicBus, wet = 0.12, pan = 0) {
+    const buf = this.string(f, { bright: Math.min(1, 0.35 + bright * 0.4), t60: Math.max(0.4, dur * 2.5), len: Math.min(2, dur + 0.6) });
+    if (buf) this.play(buf, t, peak * 3, { bus, wet, pan, dur: dur + 0.25, lp: 7000 });
+  }
+  // Upright-bass pluck: dark string plus a little sine weight underneath.
   bassNote(t, f, dur, peak) {
-    this.osc("triangle", f, t, dur, peak, { attack: 0.006, bus: this.musicBus, lp: 500 });
-    this.osc("sine", f / 2, t, dur * 0.8, peak * 0.6, { attack: 0.006, bus: this.musicBus });
+    const buf = this.string(f, { bright: 0.25, t60: 1.6, len: 1.2 });
+    if (buf) this.play(buf, t, peak * 2.4, { bus: this.musicBus, dur: dur + 0.2, lp: 900 });
+    this.osc("sine", f, t, dur * 0.7, peak * 0.35, { attack: 0.006, bus: this.musicBus });
   }
   // Whistled lead: sine with a pitch scoop, delayed vibrato and breath.
   whistle(t, f, dur, peak) {
@@ -78194,7 +78292,7 @@ class GameAudio {
     this.osc("sine", f * 0.5, t, 0.05, peak * 0.6, { attack: 0.001, bus });
   }
   shaker(t, peak) {
-    this.hiss(t, 0.05, peak, { type: "highpass", f: 6500, q: 0.7, bus: this.musicBus, attack: 0.008 });
+    this.hiss(t, 0.05, peak, { type: "highpass", f: 6500, q: 0.7, bus: this.musicBus, attack: 0.008, pan: 0.4 });
   }
   kick(t, peak) {
     this.thud(t, 130, 42, 0.22, peak, this.musicBus);
@@ -78211,8 +78309,10 @@ class GameAudio {
     if (this.timer) return;
     this.step = 0;
     this.next = this.now + 0.06;
+    this.startAmbience();
     const tick = () => {
       if (!this.playing || this.muted || !this.context) return;
+      this.ambienceTick();
       while (this.next < this.now + 0.14) {
         this.scheduleStep(this.step, this.next);
         this.step++;
@@ -78235,7 +78335,7 @@ class GameAudio {
       if (s % 8 === 0) this.woodblock(t, 900, 0.16);
       if (s % 8 === 3) this.woodblock(t, 1300, 0.1);
       if (s % 8 === 4) this.woodblock(t, 1100, 0.13);
-      if (s % 2 === 1) this.shaker(t, this.tension ? 0.06 : 0.035);
+      if (s % 2 === 1) this.shaker(t, this.tension ? 0.075 : 0.05);
       if (s === 0 || s === 8) this.kick(t, 0.32);
     } else {
       // Train beat: brushed 8ths with an accent on 2 and 4.
@@ -78252,12 +78352,12 @@ class GameAudio {
     if (western) {
       // Off-beat strums with a light gallop between them.
       if (s === 4 || s === 12)
-        chord.forEach((n, k) => this.pluck(t + k * 0.012, midi(n), 0.32, 0.075, 1));
-      if (s === 6 || s === 14) this.pluck(t, midi(chord[0] + 12), 0.12, 0.04, 0.6);
+        chord.forEach((n, k) => this.pluck(t + k * 0.014, midi(n), 0.45, 0.07, 1.25, this.musicBus, 0.15, -0.35));
+      if (s === 6 || s === 14) this.pluck(t, midi(chord[0] + 12), 0.15, 0.035, 0.5, this.musicBus, 0.1, -0.35);
     } else if (s % 2 === 0) {
       // Banjo-style roll over the chord.
       const roll = [chord[0] + 12, chord[1] + 12, chord[2] + 12, chord[1] + 12];
-      this.pluck(t, midi(roll[(s / 2) % 4]), 0.26, 0.085, 1.6);
+      this.pluck(t, midi(roll[(s / 2) % 4]), 0.3, 0.075, 1.6, this.musicBus, 0.12, 0.35);
     }
     // Lead: rests every third loop so the groove can breathe.
     if (loop % 3 !== 2)
@@ -78271,8 +78371,65 @@ class GameAudio {
   setTension(on) {
     this.tension = !!on;
   }
+  // Background bed under the music: desert wind outdoors, rumble and drips in the mine.
+  setPlace(place) {
+    if (place === this.place) return;
+    this.place = place;
+    if (this.ambFilter && this.context) {
+      const t = this.now,
+        mine = place === "mine";
+      this.ambFilter.type = mine ? "lowpass" : "bandpass";
+      this.ambFilter.frequency.setTargetAtTime?.(mine ? 220 : 650, t, 0.4);
+    }
+  }
+  startAmbience() {
+    if (this.ambSource || !this.noise) return;
+    const ctx = this.context,
+      src = ctx.createBufferSource(),
+      flt = this.filter(this.place === "mine" ? "lowpass" : "bandpass", this.place === "mine" ? 220 : 650, 0.6),
+      g = ctx.createGain();
+    src.buffer = this.noise;
+    src.loop = true;
+    g.gain.value = 0.0001;
+    g.gain.setValueAtTime(0.0001, this.now);
+    g.gain.linearRampToValueAtTime(0.5, this.now + 1.5);
+    src.connect(flt);
+    flt.connect(g);
+    g.connect(this.ambBus);
+    this.ambSource = src;
+    this.ambFilter = flt;
+    this.ambGain = g;
+    this.nextGust = this.now + 1;
+    this.voices.add(src);
+    src.onended = () => {
+      this.voices.delete(src);
+      try {
+        src.disconnect();
+        flt.disconnect();
+        g.disconnect();
+      } catch {}
+    };
+    src.start(this.now);
+  }
+  ambienceTick() {
+    if (!this.ambGain) return;
+    const t = this.now;
+    if (t < this.nextGust) return;
+    const mine = this.place === "mine";
+    // Wind gusts swell and fall; the mine gets a steadier rumble and the odd drip.
+    const level = mine ? 0.35 + Math.random() * 0.2 : 0.25 + Math.random() * 0.75,
+      span = 1.2 + Math.random() * 2.5;
+    this.ambGain.gain.linearRampToValueAtTime(level, t + span);
+    if (mine && Math.random() < 0.7) {
+      const at = t + Math.random() * span,
+        f = 1400 + Math.random() * 900;
+      this.osc("sine", f, at, 0.09, 0.05, { to: f * 0.6, glide: 0.07, bus: this.ambBus, wet: 0.9 });
+    }
+    this.nextGust = t + span;
+  }
   stop() {
     this.playing = false;
+    this.ambSource = this.ambFilter = this.ambGain = null;
     if (this.timer) this.host.clearInterval(this.timer);
     this.timer = null;
     for (const v of this.voices) {
@@ -78319,12 +78476,16 @@ class GameAudio {
     if (surface === "wood") this.woodblock(t, 420, 0.3, this.sfxBus);
   }
   fx_step(t, { surface } = {}) {
+    this.stepSide = -this.stepSide;
+    const pan = this.stepSide * 0.12;
     if (surface === "wood") {
-      this.woodblock(t, 380 + Math.random() * 60, 0.14, this.sfxBus);
-      this.thud(t, 90, 50, 0.06, 0.12);
+      this.hiss(t, 0.03, 0.1, { f: 420 + Math.random() * 80, q: 6, pan });
+      this.thud(t, 95, 50, 0.07, 0.11);
     } else {
-      this.hiss(t, 0.05, 0.1, { type: "bandpass", f: 700 + Math.random() * 300, q: 0.9 });
-      this.thud(t, 80, 45, 0.05, 0.12);
+      // Boot on packed dirt: a soft crunch with a little grit on top.
+      this.hiss(t, 0.06, 0.07, { type: "bandpass", f: 600 + Math.random() * 250, q: 1.1, pan });
+      this.hiss(t + 0.01, 0.04, 0.025, { type: "highpass", f: 3500, pan });
+      this.thud(t, 75, 45, 0.05, 0.09);
     }
   }
   fx_slide(t) {
@@ -78337,9 +78498,10 @@ class GameAudio {
     this.coinStreak = now - this.lastCoin < 0.45 ? Math.min(8, this.coinStreak + 1) : 0;
     this.lastCoin = now;
     const base = midi(88 + [0, 2, 4, 5, 7, 9, 11, 12, 14][this.coinStreak]);
-    this.osc("triangle", base, t, 0.07, 0.16);
-    this.osc("triangle", base * 1.5, t + 0.055, 0.22, 0.13);
-    this.osc("sine", base * 4, t + 0.055, 0.12, 0.04);
+    this.osc("triangle", base, t, 0.07, 0.14);
+    // Second hit rings with inharmonic partials, like a real coin.
+    for (const [m, a] of [[1.5, 0.12], [3.76, 0.035], [5.4, 0.02]])
+      this.osc("sine", base * m, t + 0.055, 0.3, a, { wet: 0.15 });
   }
   fx_gem(t) {
     [84, 88, 91, 96].forEach((n, k) => {
@@ -78374,12 +78536,12 @@ class GameAudio {
       this.thud(t, 140, 50, 0.12, 0.4);
       return;
     }
-    const heavy = weapon === "storm",
-      light = weapon === "repeater" || weapon === "burst";
-    // Revolver crack: sharp noise transient, body thump and a canyon tail.
-    this.hiss(t, light ? 0.06 : 0.1, light ? 0.45 : 0.6, { type: "bandpass", f: heavy ? 1200 : 1900, q: 0.6, attack: 0.001, wet: 0.35 });
-    this.hiss(t, 0.03, 0.4, { type: "highpass", f: 3500, attack: 0.0005 });
-    this.thud(t, heavy ? 170 : 150, 55, heavy ? 0.14 : 0.08, heavy ? 0.5 : 0.35);
+    const kind = weapon === "storm" ? "heavy" : weapon === "repeater" || weapon === "burst" ? "light" : "normal";
+    // Small random pitch keeps rapid fire from sounding like one sample on repeat.
+    this.play(this.gunBuffer(kind), t, kind === "light" ? 0.5 : 0.65, {
+      wet: 0.45,
+      rate: 0.93 + Math.random() * 0.14,
+    });
   }
   fx_reload(t) {
     this.woodblock(t, 2400, 0.12, this.sfxBus);
@@ -84312,6 +84474,7 @@ function update(dt, simulate = true) {
     if (run.reload > 0 && !courier.reloading) sfx("reload");
     courier.reloading = run.reload > 0;
     gameAudio.setTension(run.mission.pursuit && run.hunter < 35);
+    gameAudio.setPlace(terrainAt(run.distance)?.kind === "metro" ? "mine" : "open");
   }
   runner.visible =
     mode !== "play" || !run || run.inv <= 0 || Math.floor(time * 16) % 2 === 0;
