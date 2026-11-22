@@ -315,7 +315,8 @@ const suit = mat("#174c5c", 0.5, 0.15).clone(),
   boot = mat("#253040");
 const courier = V.buildCourier(body, suit, armor, accent);
 const { arms, legs, weapon, head, torso } = courier;
-const muzzleFlash = glow("#ffce6c", 0.55, 1.27, -0.95, 1.7, body);
+// The flash rides on the revolver muzzle, which moves with the aiming arm.
+const muzzleFlash = glow("#ffce6c", 0, 0, 0, 1.7, courier.muzzle);
 muzzleFlash.visible = false;
 let shieldBubble = new T.Mesh(
   new T.SphereGeometry(1.5, 20, 16),
@@ -2632,7 +2633,7 @@ function events() {
     if (e.type === "slide") sound(180);
     if (e.type === "fire") {
       sound(900, 0.05, "triangle");
-      arms[1].rotation.x = -1.3;
+      courier.fireAt = time;
       muzzleFlash.userData.until = time + 0.1;
     }
     if (e.type === "coin") {
@@ -3268,27 +3269,19 @@ function update(dt, simulate = true) {
     py = (run?.y || 0) + groundAt(run?.distance || 0),
     offset = run?.offset || 0;
   runner.position.set(px + offset, py, 3);
-  body.scale.y = T.MathUtils.damp(
-    body.scale.y,
-    run?.slide > 0 ? 0.43 : 1,
-    16,
-    dt,
-  );
-  body.rotation.z = T.MathUtils.damp(
-    body.rotation.z,
-    run ? (run.lane * 3.2 - run.x) * -0.06 : 0,
-    8,
-    dt,
-  );
-  let cycle = time * (mode === "play" ? run.speed * 0.8 : 4),
-    stride = mode === "play" ? 0.85 : 0.05;
-  legs[0].rotation.x = Math.sin(cycle) * stride;
-  legs[1].rotation.x = -legs[0].rotation.x;
-  arms[0].rotation.x = -legs[0].rotation.x * 0.7;
-  arms[1].rotation.x = T.MathUtils.damp(
-    arms[1].rotation.x,
-    holding ? -1.15 : legs[0].rotation.x * 0.6,
-    10,
+  V.animateCourier(
+    courier,
+    body,
+    {
+      mode,
+      time,
+      speed: run?.speed || 0,
+      y: run?.y || 0,
+      vy: run?.vy || 0,
+      slide: run?.slide || 0,
+      holding,
+      lean: run ? (run.lane * 3.2 - run.x) * -0.06 : 0,
+    },
     dt,
   );
   runner.visible =

@@ -1,5 +1,5 @@
 {
-  "initialBytes": 2314346,
+  "initialBytes": 2319859,
   "files": [
     {
       "file": "README.md",
@@ -23,7 +23,7 @@
     },
     {
       "file": "js/kulhat.bundle.js",
-      "bytes": 2248087
+      "bytes": 2253600
     },
     {
       "file": "js/platform.js",
@@ -43,7 +43,7 @@
     },
     {
       "file": "source/dist/game.js",
-      "bytes": 107874
+      "bytes": 107601
     },
     {
       "file": "source/dist/i18n.js",

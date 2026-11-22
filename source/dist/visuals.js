@@ -585,45 +585,68 @@ export function buildCourier(body, suit, armor, accent) {
   const skin = m("#c98d63", { rough: 0.7 }),
     leather = m("#5a3a26", { rough: 0.75 }),
     hatM = m("#6b4428", { rough: 0.85 }),
+    hair = m("#3b2516", { rough: 0.9 }),
     denim = m("#3d4d63", { rough: 0.9 }),
     bootM = m("#3a2619", { rough: 0.6 }),
     brass = m("#d6a24a", { metal: 0.8, rough: 0.35 }),
     glowM = m("#ffd27a", { emissive: "#ffae3d", ei: 1.6, rough: 0.4 });
-  const add = (geo, material, x, y, z, parent = body) => {
+  const add = (geo, material, x, y, z, parent) => {
     const o = new T.Mesh(geo, material);
     o.position.set(x, y, z);
     o.castShadow = true;
     parent.add(o);
     return o;
   };
+  const group = (parent, x = 0, y = 0, z = 0) => {
+    const g = new T.Group();
+    g.position.set(x, y, z);
+    parent.add(g);
+    return g;
+  };
+  // Rig: body (feet) → hips (bob) → chest (lean/twist, pivots at the hip joint).
+  // `upper` undoes the hip height so upper-body parts keep model-space coordinates.
+  const HIP = 1.05;
+  const hips = group(body),
+    chest = group(hips, 0, HIP, 0),
+    upper = group(chest, 0, -HIP, 0);
   // Torso: duster coat over a vest.
-  const torso = add(new T.CapsuleGeometry(0.42, 0.55, 4, 10), suit, 0, 1.55, 0);
+  const torso = add(new T.CapsuleGeometry(0.42, 0.55, 4, 10), suit, 0, 1.55, 0, upper);
   torso.scale.set(1.05, 1, 0.78);
-  add(new T.CapsuleGeometry(0.36, 0.5, 4, 10), armor, 0, 1.6, -0.12).scale.set(0.95, 1, 0.6);
-  // Coat tails flaring behind (the camera sees the back).
+  add(new T.CapsuleGeometry(0.36, 0.5, 4, 10), armor, 0, 1.6, -0.12, upper).scale.set(0.95, 1, 0.6);
+  // Shoulder cape: gives the back a readable western silhouette.
+  const cape = add(new T.CylinderGeometry(0.36, 0.62, 0.34, 14, 1, true), suit, 0, 1.94, 0.02, upper);
+  cape.material = suit;
+  cape.scale.z = 0.8;
+  // Coat tails hinge at the waist so they can flap behind a running courier.
+  const tails = [];
   for (const s of [-1, 1]) {
-    const tail = add(new T.BoxGeometry(0.42, 0.95, 0.08), suit, s * 0.22, 0.95, 0.28);
-    tail.rotation.set(0.28, 0, s * 0.12);
+    const hinge = group(upper, s * 0.2, 1.38, 0.26);
+    const tail = add(new T.BoxGeometry(0.42, 0.95, 0.07), suit, 0, -0.46, 0, hinge);
+    tail.rotation.z = s * 0.1;
+    hinge.userData.side = s;
+    tails.push(hinge);
   }
   // Belt + buckle + holster
-  add(new T.CylinderGeometry(0.43, 0.43, 0.12, 14), leather, 0, 1.12, 0).scale.z = 0.8;
-  add(new T.BoxGeometry(0.16, 0.12, 0.05), brass, 0, 1.12, -0.35);
-  // Cargo satchel with a glowing seal.
-  add(new T.BoxGeometry(0.62, 0.5, 0.32), leather, 0, 1.6, 0.42);
-  add(new T.BoxGeometry(0.64, 0.12, 0.34), accent, 0, 1.78, 0.42);
-  add(new T.SphereGeometry(0.08, 10, 8), glowM, 0, 1.62, 0.6);
-  for (const s of [-1, 1]) add(new T.BoxGeometry(0.08, 0.7, 0.06), leather, s * 0.24, 1.75, 0.18).rotation.x = -0.3;
-  // Head, bandana, hat
-  const head = add(new T.SphereGeometry(0.3, 14, 12), skin, 0, 2.2, -0.02);
+  add(new T.CylinderGeometry(0.43, 0.43, 0.12, 14), leather, 0, 1.12, 0, upper).scale.z = 0.8;
+  add(new T.BoxGeometry(0.16, 0.12, 0.05), brass, 0, 1.12, -0.35, upper);
+  add(new T.BoxGeometry(0.14, 0.3, 0.12), leather, 0.4, 1.0, 0.05, upper);
+  // Cargo satchel with a glowing seal and crossed straps.
+  add(new T.BoxGeometry(0.62, 0.5, 0.32), leather, 0, 1.6, 0.42, upper);
+  add(new T.BoxGeometry(0.64, 0.12, 0.34), accent, 0, 1.78, 0.42, upper);
+  add(new T.SphereGeometry(0.08, 10, 8), glowM, 0, 1.62, 0.6, upper);
+  for (const s of [-1, 1]) add(new T.BoxGeometry(0.08, 0.7, 0.06), leather, s * 0.24, 1.75, 0.18, upper).rotation.x = -0.3;
+  // Head: neck, face, bandana, hair, hat.
+  const headPivot = group(upper, 0, 1.98, 0);
+  add(new T.CylinderGeometry(0.17, 0.2, 0.18, 10), skin, 0, -0.03, 0, headPivot);
+  const head = add(new T.SphereGeometry(0.3, 14, 12), skin, 0, 0.22, -0.02, headPivot);
   head.scale.set(0.95, 1.05, 0.95);
-  // Bandana covers only the face; the back of the head shows hair under the hat.
-  add(new T.CylinderGeometry(0.31, 0.27, 0.24, 14, 1, true, Math.PI / 2, Math.PI), armor, 0, 2.08, -0.03).material.side = T.DoubleSide;
-  add(new T.SphereGeometry(0.31, 12, 8, Math.PI * 1.5, Math.PI, 0, Math.PI * 0.62), m("#3b2516", { rough: 0.9 }), 0, 2.22, 0.0);
-  add(new T.CylinderGeometry(0.17, 0.2, 0.18, 10), skin, 0, 1.95, 0);
-  const hat = new T.Group();
-  hat.position.set(0, 2.42, -0.02);
+  add(new T.CylinderGeometry(0.31, 0.27, 0.24, 14, 1, true, Math.PI / 2, Math.PI), armor, 0, 0.1, -0.03, headPivot).material.side = T.DoubleSide;
+  add(new T.SphereGeometry(0.31, 12, 8, Math.PI * 1.5, Math.PI, 0, Math.PI * 0.62), hair, 0, 0.24, 0.0, headPivot);
+  // Short ponytail under the hat: moves with the run and reads from behind.
+  const pony = group(headPivot, 0, 0.2, 0.27);
+  add(new T.CapsuleGeometry(0.07, 0.22, 3, 6), hair, 0, -0.14, 0.03, pony);
+  const hat = group(headPivot, 0, 0.44, -0.02);
   hat.rotation.x = -0.08;
-  body.add(hat);
   const brim = add(new T.CylinderGeometry(0.62, 0.62, 0.05, 20), hatM, 0, 0, 0, hat);
   brim.scale.z = 0.9;
   add(new T.TorusGeometry(0.58, 0.05, 6, 20), hatM, 0, 0.03, 0, hat).rotation.x = Math.PI / 2;
@@ -631,32 +654,148 @@ export function buildCourier(body, suit, armor, accent) {
   crown.scale.z = 0.92;
   add(new T.CylinderGeometry(0.335, 0.335, 0.08, 14), accent, 0, 0.07, 0, hat).scale.z = 0.92;
   add(new T.SphereGeometry(0.26, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2), hatM, 0, 0.36, 0, hat).scale.set(1, 0.35, 0.92);
-  const arms = [],
-    legs = [];
-  for (const s of [-1, 1]) {
-    const leg = new T.Group();
-    leg.position.set(s * 0.2, 1.05, 0);
-    add(new T.CapsuleGeometry(0.13, 0.45, 3, 8), denim, 0, -0.28, 0, leg);
-    add(new T.CapsuleGeometry(0.12, 0.35, 3, 8), denim, 0, -0.68, 0.02, leg);
-    add(new T.CylinderGeometry(0.15, 0.14, 0.32, 10), bootM, 0, -0.82, 0.02, leg);
-    add(new T.BoxGeometry(0.24, 0.12, 0.42), bootM, 0, -0.98, -0.08, leg);
-    add(new T.TorusGeometry(0.05, 0.015, 4, 8), brass, 0, -0.95, 0.18, leg).rotation.y = Math.PI / 2;
-    body.add(leg);
-    legs.push(leg);
-    const arm = new T.Group();
-    arm.position.set(s * 0.5, 1.92, 0);
-    add(new T.CapsuleGeometry(0.12, 0.38, 3, 8), suit, 0, -0.25, 0, arm).rotation.z = s * 0.1;
-    add(new T.CapsuleGeometry(0.1, 0.3, 3, 8), suit, 0, -0.6, -0.03, arm);
-    add(new T.SphereGeometry(0.11, 8, 6), leather, 0, -0.82, -0.04, arm);
-    body.add(arm);
-    arms.push(arm);
+  // Scarf: a short chain behind the neck in the accent colour, the most visible
+  // moving part from the chase camera.
+  const scarf = [];
+  let link = group(headPivot, 0, 0.0, 0.2);
+  add(new T.SphereGeometry(0.14, 10, 8), accent, 0, 0, -0.02, link).scale.set(1.6, 0.7, 0.9);
+  for (let i = 0; i < 4; i++) {
+    const seg = group(link, 0, 0, i === 0 ? 0.06 : 0.2);
+    add(new T.BoxGeometry(0.26 - i * 0.03, 0.07, 0.24), accent, 0, 0, 0.1, seg);
+    scarf.push(seg);
+    link = seg;
   }
-  // Revolver: grip, cylinder, long barrel. weapon = barrel mesh (game.js tints it per gun).
-  const weapon = add(new T.CylinderGeometry(0.055, 0.055, 0.62, 10), m("#59656e", { metal: 0.8, rough: 0.3 }).clone(), 0.55, 1.27, -0.55);
-  weapon.rotation.x = Math.PI / 2;
-  add(new T.CylinderGeometry(0.11, 0.11, 0.16, 8), m("#3f454a", { metal: 0.85, rough: 0.3 }), 0.55, 1.27, -0.22).rotation.x = Math.PI / 2;
-  add(new T.BoxGeometry(0.1, 0.28, 0.14), m("#6e432a", { rough: 0.6 }), 0.55, 1.12, -0.1).rotation.x = 0.35;
-  return { arms, legs, weapon, head, torso };
+  const arms = [],
+    legs = [],
+    knees = [],
+    elbows = [];
+  for (const s of [-1, 1]) {
+    // Leg: hip joint → thigh → knee joint → shin + boot.
+    const leg = group(hips, s * 0.2, HIP, 0);
+    add(new T.CapsuleGeometry(0.135, 0.4, 3, 8), denim, 0, -0.25, 0, leg);
+    const knee = group(leg, 0, -0.5, 0);
+    add(new T.CapsuleGeometry(0.12, 0.3, 3, 8), denim, 0, -0.17, 0.01, knee);
+    add(new T.CylinderGeometry(0.15, 0.14, 0.3, 10), bootM, 0, -0.3, 0.02, knee);
+    add(new T.BoxGeometry(0.24, 0.12, 0.42), bootM, 0, -0.47, -0.08, knee);
+    add(new T.TorusGeometry(0.05, 0.015, 4, 8), brass, 0, -0.44, 0.18, knee).rotation.y = Math.PI / 2;
+    legs.push(leg);
+    knees.push(knee);
+    // Arm: shoulder → upper arm → elbow → forearm + glove.
+    const arm = group(upper, s * 0.5, 1.9, 0);
+    add(new T.CapsuleGeometry(0.12, 0.3, 3, 8), suit, 0, -0.2, 0, arm);
+    const elbow = group(arm, 0, -0.42, 0);
+    add(new T.CapsuleGeometry(0.1, 0.26, 3, 8), suit, 0, -0.16, 0, elbow);
+    add(new T.SphereGeometry(0.11, 8, 6), leather, 0, -0.38, 0, elbow);
+    arms.push(arm);
+    elbows.push(elbow);
+  }
+  // Revolver in the right glove, barrel continuing the forearm line so that
+  // raising the arm points it down the street. weapon = barrel (game.js tints it).
+  const gun = group(elbows[1], 0, -0.4, -0.02);
+  add(new T.BoxGeometry(0.1, 0.12, 0.24), m("#6e432a", { rough: 0.6 }), 0, 0.02, 0.06, gun);
+  add(new T.CylinderGeometry(0.1, 0.1, 0.15, 8), m("#3f454a", { metal: 0.85, rough: 0.3 }), 0, -0.1, 0, gun);
+  const weapon = add(new T.CylinderGeometry(0.05, 0.05, 0.5, 10), m("#59656e", { metal: 0.8, rough: 0.3 }).clone(), 0, -0.4, 0, gun);
+  const muzzle = group(gun, 0, -0.7, 0);
+  return {
+    arms, legs, knees, elbows, weapon, head, torso,
+    hips, chest, headPivot, hat, tails, scarf, pony, muzzle,
+    phase: 0, squash: 0, wasAir: false, fireAt: -9,
+  };
+}
+
+// Pose the courier for this frame. Presentation only: the simulation never reads
+// any of it. `st` = {mode, time, speed, y, vy, slide, holding, lean}.
+export function animateCourier(c, body, st, dt) {
+  const k = 1 - Math.exp(-16 * dt),
+    soft = 1 - Math.exp(-7 * dt);
+  const to = (o, key, v, f = k) => (o[key] += (v - o[key]) * f);
+  const running = st.mode === "play",
+    air = running && st.y > 0.05,
+    slide = running && st.slide > 0,
+    aiming = running && (st.holding || st.time - c.fireAt < 0.35);
+  if (running) c.phase += dt * Math.min(15, Math.max(9, (st.speed || 20) * 0.6));
+  else c.phase += dt * 1.6;
+  if (c.wasAir && !air && running) c.squash = 1;
+  c.wasAir = air;
+  c.squash = Math.max(0, c.squash - dt * 5);
+  const p = c.phase,
+    s = Math.sin(p),
+    co = Math.cos(p);
+  // Targets for each joint; positive x rotation swings a limb forward.
+  let thigh = [0, 0], knee = [-0.05, -0.05], shoulder = [0.05, 0.05], elbow = [0.2, 0.2],
+    hipY = 0, chestX = 0, chestY = 0, bodyX = 0, bodyZ = 0, spread = 0;
+  if (!running) {
+    // Idle: relaxed stance with breathing.
+    const b = Math.sin(st.time * 1.8);
+    hipY = b * 0.012;
+    chestX = -0.03 + b * 0.015;
+    shoulder = [0.05 + b * 0.03, 0.05 - b * 0.03];
+    elbow = [0.25, 0.25];
+    knee = [-0.08, -0.08];
+    thigh = [0.04, 0.04];
+  } else if (slide) {
+    // Baseball slide: lean back on the trailing leg, lead leg forward.
+    bodyX = 0.95;
+    hipY = -0.08;
+    chestX = -0.55;
+    thigh = [1.55, 0.75];
+    knee = [-0.1, -1.7];
+    shoulder = [-0.9, 0.6];
+    elbow = [0.1, 0.9];
+    spread = 0.35;
+  } else if (air) {
+    // Tuck on the way up, reach for the ground on the way down.
+    const rising = (st.vy || 0) > 0;
+    chestX = -0.12;
+    thigh = rising ? [1.05, 0.25] : [0.55, -0.1];
+    knee = rising ? [-1.5, -0.9] : [-0.6, -0.35];
+    shoulder = [-0.7, -0.5];
+    elbow = [0.7, 0.7];
+    spread = 0.45;
+  } else {
+    // Sprint cycle with knee lift on the recovery swing and a hip bob per step.
+    thigh = [s * 0.95, -s * 0.95];
+    knee = [-(0.15 + 1.3 * Math.max(0, co)), -(0.15 + 1.3 * Math.max(0, -co))];
+    shoulder = [-s * 0.85, s * 0.85];
+    elbow = [1.25 + s * 0.25, 1.25 - s * 0.25];
+    hipY = -0.04 + 0.09 * Math.abs(co);
+    chestX = -0.24;
+    chestY = s * 0.12;
+  }
+  if (aiming) {
+    shoulder[1] = 1.5;
+    elbow[1] = 0.02;
+    chestY = -0.18;
+  }
+  hipY -= c.squash * 0.14;
+  bodyZ = st.lean || 0;
+  for (let i = 0; i < 2; i++) {
+    to(c.legs[i].rotation, "x", thigh[i]);
+    to(c.knees[i].rotation, "x", knee[i]);
+    to(c.arms[i].rotation, "x", shoulder[i], i === 1 && aiming ? 0.6 : k);
+    to(c.arms[i].rotation, "z", (i ? -1 : 1) * spread);
+    to(c.elbows[i].rotation, "x", elbow[i]);
+  }
+  to(c.hips.position, "y", hipY);
+  to(c.chest.rotation, "x", chestX, soft);
+  to(c.chest.rotation, "y", chestY);
+  to(c.headPivot.rotation, "y", -chestY * 0.7);
+  to(c.headPivot.rotation, "x", -chestX * 0.6, soft);
+  to(body.rotation, "x", bodyX, soft);
+  to(body.position, "z", bodyX * -0.55, soft);
+  to(body.rotation, "z", bodyZ, 1 - Math.exp(-8 * dt));
+  body.scale.y = 1;
+  // Cloth: tails and scarf trail behind (negative x), flapping with speed.
+  const wind = running ? (slide || air ? 1.2 : 0.8) : 0.1,
+    t = st.time;
+  for (const h of c.tails)
+    to(h.rotation, "x", -(0.12 + wind * 0.5) - wind * 0.12 * Math.sin(t * 11 + h.userData.side), soft);
+  c.scarf.forEach((seg, i) => {
+    // Positive x droops a link downward; wind lifts the first link toward horizontal.
+    seg.rotation.x = (i === 0 ? 1.3 - wind * 1.25 : 0.1) + Math.sin(t * 9 - i * 1.1) * (0.1 + wind * 0.2);
+    seg.rotation.y = Math.sin(t * 6.5 - i * 0.8) * 0.12 * (0.4 + wind);
+  });
+  c.pony.rotation.x = -0.2 - wind * 0.5 + Math.sin(p * 2) * 0.15 * wind;
 }
 
 // ---------------------------------------------------------------- ambient life
