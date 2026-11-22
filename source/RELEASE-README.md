@@ -34,7 +34,7 @@ KOSTÜMLER: 6 görsel seçenek; altınla açılır, güç/hız/hasar kazandırma
 
 `source/dist/profile.js` içindeki `saveGame()` / `loadGame()` tek kayıt katmanıdır. Mevcut adaptör localStorage kullanır. YouTube Playables SDK'ya geçerken bu katmanı platform kaydıyla değiştirin; asenkron yüklemeyi oyunun ilk başlatılmasından önce tamamlayın.
 
-`showRewardedAd()` tek reklam giriş noktasıdır; şu anda hemen `{success: true, mock: true}` dönen çevrimdışı test fonksiyonudur. `REWARDED_ADS_ENABLED = false`; iki sonuç ekranı yerleşimi de devre dışıdır ve ödül dağıtmaz. Gerçek reklam SDK'sı, izleme veya ağ çağrısı yoktur. Gerçek entegrasyonda devam/iki kat ödül işlemelerini yalnızca doğrulanmış tamamlama sonucuna bağlayın ve aynı koşuda ikinci ödeme yapılmasını engelleyin. Yalnızca bayrağı açmak gerçek reklam entegrasyonu sağlamaz.
+Reklamlar yalnızca YouTube Playables içinde, YouTube'un kendi reklam API'siyle çalışır (`platform.js` → `ads`, `profile.js` → `showRewardedAd`, `interstitialDue`). Sonuç ekranında isteğe bağlı "altını 2 katına çıkar" ödüllü reklamı ve ekran geçişlerinde seyrek ara reklam vardır; ayrıntılar README.md'de. YouTube dışında reklam yoktur.
 
 ## Görüntü ve performans
 

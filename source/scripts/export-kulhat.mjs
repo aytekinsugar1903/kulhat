@@ -89,6 +89,35 @@ let platformJs = fs.readFileSync(path.join(dist, "platform.js"), "utf8");
 if (playables)
   platformJs = platformJs.replace(/\/\*BROWSER-LANG\*\/[\s\S]*?\/\*END\*\//, '"en"');
 fs.writeFileSync(path.join(output, "js", "platform.js"), platformJs);
+// Web build only: "Add to Home screen" opens the game full screen like an app.
+// Playables packages get no manifest (YouTube hosts the game itself).
+if (!playables) {
+  html = html.replace(
+    '<link rel="apple-touch-icon"',
+    '<link rel="manifest" href="./manifest.webmanifest" />\n    <meta name="mobile-web-app-capable" content="yes" />\n    <meta name="apple-mobile-web-app-capable" content="yes" />\n    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />\n    <link rel="apple-touch-icon"',
+  );
+  fs.writeFileSync(
+    path.join(output, "manifest.webmanifest"),
+    JSON.stringify(
+      {
+        name: "KÜLHAT · Son Teslimat",
+        short_name: "KÜLHAT",
+        start_url: "./",
+        scope: "./",
+        display: "fullscreen",
+        orientation: "portrait",
+        background_color: "#0b141e",
+        theme_color: "#0b141e",
+        icons: [
+          { src: "./assets/icon-192.png", sizes: "192x192", type: "image/png" },
+          { src: "./assets/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
+        ],
+      },
+      null,
+      2,
+    ) + "\n",
+  );
+}
 html = html.replaceAll("./icon.svg", "./assets/icon.svg");
 html = html.replaceAll("./icon-192.png", "./assets/icon-192.png");
 fs.writeFileSync(path.join(output, "index.html"), html);

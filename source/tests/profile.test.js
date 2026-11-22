@@ -11,8 +11,10 @@ import {
   selectCostume,
   dailyState,
   LOGIN_REWARDS,
-  REWARDED_ADS_ENABLED,
+  REWARD_IDS,
+  rewardedAdsAvailable,
   showRewardedAd,
+  interstitialDue,
 } from "../dist/profile.js";
 const date = (n) => new Date(2026, 9, n, 12);
 test("single persistence layer migrates old saves, tolerates corrupt/blocked storage, retains cosmetics after core rewards", () => {
@@ -96,7 +98,41 @@ test("cosmetic selections do not change combat or movement settings and never ch
   assert.equal(selectCostume(settings, profile, "ember"), false);
   assert.deepEqual({ ...settings, coins: before.coins }, before);
 });
-test("rewarded ads are disabled; the only adapter is a deterministic offline mock", async () => {
-  assert.equal(REWARDED_ADS_ENABLED, false);
-  assert.deepEqual(await showRewardedAd(), { success: true, mock: true });
+test("outside YouTube there are no ads: no adapter, no reward", async () => {
+  assert.equal(rewardedAdsAvailable(null), false);
+  assert.equal(rewardedAdsAvailable({ inPlayables: false }), false);
+  assert.deepEqual(await showRewardedAd(REWARD_IDS.doubleGold, null), {
+    success: false,
+    unavailable: true,
+  });
+});
+test("rewarded ad grants only when YouTube reports the reward earned", async () => {
+  const calls = [];
+  const fake = (result) => ({
+    ads: {
+      available: true,
+      rewarded: async (id) => {
+        calls.push(id);
+        if (result instanceof Error) throw result;
+        return result;
+      },
+    },
+  });
+  assert.deepEqual(await showRewardedAd(REWARD_IDS.doubleGold, fake(true)), { success: true });
+  assert.deepEqual(await showRewardedAd(REWARD_IDS.doubleGold, fake(false)), { success: false });
+  assert.deepEqual(await showRewardedAd(REWARD_IDS.doubleGold, fake("yes")), { success: false });
+  assert.deepEqual(await showRewardedAd(REWARD_IDS.doubleGold, fake(Error("no fill"))), { success: false });
+  assert.ok(calls.every((id) => id === "kulhat-double-gold-1"));
+  // Reward IDs must be readable and carry no user data.
+  for (const id of Object.values(REWARD_IDS)) assert.match(id, /^[a-z0-9-]+$/);
+});
+test("interstitials wait for the first runs, then respect run and time gaps", () => {
+  const now = 1_000_000;
+  const p = (sessionRuns, runsSinceAd, lastAdAt) => ({ sessionRuns, runsSinceAd, lastAdAt });
+  assert.equal(interstitialDue(p(1, 1, -Infinity), now), false);
+  assert.equal(interstitialDue(p(2, 2, -Infinity), now), false);
+  assert.equal(interstitialDue(p(3, 3, -Infinity), now), true);
+  assert.equal(interstitialDue(p(6, 2, now - 600000), now), false);
+  assert.equal(interstitialDue(p(6, 3, now - 60000), now), false);
+  assert.equal(interstitialDue(p(6, 3, now - 180000), now), true);
 });

@@ -77531,7 +77531,7 @@ const EN = {
  "</div></section><div class=\"tip\">Telefonda doğrudan kaydır. Hedefe dokunarak ateş et.<br>PC: WASD / oklar · Space ateş · Esc duraklat.<br>40 görev + 120 yıldız + kampanya sonrası sonsuz koşu.</div><div class=\"menu-settings\"><button id=\"sound\">SES ": "</div></section><div class=\"tip\">On phones, just swipe. Tap a target to fire.<br>PC: WASD / arrows · Space to fire · Esc to pause.<br>40 missions + 120 stars + an endless run after the campaign.</div><div class=\"menu-settings\"><button id=\"sound\">SOUND ",
  "KAPALI": "OFF",
  "AÇIK": "ON",
- "</button><button id=\"controls\">NASIL OYNANIR?</button><button id=\"dailyHub\">GÜNLÜK ÖDÜLLER</button><button id=\"costumeHub\">KOSTÜMLER</button></div><div id=\"storage\" class=\"storage\">İlerleme bu tarayıcıda saklanır.</div><div class=\"build-label\">Yayın adayı · Cihaz ve platform kontrolleri bekleniyor.</div></div>": "</button><button id=\"controls\">HOW TO PLAY</button><button id=\"dailyHub\">DAILY REWARDS</button><button id=\"costumeHub\">OUTFITS</button></div><div id=\"storage\" class=\"storage\">Progress is saved in this browser.</div><div class=\"build-label\">Release candidate · Device and platform checks pending.</div></div>",
+ "</button><button id=\"controls\">NASIL OYNANIR?</button><button id=\"dailyHub\">GÜNLÜK ÖDÜLLER</button><button id=\"costumeHub\">KOSTÜMLER</button></div><div id=\"storage\" class=\"storage\">İlerleme bu tarayıcıda saklanır.</div></div>": "</button><button id=\"controls\">HOW TO PLAY</button><button id=\"dailyHub\">DAILY REWARDS</button><button id=\"costumeHub\">OUTFITS</button></div><div id=\"storage\" class=\"storage\">Progress is saved in this browser.</div></div>",
  "<aside class=\"scoreboard\"><h2>PUAN TABLOSU · BU CİHAZ</h2><p>En iyi 10 koşun</p>": "<aside class=\"scoreboard\"><h2>LEADERBOARD · THIS DEVICE</h2><p>Your top 10 runs</p>",
  "<table style=\"width:100%;text-align:left\"><tr><th>#</th><th>Bölüm</th><th>Puan</th></tr>": "<table style=\"width:100%;text-align:left\"><tr><th>#</th><th>Stage</th><th>Score</th></tr>",
  "<p>İlk koşunu tamamlayınca puanın burada görünecek.</p>": "<p>Finish your first run and your score will show up here.</p>",
@@ -77586,8 +77586,11 @@ const EN = {
  "</button><button id=\"back\">Üs ve yükseltmeler</button></div></div>": "</button><button id=\"back\">Base and upgrades</button></div></div>",
  "✦ YENİ REKOR! ✦ · ": "✦ NEW RECORD! ✦ · ",
  "EN İYİ SKOR · ": "BEST SCORE · ",
- "<div class=\"ad-placements\"><button id=\"adContinue\" disabled>Devam et (reklam)</button><button id=\"adDouble\" disabled>Altını 2 katına çıkar (reklam)</button><small>Reklamlar bu sürümde kapalı.</small></div>": "<div class=\"ad-placements\"><button id=\"adContinue\" disabled>Continue (ad)</button><button id=\"adDouble\" disabled>Double your gold (ad)</button><small>Ads are off in this version.</small></div>",
- "Reklam yerleri için platform entegrasyonu gerekli.": "Ad slots need platform integration.",
+ "▶ Reklam izle · altını 2 katına çıkar": "▶ Watch an ad · double your gold",
+ "İsteğe bağlı. İstemezsen hemen devam edebilirsin.": "Optional. You can keep playing without it.",
+ "Reklam yükleniyor…": "Loading ad…",
+ " altın eklendi": " gold added",
+ "Reklam tamamlanmadı, ödül verilmedi.": "Ad not finished, no reward given.",
  "SİLAH GÜCÜ ": "WEAPON POWER ",
  "/5 · HASAR ARTTI": "/5 · MORE DAMAGE",
  "ELMAS ALINDI · ◆ ": "GEM COLLECTED · ◆ ",
@@ -77826,13 +77829,34 @@ function selectCostume(settings, profile, id) {
   profile.costume = id;
   return true;
 }
-// No ad SDK/network calls. Placements remain disabled in this build.
-const REWARDED_ADS_ENABLED = false;
-async function showRewardedAd() {
-  return { success: true, mock: true };
+// Ads come only from the YouTube Playables ads API (via platform.js). Outside
+// YouTube there is no ad SDK and no network call: every placement stays hidden.
+const REWARD_IDS = { doubleGold: "kulhat-double-gold-1" };
+function rewardedAdsAvailable(platform = globalThis.KULHAT_PLATFORM) {
+  return !!platform?.ads?.available;
+}
+// Resolves {success:true} only when YouTube reports the reward as earned.
+async function showRewardedAd(id, platform = globalThis.KULHAT_PLATFORM) {
+  if (!rewardedAdsAvailable(platform)) return { success: false, unavailable: true };
+  try {
+    return { success: (await platform.ads.rewarded(id)) === true };
+  } catch {
+    return { success: false };
+  }
+}
+// Interstitial pacing: never during a player's first runs of the session, then at
+// most one ad per 3 finished runs and per 3 minutes. Shown only on the result →
+// next screen transition (never during play).
+const INTERSTITIAL_RULES = { firstAfterRuns: 3, everyRuns: 3, minGapMs: 180000 };
+function interstitialDue(p, now, rules = INTERSTITIAL_RULES) {
+  return (
+    p.sessionRuns >= rules.firstAfterRuns &&
+    p.runsSinceAd >= rules.everyRuns &&
+    now - p.lastAdAt >= rules.minGapMs
+  );
 }
 
-return {SAVE_KEY,loadGame,saveGame,COSTUMES,normalizeProfile,dayKey,LOGIN_REWARDS,TASKS,dailyState,claimLogin,recordDaily,claimTask,selectCostume,REWARDED_ADS_ENABLED,showRewardedAd};
+return {SAVE_KEY,loadGame,saveGame,COSTUMES,normalizeProfile,dayKey,LOGIN_REWARDS,TASKS,dailyState,claimLogin,recordDaily,claimTask,selectCostume,REWARD_IDS,rewardedAdsAvailable,showRewardedAd,INTERSTITIAL_RULES,interstitialDue};
 })();
 // audio.js
 M[6]=(()=>{
@@ -78535,45 +78559,68 @@ function buildCourier(body, suit, armor, accent) {
   const skin = m("#c98d63", { rough: 0.7 }),
     leather = m("#5a3a26", { rough: 0.75 }),
     hatM = m("#6b4428", { rough: 0.85 }),
+    hair = m("#3b2516", { rough: 0.9 }),
     denim = m("#3d4d63", { rough: 0.9 }),
     bootM = m("#3a2619", { rough: 0.6 }),
     brass = m("#d6a24a", { metal: 0.8, rough: 0.35 }),
     glowM = m("#ffd27a", { emissive: "#ffae3d", ei: 1.6, rough: 0.4 });
-  const add = (geo, material, x, y, z, parent = body) => {
+  const add = (geo, material, x, y, z, parent) => {
     const o = new T.Mesh(geo, material);
     o.position.set(x, y, z);
     o.castShadow = true;
     parent.add(o);
     return o;
   };
+  const group = (parent, x = 0, y = 0, z = 0) => {
+    const g = new T.Group();
+    g.position.set(x, y, z);
+    parent.add(g);
+    return g;
+  };
+  // Rig: body (feet) → hips (bob) → chest (lean/twist, pivots at the hip joint).
+  // `upper` undoes the hip height so upper-body parts keep model-space coordinates.
+  const HIP = 1.05;
+  const hips = group(body),
+    chest = group(hips, 0, HIP, 0),
+    upper = group(chest, 0, -HIP, 0);
   // Torso: duster coat over a vest.
-  const torso = add(new T.CapsuleGeometry(0.42, 0.55, 4, 10), suit, 0, 1.55, 0);
+  const torso = add(new T.CapsuleGeometry(0.42, 0.55, 4, 10), suit, 0, 1.55, 0, upper);
   torso.scale.set(1.05, 1, 0.78);
-  add(new T.CapsuleGeometry(0.36, 0.5, 4, 10), armor, 0, 1.6, -0.12).scale.set(0.95, 1, 0.6);
-  // Coat tails flaring behind (the camera sees the back).
+  add(new T.CapsuleGeometry(0.36, 0.5, 4, 10), armor, 0, 1.6, -0.12, upper).scale.set(0.95, 1, 0.6);
+  // Shoulder cape: gives the back a readable western silhouette.
+  const cape = add(new T.CylinderGeometry(0.36, 0.62, 0.34, 14, 1, true), suit, 0, 1.94, 0.02, upper);
+  cape.material = suit;
+  cape.scale.z = 0.8;
+  // Coat tails hinge at the waist so they can flap behind a running courier.
+  const tails = [];
   for (const s of [-1, 1]) {
-    const tail = add(new T.BoxGeometry(0.42, 0.95, 0.08), suit, s * 0.22, 0.95, 0.28);
-    tail.rotation.set(0.28, 0, s * 0.12);
+    const hinge = group(upper, s * 0.2, 1.38, 0.26);
+    const tail = add(new T.BoxGeometry(0.42, 0.95, 0.07), suit, 0, -0.46, 0, hinge);
+    tail.rotation.z = s * 0.1;
+    hinge.userData.side = s;
+    tails.push(hinge);
   }
   // Belt + buckle + holster
-  add(new T.CylinderGeometry(0.43, 0.43, 0.12, 14), leather, 0, 1.12, 0).scale.z = 0.8;
-  add(new T.BoxGeometry(0.16, 0.12, 0.05), brass, 0, 1.12, -0.35);
-  // Cargo satchel with a glowing seal.
-  add(new T.BoxGeometry(0.62, 0.5, 0.32), leather, 0, 1.6, 0.42);
-  add(new T.BoxGeometry(0.64, 0.12, 0.34), accent, 0, 1.78, 0.42);
-  add(new T.SphereGeometry(0.08, 10, 8), glowM, 0, 1.62, 0.6);
-  for (const s of [-1, 1]) add(new T.BoxGeometry(0.08, 0.7, 0.06), leather, s * 0.24, 1.75, 0.18).rotation.x = -0.3;
-  // Head, bandana, hat
-  const head = add(new T.SphereGeometry(0.3, 14, 12), skin, 0, 2.2, -0.02);
+  add(new T.CylinderGeometry(0.43, 0.43, 0.12, 14), leather, 0, 1.12, 0, upper).scale.z = 0.8;
+  add(new T.BoxGeometry(0.16, 0.12, 0.05), brass, 0, 1.12, -0.35, upper);
+  add(new T.BoxGeometry(0.14, 0.3, 0.12), leather, 0.4, 1.0, 0.05, upper);
+  // Cargo satchel with a glowing seal and crossed straps.
+  add(new T.BoxGeometry(0.62, 0.5, 0.32), leather, 0, 1.6, 0.42, upper);
+  add(new T.BoxGeometry(0.64, 0.12, 0.34), accent, 0, 1.78, 0.42, upper);
+  add(new T.SphereGeometry(0.08, 10, 8), glowM, 0, 1.62, 0.6, upper);
+  for (const s of [-1, 1]) add(new T.BoxGeometry(0.08, 0.7, 0.06), leather, s * 0.24, 1.75, 0.18, upper).rotation.x = -0.3;
+  // Head: neck, face, bandana, hair, hat.
+  const headPivot = group(upper, 0, 1.98, 0);
+  add(new T.CylinderGeometry(0.17, 0.2, 0.18, 10), skin, 0, -0.03, 0, headPivot);
+  const head = add(new T.SphereGeometry(0.3, 14, 12), skin, 0, 0.22, -0.02, headPivot);
   head.scale.set(0.95, 1.05, 0.95);
-  // Bandana covers only the face; the back of the head shows hair under the hat.
-  add(new T.CylinderGeometry(0.31, 0.27, 0.24, 14, 1, true, Math.PI / 2, Math.PI), armor, 0, 2.08, -0.03).material.side = T.DoubleSide;
-  add(new T.SphereGeometry(0.31, 12, 8, Math.PI * 1.5, Math.PI, 0, Math.PI * 0.62), m("#3b2516", { rough: 0.9 }), 0, 2.22, 0.0);
-  add(new T.CylinderGeometry(0.17, 0.2, 0.18, 10), skin, 0, 1.95, 0);
-  const hat = new T.Group();
-  hat.position.set(0, 2.42, -0.02);
+  add(new T.CylinderGeometry(0.31, 0.27, 0.24, 14, 1, true, Math.PI / 2, Math.PI), armor, 0, 0.1, -0.03, headPivot).material.side = T.DoubleSide;
+  add(new T.SphereGeometry(0.31, 12, 8, Math.PI * 1.5, Math.PI, 0, Math.PI * 0.62), hair, 0, 0.24, 0.0, headPivot);
+  // Short ponytail under the hat: moves with the run and reads from behind.
+  const pony = group(headPivot, 0, 0.2, 0.27);
+  add(new T.CapsuleGeometry(0.07, 0.22, 3, 6), hair, 0, -0.14, 0.03, pony);
+  const hat = group(headPivot, 0, 0.44, -0.02);
   hat.rotation.x = -0.08;
-  body.add(hat);
   const brim = add(new T.CylinderGeometry(0.62, 0.62, 0.05, 20), hatM, 0, 0, 0, hat);
   brim.scale.z = 0.9;
   add(new T.TorusGeometry(0.58, 0.05, 6, 20), hatM, 0, 0.03, 0, hat).rotation.x = Math.PI / 2;
@@ -78581,32 +78628,148 @@ function buildCourier(body, suit, armor, accent) {
   crown.scale.z = 0.92;
   add(new T.CylinderGeometry(0.335, 0.335, 0.08, 14), accent, 0, 0.07, 0, hat).scale.z = 0.92;
   add(new T.SphereGeometry(0.26, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2), hatM, 0, 0.36, 0, hat).scale.set(1, 0.35, 0.92);
-  const arms = [],
-    legs = [];
-  for (const s of [-1, 1]) {
-    const leg = new T.Group();
-    leg.position.set(s * 0.2, 1.05, 0);
-    add(new T.CapsuleGeometry(0.13, 0.45, 3, 8), denim, 0, -0.28, 0, leg);
-    add(new T.CapsuleGeometry(0.12, 0.35, 3, 8), denim, 0, -0.68, 0.02, leg);
-    add(new T.CylinderGeometry(0.15, 0.14, 0.32, 10), bootM, 0, -0.82, 0.02, leg);
-    add(new T.BoxGeometry(0.24, 0.12, 0.42), bootM, 0, -0.98, -0.08, leg);
-    add(new T.TorusGeometry(0.05, 0.015, 4, 8), brass, 0, -0.95, 0.18, leg).rotation.y = Math.PI / 2;
-    body.add(leg);
-    legs.push(leg);
-    const arm = new T.Group();
-    arm.position.set(s * 0.5, 1.92, 0);
-    add(new T.CapsuleGeometry(0.12, 0.38, 3, 8), suit, 0, -0.25, 0, arm).rotation.z = s * 0.1;
-    add(new T.CapsuleGeometry(0.1, 0.3, 3, 8), suit, 0, -0.6, -0.03, arm);
-    add(new T.SphereGeometry(0.11, 8, 6), leather, 0, -0.82, -0.04, arm);
-    body.add(arm);
-    arms.push(arm);
+  // Scarf: a short chain behind the neck in the accent colour, the most visible
+  // moving part from the chase camera.
+  const scarf = [];
+  let link = group(headPivot, 0, 0.0, 0.2);
+  add(new T.SphereGeometry(0.14, 10, 8), accent, 0, 0, -0.02, link).scale.set(1.6, 0.7, 0.9);
+  for (let i = 0; i < 4; i++) {
+    const seg = group(link, 0, 0, i === 0 ? 0.06 : 0.2);
+    add(new T.BoxGeometry(0.26 - i * 0.03, 0.07, 0.24), accent, 0, 0, 0.1, seg);
+    scarf.push(seg);
+    link = seg;
   }
-  // Revolver: grip, cylinder, long barrel. weapon = barrel mesh (game.js tints it per gun).
-  const weapon = add(new T.CylinderGeometry(0.055, 0.055, 0.62, 10), m("#59656e", { metal: 0.8, rough: 0.3 }).clone(), 0.55, 1.27, -0.55);
-  weapon.rotation.x = Math.PI / 2;
-  add(new T.CylinderGeometry(0.11, 0.11, 0.16, 8), m("#3f454a", { metal: 0.85, rough: 0.3 }), 0.55, 1.27, -0.22).rotation.x = Math.PI / 2;
-  add(new T.BoxGeometry(0.1, 0.28, 0.14), m("#6e432a", { rough: 0.6 }), 0.55, 1.12, -0.1).rotation.x = 0.35;
-  return { arms, legs, weapon, head, torso };
+  const arms = [],
+    legs = [],
+    knees = [],
+    elbows = [];
+  for (const s of [-1, 1]) {
+    // Leg: hip joint → thigh → knee joint → shin + boot.
+    const leg = group(hips, s * 0.2, HIP, 0);
+    add(new T.CapsuleGeometry(0.135, 0.4, 3, 8), denim, 0, -0.25, 0, leg);
+    const knee = group(leg, 0, -0.5, 0);
+    add(new T.CapsuleGeometry(0.12, 0.3, 3, 8), denim, 0, -0.17, 0.01, knee);
+    add(new T.CylinderGeometry(0.15, 0.14, 0.3, 10), bootM, 0, -0.3, 0.02, knee);
+    add(new T.BoxGeometry(0.24, 0.12, 0.42), bootM, 0, -0.47, -0.08, knee);
+    add(new T.TorusGeometry(0.05, 0.015, 4, 8), brass, 0, -0.44, 0.18, knee).rotation.y = Math.PI / 2;
+    legs.push(leg);
+    knees.push(knee);
+    // Arm: shoulder → upper arm → elbow → forearm + glove.
+    const arm = group(upper, s * 0.5, 1.9, 0);
+    add(new T.CapsuleGeometry(0.12, 0.3, 3, 8), suit, 0, -0.2, 0, arm);
+    const elbow = group(arm, 0, -0.42, 0);
+    add(new T.CapsuleGeometry(0.1, 0.26, 3, 8), suit, 0, -0.16, 0, elbow);
+    add(new T.SphereGeometry(0.11, 8, 6), leather, 0, -0.38, 0, elbow);
+    arms.push(arm);
+    elbows.push(elbow);
+  }
+  // Revolver in the right glove, barrel continuing the forearm line so that
+  // raising the arm points it down the street. weapon = barrel (game.js tints it).
+  const gun = group(elbows[1], 0, -0.4, -0.02);
+  add(new T.BoxGeometry(0.1, 0.12, 0.24), m("#6e432a", { rough: 0.6 }), 0, 0.02, 0.06, gun);
+  add(new T.CylinderGeometry(0.1, 0.1, 0.15, 8), m("#3f454a", { metal: 0.85, rough: 0.3 }), 0, -0.1, 0, gun);
+  const weapon = add(new T.CylinderGeometry(0.05, 0.05, 0.5, 10), m("#59656e", { metal: 0.8, rough: 0.3 }).clone(), 0, -0.4, 0, gun);
+  const muzzle = group(gun, 0, -0.7, 0);
+  return {
+    arms, legs, knees, elbows, weapon, head, torso,
+    hips, chest, headPivot, hat, tails, scarf, pony, muzzle,
+    phase: 0, squash: 0, wasAir: false, fireAt: -9,
+  };
+}
+
+// Pose the courier for this frame. Presentation only: the simulation never reads
+// any of it. `st` = {mode, time, speed, y, vy, slide, holding, lean}.
+function animateCourier(c, body, st, dt) {
+  const k = 1 - Math.exp(-16 * dt),
+    soft = 1 - Math.exp(-7 * dt);
+  const to = (o, key, v, f = k) => (o[key] += (v - o[key]) * f);
+  const running = st.mode === "play",
+    air = running && st.y > 0.05,
+    slide = running && st.slide > 0,
+    aiming = running && (st.holding || st.time - c.fireAt < 0.35);
+  if (running) c.phase += dt * Math.min(15, Math.max(9, (st.speed || 20) * 0.6));
+  else c.phase += dt * 1.6;
+  if (c.wasAir && !air && running) c.squash = 1;
+  c.wasAir = air;
+  c.squash = Math.max(0, c.squash - dt * 5);
+  const p = c.phase,
+    s = Math.sin(p),
+    co = Math.cos(p);
+  // Targets for each joint; positive x rotation swings a limb forward.
+  let thigh = [0, 0], knee = [-0.05, -0.05], shoulder = [0.05, 0.05], elbow = [0.2, 0.2],
+    hipY = 0, chestX = 0, chestY = 0, bodyX = 0, bodyZ = 0, spread = 0;
+  if (!running) {
+    // Idle: relaxed stance with breathing.
+    const b = Math.sin(st.time * 1.8);
+    hipY = b * 0.012;
+    chestX = -0.03 + b * 0.015;
+    shoulder = [0.05 + b * 0.03, 0.05 - b * 0.03];
+    elbow = [0.25, 0.25];
+    knee = [-0.08, -0.08];
+    thigh = [0.04, 0.04];
+  } else if (slide) {
+    // Baseball slide: lean back on the trailing leg, lead leg forward.
+    bodyX = 0.95;
+    hipY = -0.08;
+    chestX = -0.55;
+    thigh = [1.55, 0.75];
+    knee = [-0.1, -1.7];
+    shoulder = [-0.9, 0.6];
+    elbow = [0.1, 0.9];
+    spread = 0.35;
+  } else if (air) {
+    // Tuck on the way up, reach for the ground on the way down.
+    const rising = (st.vy || 0) > 0;
+    chestX = -0.12;
+    thigh = rising ? [1.05, 0.25] : [0.55, -0.1];
+    knee = rising ? [-1.5, -0.9] : [-0.6, -0.35];
+    shoulder = [-0.7, -0.5];
+    elbow = [0.7, 0.7];
+    spread = 0.45;
+  } else {
+    // Sprint cycle with knee lift on the recovery swing and a hip bob per step.
+    thigh = [s * 0.95, -s * 0.95];
+    knee = [-(0.15 + 1.3 * Math.max(0, co)), -(0.15 + 1.3 * Math.max(0, -co))];
+    shoulder = [-s * 0.85, s * 0.85];
+    elbow = [1.25 + s * 0.25, 1.25 - s * 0.25];
+    hipY = -0.04 + 0.09 * Math.abs(co);
+    chestX = -0.24;
+    chestY = s * 0.12;
+  }
+  if (aiming) {
+    shoulder[1] = 1.5;
+    elbow[1] = 0.02;
+    chestY = -0.18;
+  }
+  hipY -= c.squash * 0.14;
+  bodyZ = st.lean || 0;
+  for (let i = 0; i < 2; i++) {
+    to(c.legs[i].rotation, "x", thigh[i]);
+    to(c.knees[i].rotation, "x", knee[i]);
+    to(c.arms[i].rotation, "x", shoulder[i], i === 1 && aiming ? 0.6 : k);
+    to(c.arms[i].rotation, "z", (i ? -1 : 1) * spread);
+    to(c.elbows[i].rotation, "x", elbow[i]);
+  }
+  to(c.hips.position, "y", hipY);
+  to(c.chest.rotation, "x", chestX, soft);
+  to(c.chest.rotation, "y", chestY);
+  to(c.headPivot.rotation, "y", -chestY * 0.7);
+  to(c.headPivot.rotation, "x", -chestX * 0.6, soft);
+  to(body.rotation, "x", bodyX, soft);
+  to(body.position, "z", bodyX * -0.55, soft);
+  to(body.rotation, "z", bodyZ, 1 - Math.exp(-8 * dt));
+  body.scale.y = 1;
+  // Cloth: tails and scarf trail behind (negative x), flapping with speed.
+  const wind = running ? (slide || air ? 1.2 : 0.8) : 0.1,
+    t = st.time;
+  for (const h of c.tails)
+    to(h.rotation, "x", -(0.12 + wind * 0.5) - wind * 0.12 * Math.sin(t * 11 + h.userData.side), soft);
+  c.scarf.forEach((seg, i) => {
+    // Positive x droops a link downward; wind lifts the first link toward horizontal.
+    seg.rotation.x = (i === 0 ? 1.3 - wind * 1.25 : 0.1) + Math.sin(t * 9 - i * 1.1) * (0.1 + wind * 0.2);
+    seg.rotation.y = Math.sin(t * 6.5 - i * 0.8) * 0.12 * (0.4 + wind);
+  });
+  c.pony.rotation.x = -0.2 - wind * 0.5 + Math.sin(p * 2) * 0.15 * wind;
 }
 
 // ---------------------------------------------------------------- ambient life
@@ -78762,7 +78925,7 @@ function westernRoofParts(variant, quality) {
   return parts;
 }
 
-return {westernStreetParts,setSignNames,trailParts,partsToGroup,createSky,fillHorizon,createDesertFloor,buildCourier,createAmbient,westernRoofParts};
+return {westernStreetParts,setSignNames,trailParts,partsToGroup,createSky,fillHorizon,createDesertFloor,buildCourier,animateCourier,createAmbient,westernRoofParts};
 })();
 // core.js
 M[8]=(()=>{
@@ -79998,7 +80161,7 @@ return {TITLE,DISTRICTS,storyText,missionName,MISSIONS,CARGOS,COURIER_WEAPONS,DE
 M[0]=(()=>{
 const T=M[1];
 const {RoundedBoxGeometry}=M[3];
-const {loadGame,saveGame,COSTUMES,LOGIN_REWARDS,TASKS,dayKey,dailyState,claimLogin,recordDaily,claimTask,selectCostume,REWARDED_ADS_ENABLED,showRewardedAd}=M[4];
+const {loadGame,saveGame,COSTUMES,LOGIN_REWARDS,TASKS,dayKey,dailyState,claimLogin,recordDaily,claimTask,selectCostume,REWARD_IDS,rewardedAdsAvailable,showRewardedAd,interstitialDue}=M[4];
 const {GameAudio}=M[6];
 const V=M[7];
 const {L,LANG,setStaticText}=M[5];
@@ -80031,6 +80194,8 @@ renderer.toneMapping = T.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
 renderer.outputColorSpace = T.SRGBColorSpace;
 view.append(renderer.domElement);
+// FPS counter and graphics toggle in the HUD are developer aids: shown only with ?debug.
+if (/[?&]debug\b/.test(location.search)) document.body.classList.add("debug");
 // Observe readbacks without issuing one. Captures a bounded, local-only trace
 // when the canvas is read by game/library code or an external integration.
 const renderAudit = {
@@ -80285,7 +80450,8 @@ const suit = mat("#174c5c", 0.5, 0.15).clone(),
   boot = mat("#253040");
 const courier = V.buildCourier(body, suit, armor, accent);
 const { arms, legs, weapon, head, torso } = courier;
-const muzzleFlash = glow("#ffce6c", 0.55, 1.27, -0.95, 1.7, body);
+// The flash rides on the revolver muzzle, which moves with the aiming arm.
+const muzzleFlash = glow("#ffce6c", 0, 0, 0, 1.7, courier.muzzle);
 muzzleFlash.visible = false;
 let shieldBubble = new T.Mesh(
   new T.SphereGeometry(1.5, 20, 16),
@@ -81770,6 +81936,8 @@ function openMission(id, endless = false) {
   );
   $("#hint").textContent =
     L("KAYDIR: KAÇ / ZIPLA / KAY · HEDEFE DOKUN VEYA BASILI TUT: ATEŞ");
+  // The control reminder is only useful on the first two stages.
+  $("#hint").classList.toggle("retired", id > 1);
   updateHud();
 }
 function showMenu() {
@@ -81922,7 +82090,7 @@ function showMenu() {
     (settings.freePlay
       ? L("SERBEST KEŞİF · 40 ETAP AÇIK")
       : L("TÜM ETAPLARI DENE · SERBEST KEŞİF")) +
-    '</button></div><div class="row"><button class="primary" id="launch" ' +
+    '</button></div><div class="row launch-row"><button class="primary" id="launch" ' +
     (selected >= settings.unlocked && !settings.freePlay ? "disabled" : "") +
     ">" +
     String(selected + 1).padStart(2, "0") +
@@ -81996,7 +82164,7 @@ function showMenu() {
     (muted ? L("KAPALI") : L("AÇIK")) +
     '</button><button id="display">' +
     (quality === "low" ? L("GÖRÜNTÜ: EKONOMİK") : L("GÖRÜNTÜ: YÜKSEK")) +
-    L('</button><button id="controls">NASIL OYNANIR?</button><button id="dailyHub">GÜNLÜK ÖDÜLLER</button><button id="costumeHub">KOSTÜMLER</button></div><div id="storage" class="storage">İlerleme bu tarayıcıda saklanır.</div><div class="build-label">Yayın adayı · Cihaz ve platform kontrolleri bekleniyor.</div></div>');
+    L('</button><button id="controls">NASIL OYNANIR?</button><button id="dailyHub">GÜNLÜK ÖDÜLLER</button><button id="costumeHub">KOSTÜMLER</button></div><div id="storage" class="storage">İlerleme bu tarayıcıda saklanır.</div></div>');
   const scorePanel =
     L('<aside class="scoreboard"><h2>PUAN TABLOSU · BU CİHAZ</h2><p>En iyi 10 koşun</p>') +
     (settings.leaderboard.length
@@ -82459,6 +82627,25 @@ function resultBreakdown(r) {
     "</p>"
   );
 }
+// Ad state lives only in memory for this session; nothing about ads is saved.
+const adPacing = { sessionRuns: 0, runsSinceAd: 0, lastAdAt: -Infinity };
+let adBusy = false;
+// Wraps a result-screen button: when pacing allows, YouTube shows an interstitial
+// on this screen change first; the game continues whether or not one was shown.
+function afterInterstitial(next) {
+  return async () => {
+    if (adBusy) return;
+    if (inPlayables && platform?.ads && interstitialDue(adPacing, Date.now())) {
+      adBusy = true;
+      gameAudio.stop();
+      adPacing.lastAdAt = Date.now();
+      adPacing.runsSinceAd = 0;
+      await platform.ads.interstitial();
+      adBusy = false;
+    }
+    next();
+  };
+}
 function results(r) {
   mode = "end";
   holding = false;
@@ -82487,6 +82674,8 @@ function results(r) {
     // YouTube shows the best score; it matches the saved leaderboard best.
     platform?.sendScore(Math.max(0, ...settings.leaderboard.map((x) => x.score)));
     sessionRewarded = true;
+    adPacing.sessionRuns++;
+    adPacing.runsSinceAd++;
   }
   gameAudio.stop();
   $("#menu").hidden = false;
@@ -82564,12 +82753,36 @@ function results(r) {
         (newRecord ? L("✦ YENİ REKOR! ✦ · ") : L("EN İYİ SKOR · ")) +
         Math.max(previousBest, r.score).toLocaleString(NUMBERS) +
         "</p>" +
-        L('<div class="ad-placements"><button id="adContinue" disabled>Devam et (reklam)</button><button id="adDouble" disabled>Altını 2 katına çıkar (reklam)</button><small>Reklamlar bu sürümde kapalı.</small></div>'),
+        // Opt-in rewarded ad: YouTube only, and only when the run earned gold.
+        (rewardedAdsAvailable() && r.coins > 0
+          ? '<div class="ad-placements"><button id="adDouble">' +
+            L("▶ Reklam izle · altını 2 katına çıkar") +
+            " (+◈ " +
+            r.coins +
+            ")</button><small>" +
+            L("İsteğe bağlı. İstemezsen hemen devam edebilirsin.") +
+            "</small></div>"
+          : ""),
     );
-  // No placements are enabled until a real SDK and platform review are complete.
-  // One mock entry point is exported by profile.js for later SDK integration.
-  if (REWARDED_ADS_ENABLED)
-    console.warn(L("Reklam yerleri için platform entegrasyonu gerekli."));
+  const adDouble = $("#adDouble");
+  if (adDouble)
+    adDouble.onclick = async () => {
+      if (r.adDoubled || adBusy) return;
+      adBusy = true;
+      adDouble.disabled = true;
+      adDouble.textContent = L("Reklam yükleniyor…");
+      gameAudio.stop();
+      const res = await showRewardedAd(REWARD_IDS.doubleGold);
+      adBusy = false;
+      if (res.success && !r.adDoubled) {
+        r.adDoubled = true;
+        settings.coins += r.coins;
+        save();
+        adDouble.textContent = "◈ +" + r.coins + L(" altın eklendi");
+      } else {
+        adDouble.textContent = L("Reklam tamamlanmadı, ödül verilmedi.");
+      }
+    };
   const retryRow = $("#retry").parentNode;
   const resultHeading = $("#menu .result-card h1");
   if (retryRow && resultHeading?.parentNode)
@@ -82577,16 +82790,21 @@ function results(r) {
   const bestScore = $("#menu .best-score");
   if (bestScore && retryRow?.parentNode)
     retryRow.parentNode.insertBefore(bestScore, retryRow);
-  $("#retry").onclick = () =>
+  // The optional ad sits right under the main buttons, never in front of them.
+  const adRow = $("#menu .ad-placements");
+  if (adRow && retryRow?.parentNode)
+    retryRow.parentNode.insertBefore(adRow, retryRow.nextSibling);
+  $("#retry").onclick = afterInterstitial(() =>
     openMission(
       r.success && r.mission < 39 ? r.mission + 1 : r.mission,
       r.endless,
-    );
-  $("#back").onclick = () => {
+    ),
+  );
+  $("#back").onclick = afterInterstitial(() => {
     page = Math.floor(Math.min(39, settings.unlocked - 1) / 5);
     selected = Math.min(39, settings.unlocked - 1);
     showMenu();
-  };
+  });
   sound(r.success ? 650 : 120, 0.25);
 }
 let lastDamage = "";
@@ -82600,7 +82818,7 @@ function events() {
     if (e.type === "slide") sound(180);
     if (e.type === "fire") {
       sound(900, 0.05, "triangle");
-      arms[1].rotation.x = -1.3;
+      courier.fireAt = time;
       muzzleFlash.userData.until = time + 0.1;
     }
     if (e.type === "coin") {
@@ -82779,6 +82997,7 @@ function updateHud() {
     ? L("TAKİPÇİ ") + Math.max(0, Math.round(run.hunter)) + " m"
     : L("TAKİP YOK");
   $("#hunter").classList.toggle("danger", run.hunter < 30);
+  $("#hunter").classList.toggle("idle", !run.mission.pursuit);
   $("#objective").textContent = "★ " + westernText(objective(run.mission).text);
   $("#route").textContent = westernText(
     run.fork
@@ -83235,27 +83454,19 @@ function update(dt, simulate = true) {
     py = (run?.y || 0) + groundAt(run?.distance || 0),
     offset = run?.offset || 0;
   runner.position.set(px + offset, py, 3);
-  body.scale.y = T.MathUtils.damp(
-    body.scale.y,
-    run?.slide > 0 ? 0.43 : 1,
-    16,
-    dt,
-  );
-  body.rotation.z = T.MathUtils.damp(
-    body.rotation.z,
-    run ? (run.lane * 3.2 - run.x) * -0.06 : 0,
-    8,
-    dt,
-  );
-  let cycle = time * (mode === "play" ? run.speed * 0.8 : 4),
-    stride = mode === "play" ? 0.85 : 0.05;
-  legs[0].rotation.x = Math.sin(cycle) * stride;
-  legs[1].rotation.x = -legs[0].rotation.x;
-  arms[0].rotation.x = -legs[0].rotation.x * 0.7;
-  arms[1].rotation.x = T.MathUtils.damp(
-    arms[1].rotation.x,
-    holding ? -1.15 : legs[0].rotation.x * 0.6,
-    10,
+  V.animateCourier(
+    courier,
+    body,
+    {
+      mode,
+      time,
+      speed: run?.speed || 0,
+      y: run?.y || 0,
+      vy: run?.vy || 0,
+      slide: run?.slide || 0,
+      holding,
+      lean: run ? (run.lane * 3.2 - run.x) * -0.06 : 0,
+    },
     dt,
   );
   runner.visible =

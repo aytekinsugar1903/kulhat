@@ -1,9 +1,9 @@
 {
-  "initialBytes": 2310889,
+  "initialBytes": 2324167,
   "files": [
     {
       "file": "README.md",
-      "bytes": 6754
+      "bytes": 6583
     },
     {
       "file": "assets/THREE-LICENSE.txt",
@@ -19,19 +19,23 @@
     },
     {
       "file": "index.html",
-      "bytes": 42757
+      "bytes": 46388
     },
     {
       "file": "js/kulhat.bundle.js",
-      "bytes": 2247997
+      "bytes": 2256153
     },
     {
       "file": "js/platform.js",
-      "bytes": 4184
+      "bytes": 5210
+    },
+    {
+      "file": "manifest.webmanifest",
+      "bytes": 465
     },
     {
       "file": "source/RELEASE-README.md",
-      "bytes": 6754
+      "bytes": 6583
     },
     {
       "file": "source/dist/audio.js",
@@ -43,11 +47,11 @@
     },
     {
       "file": "source/dist/game.js",
-      "bytes": 107604
+      "bytes": 109275
     },
     {
       "file": "source/dist/i18n.js",
-      "bytes": 30355
+      "bytes": 30007
     },
     {
       "file": "source/dist/icon-192.png",
@@ -59,15 +63,15 @@
     },
     {
       "file": "source/dist/kulhat.html",
-      "bytes": 43091
+      "bytes": 46458
     },
     {
       "file": "source/dist/platform.js",
-      "bytes": 4184
+      "bytes": 5210
     },
     {
       "file": "source/dist/profile.js",
-      "bytes": 4503
+      "bytes": 5531
     },
     {
       "file": "source/dist/vendor/LICENSE-THREE.txt",
@@ -91,7 +95,7 @@
     },
     {
       "file": "source/scripts/export-kulhat.mjs",
-      "bytes": 7761
+      "bytes": 8897
     },
     {
       "file": "source/tests/audio.test.js",
@@ -111,7 +115,7 @@
     },
     {
       "file": "source/tests/profile.test.js",
-      "bytes": 3778
+      "bytes": 5445
     }
   ]
 }

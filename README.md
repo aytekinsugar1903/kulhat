@@ -13,6 +13,12 @@ python3 -m http.server 8080
 
 `index.html` dosyasını doğrudan açmak da çalışır, ancak bazı tarayıcılar yerel dosyada kaydı engeller.
 
+## Telefonda test
+
+- GitHub Pages açıkken oyun `https://aytekinsugar1903.github.io/kulhat/` adresinden açılır (Settings → Pages → Deploy from a branch → dal ve `/ (root)`).
+- Telefonda tarayıcı menüsünden **Ana ekrana ekle** seçilirse oyun adres çubuğu olmadan, tam ekran açılır (`manifest.webmanifest`, yalnızca web sürümünde).
+- Adresin sonuna `?debug` eklenirse sağ üstte FPS sayacı ve görüntü kalitesi düğmesi görünür. Hedef: orta seviye telefonda en az 30 FPS.
+
 ## Klasör yapısı
 
 - `index.html`, `js/`, `assets/`: derlenmiş, oynanabilir sürüm.
@@ -45,7 +51,12 @@ Web sürümünü güncellemek için `rebuilt/` içindeki `index.html`, `js/` ve 
 - En iyi puan `sendScore()` ile gönderilir ve kayıttaki en iyi puanla aynıdır.
 - Titreşim YouTube içinde kapalıdır, çünkü Playables kuralları titreşim için ayrı bir aç/kapa düğmesi ister.
 - Playables paketinde tarayıcı dili okunmaz (`navigator.language` derleme sırasında çıkarılır).
-- Reklamlar kapalıdır: `showRewardedAd()` yalnızca bir test fonksiyonudur ve `REWARDED_ADS_ENABLED = false`.
+- Reklamlar yalnızca YouTube içinde ve yalnızca YouTube'un kendi reklam API'siyle (`ytgame.ads`) gösterilir. Playables kuralları dış reklam ağlarını ve uygulama içi satın almayı yasaklar; oyunda ikisi de yoktur.
+  - **Ödüllü reklam:** Sonuç ekranında, koşuda altın toplandıysa "▶ Reklam izle · altını 2 katına çıkar" düğmesi çıkar. Tamamen isteğe bağlıdır, otomatik açılmaz, ilerlemeyi engellemez. Ödül yalnızca YouTube `requestRewardedAd` sonucunu `true` döndürürse ve sonuç başına bir kez verilir. Ödül kimliği: `kulhat-double-gold-1`.
+  - **Ara reklam:** Yalnızca sonuç ekranından sonraki ekrana geçerken istenir; oynanış sırasında asla. Oturumun ilk 3 koşusunda yoktur, sonra en fazla 3 koşuda ve 3 dakikada bir (`INTERSTITIAL_RULES`, `source/dist/profile.js`).
+  - Reklam isteği 60–120 saniye içinde yanıt vermezse oyun beklemeden devam eder. Reklam sırasında YouTube `onPause`/`onResume` ve ses ayarı mevcut kodla işlenir.
+  - Reklamlar açıksa Playables Geliştirici Portalı'nda para kazanma ayarlarının da yapılması gerekir. Ara ve ödüllü reklam portalda ayrı ayrı açılıp kapatılabilir.
+- YouTube dışındaki web sürümünde hiçbir reklam, reklam düğmesi veya ağ çağrısı yoktur.
 
 ## Dil
 

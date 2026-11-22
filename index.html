@@ -13,6 +13,10 @@
     />
     <title>KÜLHAT · Son Teslimat</title>
     <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="apple-touch-icon" href="./assets/icon-192.png" />
     <style>
       * {
@@ -1762,6 +1766,143 @@
         .bottomstats > div {
           padding: 6px 9px;
           font-size: 12px;
+        }
+      }
+
+      /* --- 2026-11 release polish: clean HUD, no dev labels, shorter menu --- */
+      #fps,
+      #quality {
+        display: none;
+      }
+      body.debug #fps {
+        display: inline;
+      }
+      body.debug #quality {
+        display: inline-block;
+      }
+      .hint.retired,
+      #hunter.idle {
+        display: none !important;
+      }
+      .launch-row {
+        position: sticky;
+        bottom: -1px;
+        z-index: 2;
+        margin-bottom: 0;
+        padding: 16px 0 8px;
+        background: linear-gradient(#0b192500, #0b1925 32%);
+      }
+      @media (max-width: 600px) and (orientation: portrait) {
+        /* Menu: get to the START button faster. */
+        .campaign h1 {
+          font-size: 40px;
+          line-height: 1.02;
+          margin: 10px 0 8px;
+          letter-spacing: -1.5px;
+        }
+        .campaign .intro,
+        .campaign .tip,
+        .campaign .quick-tools {
+          display: none;
+        }
+        .retention-grid {
+          margin: 8px 0 12px;
+        }
+        .retention-card {
+          min-height: 0;
+          padding: 9px 10px;
+        }
+        .launch-row button {
+          flex: 1 1 auto;
+        }
+        .launch-row #launch {
+          flex: 2 1 auto;
+          font-size: 15px;
+          min-height: 52px;
+        }
+        /* In-run HUD: compact top card, slim bottom row, road stays visible. */
+        .hud {
+          padding: max(10px, env(safe-area-inset-top)) 10px 8px;
+        }
+        .sub {
+          display: none;
+        }
+        .status {
+          padding: 6px 8px;
+          font-size: 13px;
+        }
+        .mission {
+          width: auto;
+          max-width: 58vw;
+          display: inline-block;
+          padding: 7px 10px;
+          margin-top: 6px;
+        }
+        .mission .label {
+          font-size: 10px;
+          letter-spacing: 0.5px;
+        }
+        .mission b {
+          font-size: 14px;
+          margin: 3px 0 5px;
+        }
+        .vitals {
+          margin-top: 5px;
+          font-size: 11px;
+          gap: 8px;
+        }
+        .route {
+          top: calc(max(10px, env(safe-area-inset-top)) + 58px);
+          right: 10px;
+          max-width: 38vw;
+          padding: 6px 8px;
+          font-size: 11px;
+        }
+        .fork-signs {
+          top: calc(max(10px, env(safe-area-inset-top)) + 150px);
+        }
+        .fork-signs > div {
+          padding: 5px 4px;
+        }
+        .fork-signs b {
+          font-size: 12px;
+        }
+        .fork-signs small {
+          font-size: 9.5px;
+          margin-top: 2px;
+        }
+        .callout:not(:empty) {
+          top: 24%;
+          font-size: 12px;
+          padding: 7px 11px;
+        }
+        .hint {
+          display: none;
+        }
+        .bottomstats {
+          left: 10px;
+          right: 10px;
+          bottom: max(12px, env(safe-area-inset-bottom));
+          align-items: center;
+        }
+        .bottomstats > div {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+          padding: 6px 10px;
+          font-size: 12px;
+          line-height: 1.2;
+        }
+        .bottomstats span {
+          margin-top: 0;
+        }
+        .bottomstats .right {
+          max-width: 62%;
+          white-space: nowrap;
+        }
+        #objective,
+        .bottomstats .right span:first-child {
+          display: none;
         }
       }
 </style>

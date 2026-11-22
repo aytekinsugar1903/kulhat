@@ -12,8 +12,10 @@ import {
   recordDaily,
   claimTask,
   selectCostume,
-  REWARDED_ADS_ENABLED,
+  REWARD_IDS,
+  rewardedAdsAvailable,
   showRewardedAd,
+  interstitialDue,
 } from "./profile.js";
 import { GameAudio } from "./audio.js";
 import * as V from "./visuals.js";
@@ -59,6 +61,8 @@ renderer.toneMapping = T.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
 renderer.outputColorSpace = T.SRGBColorSpace;
 view.append(renderer.domElement);
+// FPS counter and graphics toggle in the HUD are developer aids: shown only with ?debug.
+if (/[?&]debug\b/.test(location.search)) document.body.classList.add("debug");
 // Observe readbacks without issuing one. Captures a bounded, local-only trace
 // when the canvas is read by game/library code or an external integration.
 const renderAudit = {
@@ -313,7 +317,8 @@ const suit = mat("#174c5c", 0.5, 0.15).clone(),
   boot = mat("#253040");
 const courier = V.buildCourier(body, suit, armor, accent);
 const { arms, legs, weapon, head, torso } = courier;
-const muzzleFlash = glow("#ffce6c", 0.55, 1.27, -0.95, 1.7, body);
+// The flash rides on the revolver muzzle, which moves with the aiming arm.
+const muzzleFlash = glow("#ffce6c", 0, 0, 0, 1.7, courier.muzzle);
 muzzleFlash.visible = false;
 let shieldBubble = new T.Mesh(
   new T.SphereGeometry(1.5, 20, 16),
@@ -1798,6 +1803,8 @@ function openMission(id, endless = false) {
   );
   $("#hint").textContent =
     L("KAYDIR: KAÇ / ZIPLA / KAY · HEDEFE DOKUN VEYA BASILI TUT: ATEŞ");
+  // The control reminder is only useful on the first two stages.
+  $("#hint").classList.toggle("retired", id > 1);
   updateHud();
 }
 function showMenu() {
@@ -1950,7 +1957,7 @@ function showMenu() {
     (settings.freePlay
       ? L("SERBEST KEŞİF · 40 ETAP AÇIK")
       : L("TÜM ETAPLARI DENE · SERBEST KEŞİF")) +
-    '</button></div><div class="row"><button class="primary" id="launch" ' +
+    '</button></div><div class="row launch-row"><button class="primary" id="launch" ' +
     (selected >= settings.unlocked && !settings.freePlay ? "disabled" : "") +
     ">" +
     String(selected + 1).padStart(2, "0") +
@@ -2024,7 +2031,7 @@ function showMenu() {
     (muted ? L("KAPALI") : L("AÇIK")) +
     '</button><button id="display">' +
     (quality === "low" ? L("GÖRÜNTÜ: EKONOMİK") : L("GÖRÜNTÜ: YÜKSEK")) +
-    L('</button><button id="controls">NASIL OYNANIR?</button><button id="dailyHub">GÜNLÜK ÖDÜLLER</button><button id="costumeHub">KOSTÜMLER</button></div><div id="storage" class="storage">İlerleme bu tarayıcıda saklanır.</div><div class="build-label">Yayın adayı · Cihaz ve platform kontrolleri bekleniyor.</div></div>');
+    L('</button><button id="controls">NASIL OYNANIR?</button><button id="dailyHub">GÜNLÜK ÖDÜLLER</button><button id="costumeHub">KOSTÜMLER</button></div><div id="storage" class="storage">İlerleme bu tarayıcıda saklanır.</div></div>');
   const scorePanel =
     L('<aside class="scoreboard"><h2>PUAN TABLOSU · BU CİHAZ</h2><p>En iyi 10 koşun</p>') +
     (settings.leaderboard.length
@@ -2487,6 +2494,25 @@ function resultBreakdown(r) {
     "</p>"
   );
 }
+// Ad state lives only in memory for this session; nothing about ads is saved.
+const adPacing = { sessionRuns: 0, runsSinceAd: 0, lastAdAt: -Infinity };
+let adBusy = false;
+// Wraps a result-screen button: when pacing allows, YouTube shows an interstitial
+// on this screen change first; the game continues whether or not one was shown.
+function afterInterstitial(next) {
+  return async () => {
+    if (adBusy) return;
+    if (inPlayables && platform?.ads && interstitialDue(adPacing, Date.now())) {
+      adBusy = true;
+      gameAudio.stop();
+      adPacing.lastAdAt = Date.now();
+      adPacing.runsSinceAd = 0;
+      await platform.ads.interstitial();
+      adBusy = false;
+    }
+    next();
+  };
+}
 function results(r) {
   mode = "end";
   holding = false;
@@ -2515,6 +2541,8 @@ function results(r) {
     // YouTube shows the best score; it matches the saved leaderboard best.
     platform?.sendScore(Math.max(0, ...settings.leaderboard.map((x) => x.score)));
     sessionRewarded = true;
+    adPacing.sessionRuns++;
+    adPacing.runsSinceAd++;
   }
   gameAudio.stop();
   $("#menu").hidden = false;
@@ -2592,12 +2620,36 @@ function results(r) {
         (newRecord ? L("✦ YENİ REKOR! ✦ · ") : L("EN İYİ SKOR · ")) +
         Math.max(previousBest, r.score).toLocaleString(NUMBERS) +
         "</p>" +
-        L('<div class="ad-placements"><button id="adContinue" disabled>Devam et (reklam)</button><button id="adDouble" disabled>Altını 2 katına çıkar (reklam)</button><small>Reklamlar bu sürümde kapalı.</small></div>'),
+        // Opt-in rewarded ad: YouTube only, and only when the run earned gold.
+        (rewardedAdsAvailable() && r.coins > 0
+          ? '<div class="ad-placements"><button id="adDouble">' +
+            L("▶ Reklam izle · altını 2 katına çıkar") +
+            " (+◈ " +
+            r.coins +
+            ")</button><small>" +
+            L("İsteğe bağlı. İstemezsen hemen devam edebilirsin.") +
+            "</small></div>"
+          : ""),
     );
-  // No placements are enabled until a real SDK and platform review are complete.
-  // One mock entry point is exported by profile.js for later SDK integration.
-  if (REWARDED_ADS_ENABLED)
-    console.warn(L("Reklam yerleri için platform entegrasyonu gerekli."));
+  const adDouble = $("#adDouble");
+  if (adDouble)
+    adDouble.onclick = async () => {
+      if (r.adDoubled || adBusy) return;
+      adBusy = true;
+      adDouble.disabled = true;
+      adDouble.textContent = L("Reklam yükleniyor…");
+      gameAudio.stop();
+      const res = await showRewardedAd(REWARD_IDS.doubleGold);
+      adBusy = false;
+      if (res.success && !r.adDoubled) {
+        r.adDoubled = true;
+        settings.coins += r.coins;
+        save();
+        adDouble.textContent = "◈ +" + r.coins + L(" altın eklendi");
+      } else {
+        adDouble.textContent = L("Reklam tamamlanmadı, ödül verilmedi.");
+      }
+    };
   const retryRow = $("#retry").parentNode;
   const resultHeading = $("#menu .result-card h1");
   if (retryRow && resultHeading?.parentNode)
@@ -2605,16 +2657,21 @@ function results(r) {
   const bestScore = $("#menu .best-score");
   if (bestScore && retryRow?.parentNode)
     retryRow.parentNode.insertBefore(bestScore, retryRow);
-  $("#retry").onclick = () =>
+  // The optional ad sits right under the main buttons, never in front of them.
+  const adRow = $("#menu .ad-placements");
+  if (adRow && retryRow?.parentNode)
+    retryRow.parentNode.insertBefore(adRow, retryRow.nextSibling);
+  $("#retry").onclick = afterInterstitial(() =>
     openMission(
       r.success && r.mission < 39 ? r.mission + 1 : r.mission,
       r.endless,
-    );
-  $("#back").onclick = () => {
+    ),
+  );
+  $("#back").onclick = afterInterstitial(() => {
     page = Math.floor(Math.min(39, settings.unlocked - 1) / 5);
     selected = Math.min(39, settings.unlocked - 1);
     showMenu();
-  };
+  });
   sound(r.success ? 650 : 120, 0.25);
 }
 let lastDamage = "";
@@ -2628,7 +2685,7 @@ function events() {
     if (e.type === "slide") sound(180);
     if (e.type === "fire") {
       sound(900, 0.05, "triangle");
-      arms[1].rotation.x = -1.3;
+      courier.fireAt = time;
       muzzleFlash.userData.until = time + 0.1;
     }
     if (e.type === "coin") {
@@ -2807,6 +2864,7 @@ function updateHud() {
     ? L("TAKİPÇİ ") + Math.max(0, Math.round(run.hunter)) + " m"
     : L("TAKİP YOK");
   $("#hunter").classList.toggle("danger", run.hunter < 30);
+  $("#hunter").classList.toggle("idle", !run.mission.pursuit);
   $("#objective").textContent = "★ " + westernText(objective(run.mission).text);
   $("#route").textContent = westernText(
     run.fork
@@ -3263,27 +3321,19 @@ function update(dt, simulate = true) {
     py = (run?.y || 0) + groundAt(run?.distance || 0),
     offset = run?.offset || 0;
   runner.position.set(px + offset, py, 3);
-  body.scale.y = T.MathUtils.damp(
-    body.scale.y,
-    run?.slide > 0 ? 0.43 : 1,
-    16,
-    dt,
-  );
-  body.rotation.z = T.MathUtils.damp(
-    body.rotation.z,
-    run ? (run.lane * 3.2 - run.x) * -0.06 : 0,
-    8,
-    dt,
-  );
-  let cycle = time * (mode === "play" ? run.speed * 0.8 : 4),
-    stride = mode === "play" ? 0.85 : 0.05;
-  legs[0].rotation.x = Math.sin(cycle) * stride;
-  legs[1].rotation.x = -legs[0].rotation.x;
-  arms[0].rotation.x = -legs[0].rotation.x * 0.7;
-  arms[1].rotation.x = T.MathUtils.damp(
-    arms[1].rotation.x,
-    holding ? -1.15 : legs[0].rotation.x * 0.6,
-    10,
+  V.animateCourier(
+    courier,
+    body,
+    {
+      mode,
+      time,
+      speed: run?.speed || 0,
+      y: run?.y || 0,
+      vy: run?.vy || 0,
+      slide: run?.slide || 0,
+      holding,
+      lean: run ? (run.lane * 3.2 - run.x) * -0.06 : 0,
+    },
     dt,
   );
   runner.visible =
