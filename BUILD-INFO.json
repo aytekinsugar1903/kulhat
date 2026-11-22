@@ -1,9 +1,9 @@
 {
-  "initialBytes": 2358896,
+  "initialBytes": 2359298,
   "files": [
     {
       "file": "README.md",
-      "bytes": 6583
+      "bytes": 7003
     },
     {
       "file": "assets/THREE-LICENSE.txt",
@@ -27,7 +27,7 @@
     },
     {
       "file": "js/platform.js",
-      "bytes": 5210
+      "bytes": 5612
     },
     {
       "file": "manifest.webmanifest",
@@ -35,7 +35,7 @@
     },
     {
       "file": "source/RELEASE-README.md",
-      "bytes": 6583
+      "bytes": 7003
     },
     {
       "file": "source/dist/audio.js",
@@ -67,7 +67,7 @@
     },
     {
       "file": "source/dist/platform.js",
-      "bytes": 5210
+      "bytes": 5612
     },
     {
       "file": "source/dist/profile.js",

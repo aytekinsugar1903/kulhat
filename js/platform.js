@@ -116,6 +116,18 @@
     if (note && platform.lang === "en") note.textContent = "The city is waking up…";
   }
   function startGame() {
+    // Single-file builds embed the game as a function instead of a separate file.
+    if (typeof window.KULHAT_BUNDLE === "function") {
+      try {
+        window.KULHAT_BUNDLE();
+      } catch (e) {
+        platform.logError();
+        const el = document.querySelector("#loading");
+        if (el) el.textContent = "Oyun yüklenemedi. Sayfayı yenile.";
+        throw e;
+      }
+      return;
+    }
     const s = document.createElement("script");
     s.src = "./js/kulhat.bundle.js";
     s.onerror = () => {
