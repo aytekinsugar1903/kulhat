@@ -80479,7 +80479,7 @@ class Run {
       extra = { cars: 1, kind: "box", ramp: false, ...extra };
     }
     if (type === "railcar") {
-      let cars = Math.max(1, Math.min(4, extra.cars || 2)),
+      let cars = Math.max(1, Math.min(8, extra.cars || 2)),
         kind = extra.kind === "flat" ? "flat" : "box";
       extra = {
         ...extra,
@@ -80594,19 +80594,33 @@ class Run {
       types.push(["barrier", free === 1 ? -1 : free + 1, 54]);
       if (m.threat >= 5) types.push(["saw", free, 88]);
     }
+    // Beside a parked train, never block both open lanes at once: keep one hazard.
+    let alongside = this.objects.find(
+      (o) => o.type === "railcar" && !o.dead && at + 60 >= o.at - RAILCAR.ramp && at - 10 <= o.at + o.len,
+    );
+    if (alongside) types = types.filter(([, l]) => l !== alongside.lane).slice(0, 1);
     for (let [t, l, d] of types) this.add(t, l, at + d);
     // Parked trains from the second mission on: ride the roof for coins, or steer around.
     if (m.id >= 1 && this.route === "normal" && (m.train ? n % 3 === 1 : n % 5 === 3)) {
       let carLane = free,
         kind = n % 4 === 1 ? "flat" : "box",
-        ramp = kind === "box" && (m.id < 5 || n % 2 === 1),
-        cars = 2 + (n % 2),
+        // Most boxcars get a ramp so the roof is a real route; a few stay walls.
+        ramp = kind === "box" && (m.id < 5 || n % 4 !== 3),
+        rideable = ramp || kind === "flat",
+        // Rideable trains are long (4-6 cars, ~60-95 m: 2-3 s on the roof);
+        // wall trains stay short so steering around them is fair.
+        cars = rideable ? 4 + (n % 3) : 2,
         start = at + 20 + RAILCAR.ramp;
       let car = this.add("railcar", carLane, start, { cars, kind, ramp });
-      if (car && (ramp || kind === "flat"))
-        for (let k = 0; k < Math.floor(car.len / 5); k++)
-          this.add("coin", carLane, start + 3 + k * 5, { value: k % 6 === 5 ? 2 : 1 });
-      if (car && ramp && n % 2) this.add("gem", carLane, start + car.len - 4);
+      if (car && rideable) {
+        // Roof loot: a coin line, gems on the way, and a pickup on longer trains.
+        for (let k = 0; k < Math.floor((car.len - 4) / 4); k++)
+          this.add("coin", carLane, start + 3 + k * 4, { value: k % 5 === 4 ? 2 : 1 });
+        this.add("gem", carLane, start + car.len * 0.5 + 1);
+        this.add("gem", carLane, start + car.len - 3);
+        if (cars >= 5)
+          this.add(n % 2 ? "shield" : "power", carLane, start + car.len * 0.25 + 1);
+      }
       return types;
     }
     if (m.environment && n % 5 === 2) {
@@ -82583,11 +82597,56 @@ function pitTexture() {
 }
 // A parked train: boxcars (roof walkway, needs a ramp) or low flatcars (jump on).
 // Spans z = 0 … -len from the group origin; an optional ramp runs toward the player.
+// Boxcar siding drawn into a texture (boards, door frame, weathering) so each car
+// is a handful of meshes instead of dozens: trains are now 4–6 cars long.
+const railBodyMats = {};
+function railBodyMat(color) {
+  return (railBodyMats[color] ??= new T.MeshStandardMaterial({
+    color,
+    roughness: 0.88,
+    metalness: 0.02,
+    map: tex(
+      (c, w, h) => {
+        c.fillStyle = "#d8d0c4";
+        c.fillRect(0, 0, w, h);
+        // Vertical boards with dark seams and grain.
+        for (let x = 0; x < w; x += 16) {
+          const v = 200 + ((x * 37) % 40);
+          c.fillStyle = `rgb(${v},${v - 8},${v - 18})`;
+          c.fillRect(x, 0, 15, h);
+          c.fillStyle = "rgba(40,25,15,.55)";
+          c.fillRect(x + 15, 0, 1, h);
+          c.fillStyle = "rgba(60,40,25,.12)";
+          for (let k = 0; k < 4; k++) c.fillRect(x + 3 + k * 3, 0, 1, h);
+        }
+        // Sliding door: frame, cross brace and rail.
+        const dx = w * 0.4,
+          dw = w * 0.2;
+        c.strokeStyle = "rgba(35,22,14,.8)";
+        c.lineWidth = 5;
+        c.strokeRect(dx, h * 0.12, dw, h * 0.82);
+        c.beginPath();
+        c.moveTo(dx, h * 0.94);
+        c.lineTo(dx + dw, h * 0.12);
+        c.stroke();
+        c.fillStyle = "rgba(35,22,14,.8)";
+        c.fillRect(dx - 10, h * 0.06, dw + 20, 5);
+        // Top and bottom trim, rust and dust.
+        c.fillRect(0, 0, w, 6);
+        c.fillRect(0, h - 6, w, 6);
+        c.fillStyle = "rgba(120,70,35,.25)";
+        for (let k = 0; k < 18; k++) c.fillRect((k * 97) % w, h * 0.7 + ((k * 13) % 20), 6 + (k % 5) * 3, 4);
+      },
+      512,
+      128,
+    ),
+  }));
+}
 function buildRailcar(o, g) {
   const western = settings.landscape === "western",
     flat = o.kind === "flat",
     h = o.h,
-    body = mat(western ? (o.id % 2 ? "#8b3b2b" : "#6f4a2e") : "#56606a", 0.85, 0.05),
+    body = railBodyMat(western ? (o.id % 2 ? "#a04a36" : "#8a5a38") : "#6c7680"),
     trim = mat("#3a2a1f", 0.8, 0.1),
     deck = mat("#a07a4c", 0.9, 0.05),
     iron = mat("#2c2a28", 0.55, 0.6),
@@ -82611,21 +82670,19 @@ function buildRailcar(o, g) {
       }
     if (flat) {
       box(2.8, 0.22, RAILCAR.carLen - 0.2, deck, 0, h - 0.11, mid, g);
-      for (let k = 0; k < 5; k++)
-        for (let x of [-1.38, 1.38]) box(0.14, 0.7, 0.14, trim, x, h + 0.3, z0 - 1.5 - k * 3, g);
+      for (let k = 0; k < 3; k++)
+        for (let x of [-1.38, 1.38]) box(0.14, 0.7, 0.14, trim, x, h + 0.3, z0 - 2 - k * 5.5, g);
     } else {
       box(2.8, h - 0.95, RAILCAR.carLen - 0.3, body, 0, 0.85 + (h - 0.95) / 2, mid, g);
-      // Vertical battens along both sides and the facing end.
-      for (let k = 1; k < 7; k++)
-        for (let x of [-1.42, 1.42]) box(0.06, h - 1.05, 0.14, trim, x, 0.9 + (h - 1.05) / 2, z0 - k * 2.1, g);
-      box(1.2, h - 1.3, 0.08, trim, 0, 0.95 + (h - 1.3) / 2, z0 + 0.12, g);
       // Roof with a plank walkway on top: this is what the courier runs on.
       box(3.0, 0.14, RAILCAR.carLen, mat(western ? "#5b3d2b" : "#4a525a", 0.85, 0.05), 0, h - 0.07, mid, g);
       box(2.0, 0.06, RAILCAR.carLen - 0.2, deck, 0, h + 0.02, mid, g);
-      // End ladder and lamp on the facing end.
-      for (let x of [-1.15, -0.75]) box(0.06, h - 0.9, 0.06, iron, x, 0.85 + (h - 0.9) / 2, z0 + 0.2, g);
-      for (let k = 0; k < 4; k++) box(0.46, 0.05, 0.06, iron, -0.95, 1.1 + k * 0.38, z0 + 0.2, g);
-      if (c === 0) orb(0.13, mat("#ffe2a0", 0.2, 0.1, "#d99a3a"), 0.95, h - 0.45, z0 + 0.22, g);
+      // End ladder and lamp on the leading car only.
+      if (c === 0) {
+        for (let x of [-1.15, -0.75]) box(0.06, h - 0.9, 0.06, iron, x, 0.85 + (h - 0.9) / 2, z0 + 0.2, g);
+        for (let k = 0; k < 4; k++) box(0.46, 0.05, 0.06, iron, -0.95, 1.1 + k * 0.38, z0 + 0.2, g);
+        orb(0.13, mat("#ffe2a0", 0.2, 0.1, "#d99a3a"), 0.95, h - 0.45, z0 + 0.22, g);
+      }
     }
     box(0.5, 0.18, 0.3, brass, 0, 0.75, z0 + 0.1, g);
     // Coupling plate so the roof path looks continuous between cars.

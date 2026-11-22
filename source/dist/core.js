@@ -794,7 +794,7 @@ export class Run {
       extra = { cars: 1, kind: "box", ramp: false, ...extra };
     }
     if (type === "railcar") {
-      let cars = Math.max(1, Math.min(4, extra.cars || 2)),
+      let cars = Math.max(1, Math.min(8, extra.cars || 2)),
         kind = extra.kind === "flat" ? "flat" : "box";
       extra = {
         ...extra,
@@ -909,19 +909,33 @@ export class Run {
       types.push(["barrier", free === 1 ? -1 : free + 1, 54]);
       if (m.threat >= 5) types.push(["saw", free, 88]);
     }
+    // Beside a parked train, never block both open lanes at once: keep one hazard.
+    let alongside = this.objects.find(
+      (o) => o.type === "railcar" && !o.dead && at + 60 >= o.at - RAILCAR.ramp && at - 10 <= o.at + o.len,
+    );
+    if (alongside) types = types.filter(([, l]) => l !== alongside.lane).slice(0, 1);
     for (let [t, l, d] of types) this.add(t, l, at + d);
     // Parked trains from the second mission on: ride the roof for coins, or steer around.
     if (m.id >= 1 && this.route === "normal" && (m.train ? n % 3 === 1 : n % 5 === 3)) {
       let carLane = free,
         kind = n % 4 === 1 ? "flat" : "box",
-        ramp = kind === "box" && (m.id < 5 || n % 2 === 1),
-        cars = 2 + (n % 2),
+        // Most boxcars get a ramp so the roof is a real route; a few stay walls.
+        ramp = kind === "box" && (m.id < 5 || n % 4 !== 3),
+        rideable = ramp || kind === "flat",
+        // Rideable trains are long (4-6 cars, ~60-95 m: 2-3 s on the roof);
+        // wall trains stay short so steering around them is fair.
+        cars = rideable ? 4 + (n % 3) : 2,
         start = at + 20 + RAILCAR.ramp;
       let car = this.add("railcar", carLane, start, { cars, kind, ramp });
-      if (car && (ramp || kind === "flat"))
-        for (let k = 0; k < Math.floor(car.len / 5); k++)
-          this.add("coin", carLane, start + 3 + k * 5, { value: k % 6 === 5 ? 2 : 1 });
-      if (car && ramp && n % 2) this.add("gem", carLane, start + car.len - 4);
+      if (car && rideable) {
+        // Roof loot: a coin line, gems on the way, and a pickup on longer trains.
+        for (let k = 0; k < Math.floor((car.len - 4) / 4); k++)
+          this.add("coin", carLane, start + 3 + k * 4, { value: k % 5 === 4 ? 2 : 1 });
+        this.add("gem", carLane, start + car.len * 0.5 + 1);
+        this.add("gem", carLane, start + car.len - 3);
+        if (cars >= 5)
+          this.add(n % 2 ? "shield" : "power", carLane, start + car.len * 0.25 + 1);
+      }
       return types;
     }
     if (m.environment && n % 5 === 2) {
