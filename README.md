@@ -13,6 +13,12 @@ python3 -m http.server 8080
 
 `index.html` dosyasını doğrudan açmak da çalışır, ancak bazı tarayıcılar yerel dosyada kaydı engeller.
 
+## Telefonda test
+
+- GitHub Pages açıkken oyun `https://aytekinsugar1903.github.io/kulhat/` adresinden açılır (Settings → Pages → Deploy from a branch → dal ve `/ (root)`).
+- Telefonda tarayıcı menüsünden **Ana ekrana ekle** seçilirse oyun adres çubuğu olmadan, tam ekran açılır (`manifest.webmanifest`, yalnızca web sürümünde).
+- Adresin sonuna `?debug` eklenirse sağ üstte FPS sayacı ve görüntü kalitesi düğmesi görünür. Hedef: orta seviye telefonda en az 30 FPS.
+
 ## Klasör yapısı
 
 - `index.html`, `js/`, `assets/`: derlenmiş, oynanabilir sürüm.

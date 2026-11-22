@@ -1,5 +1,5 @@
 {
-  "initialBytes": 2323438,
+  "initialBytes": 2324167,
   "files": [
     {
       "file": "README.md",
@@ -19,7 +19,7 @@
     },
     {
       "file": "index.html",
-      "bytes": 46124
+      "bytes": 46388
     },
     {
       "file": "js/kulhat.bundle.js",
@@ -28,6 +28,10 @@
     {
       "file": "js/platform.js",
       "bytes": 5210
+    },
+    {
+      "file": "manifest.webmanifest",
+      "bytes": 465
     },
     {
       "file": "source/RELEASE-README.md",
@@ -91,7 +95,7 @@
     },
     {
       "file": "source/scripts/export-kulhat.mjs",
-      "bytes": 7761
+      "bytes": 8897
     },
     {
       "file": "source/tests/audio.test.js",
