@@ -77531,7 +77531,7 @@ const EN = {
  "</div></section><div class=\"tip\">Telefonda doğrudan kaydır. Hedefe dokunarak ateş et.<br>PC: WASD / oklar · Space ateş · Esc duraklat.<br>40 görev + 120 yıldız + kampanya sonrası sonsuz koşu.</div><div class=\"menu-settings\"><button id=\"sound\">SES ": "</div></section><div class=\"tip\">On phones, just swipe. Tap a target to fire.<br>PC: WASD / arrows · Space to fire · Esc to pause.<br>40 missions + 120 stars + an endless run after the campaign.</div><div class=\"menu-settings\"><button id=\"sound\">SOUND ",
  "KAPALI": "OFF",
  "AÇIK": "ON",
- "</button><button id=\"controls\">NASIL OYNANIR?</button><button id=\"dailyHub\">GÜNLÜK ÖDÜLLER</button><button id=\"costumeHub\">KOSTÜMLER</button></div><div id=\"storage\" class=\"storage\">İlerleme bu tarayıcıda saklanır.</div><div class=\"build-label\">Yayın adayı · Cihaz ve platform kontrolleri bekleniyor.</div></div>": "</button><button id=\"controls\">HOW TO PLAY</button><button id=\"dailyHub\">DAILY REWARDS</button><button id=\"costumeHub\">OUTFITS</button></div><div id=\"storage\" class=\"storage\">Progress is saved in this browser.</div><div class=\"build-label\">Release candidate · Device and platform checks pending.</div></div>",
+ "</button><button id=\"controls\">NASIL OYNANIR?</button><button id=\"dailyHub\">GÜNLÜK ÖDÜLLER</button><button id=\"costumeHub\">KOSTÜMLER</button></div><div id=\"storage\" class=\"storage\">İlerleme bu tarayıcıda saklanır.</div></div>": "</button><button id=\"controls\">HOW TO PLAY</button><button id=\"dailyHub\">DAILY REWARDS</button><button id=\"costumeHub\">OUTFITS</button></div><div id=\"storage\" class=\"storage\">Progress is saved in this browser.</div></div>",
  "<aside class=\"scoreboard\"><h2>PUAN TABLOSU · BU CİHAZ</h2><p>En iyi 10 koşun</p>": "<aside class=\"scoreboard\"><h2>LEADERBOARD · THIS DEVICE</h2><p>Your top 10 runs</p>",
  "<table style=\"width:100%;text-align:left\"><tr><th>#</th><th>Bölüm</th><th>Puan</th></tr>": "<table style=\"width:100%;text-align:left\"><tr><th>#</th><th>Stage</th><th>Score</th></tr>",
  "<p>İlk koşunu tamamlayınca puanın burada görünecek.</p>": "<p>Finish your first run and your score will show up here.</p>",
@@ -80031,6 +80031,8 @@ renderer.toneMapping = T.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
 renderer.outputColorSpace = T.SRGBColorSpace;
 view.append(renderer.domElement);
+// FPS counter and graphics toggle in the HUD are developer aids: shown only with ?debug.
+if (/[?&]debug\b/.test(location.search)) document.body.classList.add("debug");
 // Observe readbacks without issuing one. Captures a bounded, local-only trace
 // when the canvas is read by game/library code or an external integration.
 const renderAudit = {
@@ -81770,6 +81772,8 @@ function openMission(id, endless = false) {
   );
   $("#hint").textContent =
     L("KAYDIR: KAÇ / ZIPLA / KAY · HEDEFE DOKUN VEYA BASILI TUT: ATEŞ");
+  // The control reminder is only useful on the first two stages.
+  $("#hint").classList.toggle("retired", id > 1);
   updateHud();
 }
 function showMenu() {
@@ -81922,7 +81926,7 @@ function showMenu() {
     (settings.freePlay
       ? L("SERBEST KEŞİF · 40 ETAP AÇIK")
       : L("TÜM ETAPLARI DENE · SERBEST KEŞİF")) +
-    '</button></div><div class="row"><button class="primary" id="launch" ' +
+    '</button></div><div class="row launch-row"><button class="primary" id="launch" ' +
     (selected >= settings.unlocked && !settings.freePlay ? "disabled" : "") +
     ">" +
     String(selected + 1).padStart(2, "0") +
@@ -81996,7 +82000,7 @@ function showMenu() {
     (muted ? L("KAPALI") : L("AÇIK")) +
     '</button><button id="display">' +
     (quality === "low" ? L("GÖRÜNTÜ: EKONOMİK") : L("GÖRÜNTÜ: YÜKSEK")) +
-    L('</button><button id="controls">NASIL OYNANIR?</button><button id="dailyHub">GÜNLÜK ÖDÜLLER</button><button id="costumeHub">KOSTÜMLER</button></div><div id="storage" class="storage">İlerleme bu tarayıcıda saklanır.</div><div class="build-label">Yayın adayı · Cihaz ve platform kontrolleri bekleniyor.</div></div>');
+    L('</button><button id="controls">NASIL OYNANIR?</button><button id="dailyHub">GÜNLÜK ÖDÜLLER</button><button id="costumeHub">KOSTÜMLER</button></div><div id="storage" class="storage">İlerleme bu tarayıcıda saklanır.</div></div>');
   const scorePanel =
     L('<aside class="scoreboard"><h2>PUAN TABLOSU · BU CİHAZ</h2><p>En iyi 10 koşun</p>') +
     (settings.leaderboard.length
@@ -82779,6 +82783,7 @@ function updateHud() {
     ? L("TAKİPÇİ ") + Math.max(0, Math.round(run.hunter)) + " m"
     : L("TAKİP YOK");
   $("#hunter").classList.toggle("danger", run.hunter < 30);
+  $("#hunter").classList.toggle("idle", !run.mission.pursuit);
   $("#objective").textContent = "★ " + westernText(objective(run.mission).text);
   $("#route").textContent = westernText(
     run.fork
